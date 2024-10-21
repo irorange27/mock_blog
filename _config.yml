@@ -123,5 +123,5 @@ sitemap:
     - sitemap.xml
     - sitemap.txt
   rel: false
-  tags: true
-  categories: true
+  tags: false
+  categories: false
