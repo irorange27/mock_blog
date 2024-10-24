@@ -4,7 +4,7 @@
 
 # Site
 title: "niina's blog"
-subtitle: 'Nothing cannot do.'
+subtitle: 'Nothing cannot do. feedId:72011729111171072+userId:65796714107971584'
 description: "Niina's blog"
 keywords:
   - blog
@@ -125,3 +125,36 @@ sitemap:
   rel: false
   tags: false
   categories: false
+
+# hexo-renderer-markdown-it
+markdown:
+  render:
+    html: true
+  plugins: 
+    - "markdown-it-github-alerts"
+
+# # hexo-renderer-marked
+# marked:
+#   gfm: true
+#   pedantic: false
+#   breaks: true
+#   smartLists: true
+#   smartypants: true
+#   quotes: '“”‘’'
+#   modifyAnchors: 0
+#   anchorAlias: false
+#   autolink: true
+#   mangle: true
+#   sanitizeUrl: false
+#   dompurify: false
+#   headerIds: true
+#   lazyload: false
+#   figcaption: false
+#   prependRoot: true
+#   postAsset: false
+#   external_link:
+#     enable: false
+#     exclude: []
+#     nofollow: false
+#   disableNunjucks: false
+#   descriptionLists: true
