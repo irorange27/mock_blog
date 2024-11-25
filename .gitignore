@@ -1,5 +1,4 @@
-content/about.md
-content/**/*.md
+content/posts/**/*.md
 
 token
 
