@@ -60,6 +60,7 @@ const formatDate = (date) => {
 <style>
 /* 自定义 prose 样式 */
 .prose {
+  font-family: 'LXGWWenKai';
   --tw-prose-body: #374151;
   --tw-prose-headings: #111827;
   --tw-prose-links: #4264ad;

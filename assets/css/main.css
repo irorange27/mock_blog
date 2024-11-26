@@ -1,0 +1,13 @@
+@font-face {
+    font-family: 'LXGWWenKai';
+    src: url('~/assets/LXGWWenKai-Regular.ttf') format('truetype');
+
+    font-weight: normal;
+    font-style: normal;
+  }
+  
+  /* 设置全局默认字体
+  body {
+    font-family: 'LXGWWenKai';
+  } */
+  
