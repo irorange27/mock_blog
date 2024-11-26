@@ -1,5 +1,3 @@
-content/posts/**/*.md
-!content/posts/tutorial.md
 token
 
 # Nuxt dev/build outputs
