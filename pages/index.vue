@@ -3,15 +3,15 @@
   <!-- 文章列表 -->
   <div class="space-y-6">
     <article v-for="post in currentPosts" :key="post._path" 
-      class="bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition">
+      class="bg-white dark:bg-gray-800 dark:text-gray-100 rounded-lg shadow-md p-6 hover:shadow-lg transition">
       <div>
         <NuxtLink :to="post._path" class="block mb-4">
-          <h2 class="text-2xl font-bold mb-2 hover:text-blue-600">
+          <h2 class="text-2xl font-bold mb-2 hover:text-blue-600 dark:hover:text-blue-400">
             {{ post.title }}
           </h2>
         </NuxtLink>
         
-        <div class="flex flex-wrap items-center text-gray-500 text-sm mb-4">
+        <div class="flex flex-wrap items-center text-gray-500 dark:text-gray-400 text-sm mb-4">
           <span>{{ formatDate(post.date) }}</span>
           <span class="mx-2">·</span>
           <div class="flex flex-wrap gap-2">
@@ -19,14 +19,14 @@
               v-for="tag in post.tags" 
               :key="tag"
               :to="`/tags/${tag}`"
-              class="px-2 py-1 bg-gray-100 rounded-full hover:bg-gray-200"
+              class="px-2 py-1 bg-gray-100 dark:bg-gray-700 rounded-full hover:bg-gray-200 dark:hover:bg-gray-600"
             >
               {{ tag }}
             </NuxtLink>
           </div>
         </div>
 
-        <div class="text-gray-600 prose-sm line-clamp-3">
+        <div class="text-gray-600 dark:text-gray-400 prose-sm line-clamp-3">
           {{ post.description || post.excerpt }}
         </div>
       </div>

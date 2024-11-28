@@ -1,5 +1,5 @@
 <template>
-  <div :class="theme === 'dark' ? 'dark' : ''"  class="min-h-screen bg-gray-50 dark:bg-gray-900">
+  <div :class="theme === 'dark' ? 'dark' : ''" class="min-h-screen bg-gray-50 dark:bg-gray-900">
     <NavBar class="mx-auto max-w-7xl px-4 rounded-lg sm:px-6 lg:px-8 " />
     
     <main class="container mx-auto max-w-7xl px-4 py-8">
@@ -46,6 +46,7 @@
 </template> 
 
 <script setup>
-const { theme } = ref('light')
+
+const theme = useColorMode()
 
 </script>

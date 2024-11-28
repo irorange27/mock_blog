@@ -1,5 +1,5 @@
 <template>
-  <div class="bg-white p-6 rounded-lg shadow-md">
+  <div class="bg-white dark:bg-gray-800 p-8 rounded-lg shadow-md dark:text-gray-100">
     <h2 class="text-2xl font-bold mb-4 border-l-4 border-blue-200 pl-2">标签</h2>
     
     <!-- 标签列表 -->
@@ -11,8 +11,8 @@
         :class="[
           'px-3 py-1 rounded-lg transition',
           selectedTag === tag.name
-            ? 'bg-blue-100 text-blue-700'
-            : 'bg-gray-100 hover:bg-gray-200'
+            ? 'bg-blue-100 text-blue-700 dark:bg-blue-900 '
+            : 'bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600',
         ]"
       >
         {{ tag.name }}
@@ -20,7 +20,7 @@
       </button>
     </div>
 
-    <!-- 选中标签的文章列表 -->
+    <!-- 选中标签的文章列表
     <div v-if="selectedTag" class="space-y-3">
       <h3 class="font-semibold text-lg mb-2">
         {{ selectedTag }} 的文章
@@ -35,7 +35,7 @@
           </NuxtLink>
         </li>
       </ul>
-    </div>
+    </div> -->
   </div>
 </template>
 

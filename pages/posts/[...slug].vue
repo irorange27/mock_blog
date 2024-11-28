@@ -1,14 +1,14 @@
 <template>
-  <article class="bg-white rounded-lg shadow-md p-8">
+  <article class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-8">
     <!-- 文章头部信息 -->
     <header class="mb-8 pb-8 border-b">
-      <h1 class="text-3xl font-bold mb-4">{{ data?.title }}</h1>
-      <div class="flex items-center text-gray-500 text-sm">
+      <h1 class="text-3xl dark:text-gray-100 font-bold mb-4">{{ data?.title }}</h1>
+      <div class="flex items-center text-gray-500 dark:text-gray-100 dakr:bg-gray-700 text-sm">
         <span>{{ formatDate(data?.date) }}</span>
         <span class="mx-2">·</span>
         <NuxtLink 
           :to="`/categories/${data?.categories || '默认'}`"
-          class="hover:text-blue-600"
+          class="dark:hover:text-blue-400 hover:text-blue-600"
         >
           {{ data?.categories || '默认' }}
         </NuxtLink>
@@ -18,7 +18,7 @@
             v-for="tag in data?.tags" 
             :key="tag"
             :to="`/tags/${tag}`"
-            class="px-2 py-1 bg-gray-100 rounded-full hover:bg-gray-200"
+            class="px-2 py-1 bg-gray-100 dark:bg-gray-700 rounded-full hover:bg-gray-200 dark:hover:bg-gray-600"
           >
             {{ tag }}
           </NuxtLink>
@@ -27,7 +27,7 @@
     </header>
 
     <!-- 文章内容 -->
-    <div class="prose prose-lg max-w-none">
+    <div class="prose prose-lg max-w-none dark:text-gray-100">
       <ContentRenderer :value="data" />
     </div>
 
@@ -62,11 +62,12 @@ const formatDate = (date) => {
 .prose {
   font-family: 'LXGWWenKai';
   --tw-prose-body: #374151;
+
   --tw-prose-headings: #111827;
-  --tw-prose-links: #4264ad;
+  /* --tw-prose-links: #4264ad; */
   --tw-prose-code: #111827;
   --tw-prose-pre-code: #e5e7eb;
-  --tw-prose-pre-bg: #1f2937;
+  --tw-prose-pre-bg: #f7faff;
   --tw-prose-blockquote: #6b7280;
 }
 
