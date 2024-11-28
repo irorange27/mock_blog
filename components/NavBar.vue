@@ -19,16 +19,12 @@
           </NuxtLink>
           
         </div>
-        <button class="hidden md:flex focus:outline-none focus:bg-gray-100 dark:focus:bg-gray-700">
-          <ColorModeSwitch class="dark:text-gray-100 hover:text-gray-700 dark:hover:text-gray-300" />
-        </button>
+        <ColorModeSwitch class="hidden md:flex focus:outline-none focus:bg-gray-100 dark:focus:bg-gray-700 dark:text-gray-100 hover:text-gray-700 dark:hover:text-gray-300" />
+
         
          <!-- 手机端导航按钮 -->
         <button @click="toggleMobileMenu" class="flex items-center space-x-5 justify-y-center p-2 md:hidden">
-          <button class="bg-rounded-lg focus:outline-none focus:bg-gray-100 dark:focus:bg-gray-700">
-            <ColorModeSwitch class="w-5 h-5 dark:text-gray-100 hover:text-gray-700 dark:hover:text-gray-300" />
-          </button>
-          
+          <ColorModeSwitch class="hidden md:flex focus:outline-none focus:bg-gray-100 dark:focus:bg-gray-700 dark:text-gray-100 hover:text-gray-700 dark:hover:text-gray-300" />
           <svg class="w-5 h-5 text-gray-600 dark:text-gray-200" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
           </svg>
