@@ -2,8 +2,7 @@
 title: First Post
 date: 2024-11-25 00:00:00
 categories: 色伏集
-tags: 
-    - Default
+tags: [Default]
 description: 这是第一个帖子，你好！
 ---
 Hello, world!
