@@ -2,7 +2,13 @@
 export default defineNuxtConfig({
   compatibilityDate: '2024-11-01',
   devtools: { enabled: true },
-  modules: ['@nuxt/content', '@nuxtjs/tailwindcss', '@nuxt/icon', '@nuxt/test-utils/module'],
+  modules: [
+    '@nuxt/content',
+    '@nuxtjs/tailwindcss',
+    '@nuxt/icon',
+    '@nuxt/test-utils/module',
+    '@nuxtjs/color-mode',
+  ],
   // router: {
   //   extendRoutes(routes, resolve) {
   //     routes.push({
@@ -19,7 +25,10 @@ export default defineNuxtConfig({
         rehypePlugins: [],
     },
       highlight: {
-        theme: 'github-light',
+        theme: {
+          default: 'github-light',
+          dark: 'github-dark',  
+        },
         preload: ['js', 'ts', 'css', 'html', 'bash', 'vue']
     }
   },
