@@ -9,6 +9,7 @@ export const usePostData = () => {
   const normalizePost = (post: Post): Post => {
     const normalized: Post = {
       ...post,
+      _path: encodeURI(post._path),
       categories: post.categories || DEFAULT_CATEGORY,
       tags: Array.isArray(post.tags) ? post.tags : [],
       date: post.date || new Date().toISOString()
