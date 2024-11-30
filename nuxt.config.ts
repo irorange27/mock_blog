@@ -9,15 +9,13 @@ export default defineNuxtConfig({
     '@nuxt/test-utils/module',
     '@nuxtjs/color-mode',
   ],
-  // router: {
-  //   extendRoutes(routes, resolve) {
-  //     routes.push({
-  //       name: 'custom-404',
-  //       path: '*',
-  //       component: resolve(__dirname, 'pages/404.vue'),
-  //     })
-  //   }
-  // },
+  app: {
+    head: {
+      link: [
+        { rel: 'icon', type: 'image/x-icon', href: '/favicon.ico' }
+      ]
+    }
+  },
   content: {
     markdown: {
       toc: { depth: 3},
