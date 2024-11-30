@@ -16,6 +16,7 @@
     "@nuxtjs/tailwindcss": "^6.12.2",
     "@tailwindcss/typography": "^0.5.15",
     "nuxt": "^3.14.1592",
+    "nuxt-app": "file:",
     "nuxt-feed": "^0.0.2",
     "nuxt-icon": "^1.0.0-beta.7",
     "vue": "latest",
