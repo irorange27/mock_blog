@@ -1,5 +1,4 @@
 ---
-_path: 位置
 title: 价值、位置
 date: 2024-11-29 02:00:00
 categories: 色伏集
