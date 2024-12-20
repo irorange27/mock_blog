@@ -132,3 +132,7 @@ Oracle: Let LLMs self correct only when the answer is wrong
 - - Zero-shot, analogical reasoning, special decoding
 - Self-Consistency greatly improves step-by-step reasoning
 - Limitation: irrelevant context, self-correction, premise order
+
+## LLM Agents: Brief History and Overview
+
+
