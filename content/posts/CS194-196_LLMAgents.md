@@ -6,6 +6,8 @@ tags:
   - Agent
 description: UCB CS294/194-196 Large Language Model Agents 的课程笔记。
 ---
+> 鉴定为水课，尽量挑感兴趣的有用的部分看。
+
 最近工作内容涉猎了大模型的应用，想更深入的了解一些，便打算试试这门课。笔记更新进度对应学习进度。
 
 ## LLM Reasoning
@@ -132,7 +134,3 @@ Oracle: Let LLMs self correct only when the answer is wrong
 - - Zero-shot, analogical reasoning, special decoding
 - Self-Consistency greatly improves step-by-step reasoning
 - Limitation: irrelevant context, self-correction, premise order
-
-## LLM Agents: Brief History and Overview
-
-

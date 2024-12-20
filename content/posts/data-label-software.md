@@ -17,7 +17,7 @@ description: 对市面上目前的AI数据（自动）标注软件进行调研�
 
 > 当我们在浏览器上搜索某样东西时，其实我们是假定使用浏览器的某人遇到了同样（相似）的问题并且有了解决方案。类似的，当我们有了一个想法的时候，你需要审查一下世界上有没有其他人早已经提出了类似的想法。
 
-AI4S，这是很自然的想法，将AI用于数据标注，并且现实中已经存在实践。考虑到数据安全性问题以及我所能接触到的调研对象有限，下面仅列举无数据安全问题的开源项目。首先简单分类为领域特定的数据标注和通用类的数据标注。
+AI4S，这是很自然的想法，将AI用于数据标注，并且现实中已经存在实践。考虑到数据安全性问题以及我所能接触到的调研对象有限，下面仅列举无数据安全问题的开源项目。首先简单分类为领域特定的数据标注和通用类的数据标注。更详细的可以参见 [awesome-data-labeling](https://github.com/humansignal/awesome-data-labeling) 和 [Data_Label_Tools](https://github.com/mingx9527/Data_Label_Tools).
 
 领域特定：
 
@@ -27,6 +27,12 @@ AI4S，这是很自然的想法，将AI用于数据标注，并且现实中已�
 - - [X-AnyLabeling](https://github.com/CVHub520/X-AnyLabeling) GPL-3.0
 - - [label-img](https://github.com/HumanSignal/labelImg) MIT(且已经 Archive, 被并入 label-studio)
 
+- NLP:
+
+- - [data-labeling](https://github.com/risesoft-y9/Data-Labeling) GPL-3.0
+
 通用类：
 
 - [label-studio](https://github.com/HumanSignal/label-studio/) Apache-2.0
+
+按企业整理的话。国外有 [HumanSignal](https://humansignal.com/)。国内有[星尘](https://stardust.ai/) 、[有生](https://www.risesoft.net/)。HumanSignal 和 星尘是较早开始进入数据标注领域的。有生是今年才开始进入数据标注软件，并在 ToG 业务上有了进展。
