@@ -1,5 +1,5 @@
 <template>
-  <div class="bg-white p-6 rounded-lg shadow-md">
+  <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md">
     <h2 class="text-2xl font-bold mb-4">归档</h2>
     <div class="space-y-4">
       <div v-for="(posts, year) in archives" :key="year" class="space-y-2">
@@ -18,8 +18,6 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
-
 const archives = ref({})
 
 onMounted(async () => {
