@@ -9,6 +9,11 @@ export default defineNuxtConfig({
     '@nuxt/test-utils/module',
     '@nuxtjs/color-mode',
   ],
+  nitro: {
+    prerender: {
+      routes: ['/about'],
+    },
+  },
   app: {
     head: {
       link: [

@@ -37,7 +37,7 @@
 
   </article>
 
-      <!-- 文章目录 -->
+      <!-- 文章目录
       <nav v-if="headings.length" class="fixed top-24 right-8 w-64 hidden xl:block">
         <div class="bg-white p-4 rounded-lg shadow-md">
           <h2 class="text-lg font-bold mb-2">目录</h2>
@@ -59,7 +59,7 @@
             </li>
           </ul>
         </div>
-      </nav>
+      </nav> -->
 </template>
 
 <script setup>
