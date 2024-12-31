@@ -28,7 +28,7 @@
 
 
     <!-- 文章内容 -->
-    <div class="prose prose-lg max-w-none dark:text-gray-100">
+    <div class="prose prose-lg max-w-none dark:text-gray-100 dark:prose-invert">
       <ContentRenderer :value="data" />
     </div>
 
