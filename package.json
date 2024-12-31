@@ -15,10 +15,12 @@
     "@nuxtjs/color-mode": "^3.5.2",
     "@nuxtjs/tailwindcss": "^6.12.2",
     "@tailwindcss/typography": "^0.5.15",
+    "feed": "^4.2.2",
     "nuxt": "^3.15.0",
     "nuxt-app": "file:",
     "nuxt-feed": "^0.0.2",
     "nuxt-icon": "1.0.0-beta.7",
+    "rss": "^1.2.2",
     "vue": "latest",
     "vue-router": "latest"
   },

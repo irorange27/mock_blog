@@ -1,6 +1,6 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
-  compatibilityDate: '2024-11-01',
+  compatibilityDate: '2024-12-31',
   devtools: { enabled: true },
   modules: [
     '@nuxt/content',
@@ -11,7 +11,7 @@ export default defineNuxtConfig({
   ],
   nitro: {
     prerender: {
-      routes: ['/about'],
+      routes: ['/about', '/rss.xml'],
     },
   },
   app: {
