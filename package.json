@@ -15,24 +15,24 @@
     "@nuxtjs/color-mode": "^3.5.2",
     "@nuxtjs/tailwindcss": "^6.12.2",
     "@tailwindcss/typography": "^0.5.15",
-    "nuxt": "^3.14.1592",
+    "nuxt": "^3.15.0",
     "nuxt-app": "file:",
     "nuxt-feed": "^0.0.2",
-    "nuxt-icon": "^1.0.0-beta.7",
+    "nuxt-icon": "1.0.0-beta.7",
     "vue": "latest",
     "vue-router": "latest"
   },
   "devDependencies": {
     "@iconify-json/mdi": "^1.2.2",
-    "@nuxt/icon": "^1.8.2",
-    "@nuxt/test-utils": "^3.14.4",
+    "@nuxt/icon": "^1.10.3",
+    "@nuxt/test-utils": "^3.15.1",
     "@testing-library/vue": "^8.1.0",
     "@vue/test-utils": "^2.4.6",
     "@vue/vue3-jest": "^29.2.6",
-    "happy-dom": "^15.11.6",
+    "happy-dom": "^15.11.7",
     "jest": "^29.7.0",
-    "playwright-core": "^1.49.0",
+    "playwright-core": "^1.49.1",
     "ts-jest": "^29.2.5",
-    "vitest": "^2.1.5"
+    "vitest": "^2.1.8"
   }
 }
