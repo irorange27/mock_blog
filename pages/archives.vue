@@ -49,8 +49,10 @@ const groupedPosts = ref({})
 
 onMounted(async () => {
   posts.value = await getPosts()
-  console.log('Posts:', posts.value)
+  
+  // console.log('Posts:', posts.value)
   groupedPosts.value = groupPostsByYearAndMonth(posts.value)
+  // console.log('Grouped posts:', groupedPosts.value)
 })
 
 const formatDay = (date) => {
@@ -59,6 +61,11 @@ const formatDay = (date) => {
   })
 }
 
+/**
+ * Group posts by year and month
+ * @param {array} posts - list of posts
+ * @returns {object} - a map of year to a map of month to a list of posts
+ */
 const groupPostsByYearAndMonth = (posts) => {
   return posts.reduce((acc, post) => {
     const date = new Date(post.date)

@@ -1,14 +1,19 @@
+<script setup>
+
+const theme = useColorMode()
+
+</script>
+
 <template>
-  <div :class="theme === 'dark' ? 'dark' : ''" class="min-h-screen bg-gray-50 dark:bg-gray-900">
+  <div :class="theme === 'dark' ? 'dark' : 'light'" class="min-h-screen bg-gray-50 dark:bg-gray-900">
     <NavBar class="mx-auto max-w-7xl px-4 rounded-lg sm:px-6 lg:px-8 " />
-    
     <main class="container mx-auto max-w-7xl px-4 py-8">
       <!-- 主要内容区域 -->
       <div class="grid grid-cols-1 lg:grid-cols-4 gap-8">
         <!-- 大屏幕时的侧边栏 -->
         <aside class="hidden lg:block lg:col-span-1">
           <div class="space-y-8 sticky top-8">
-            <ProfileCard 
+            <ProfileCard
               avatar="/avatar.png"
               github="https://github.com/irorange27"
               name="Niina"
@@ -18,7 +23,6 @@
           </div>
         </aside>
 
-        
         <!-- 内容区域 -->
         <div class="lg:col-span-3">
           <slot />
@@ -49,10 +53,4 @@
       </div>
     </footer>
   </div>
-</template> 
-
-<script setup>
-
-const theme = useColorMode()
-
-</script>
+</template>

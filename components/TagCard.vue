@@ -40,6 +40,18 @@
 </template>
 
 <script setup>
+const posts = ref([])
+
+// 获取文章列表
+const { data } = await useAsyncData('posts-list', () => 
+  queryContent('posts')
+    .sort({ date: -1 }) // 按日期降序排序
+    .where({ _partial: false }) // 排除部分内容
+    .find()
+)
+
+posts.value = data.value
+
 const { getTags } = usePostData()
 
 const tags = ref([])
