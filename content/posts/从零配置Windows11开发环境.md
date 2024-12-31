@@ -1,12 +1,11 @@
 ---
 title: 从零配置 Windows11 开发环境
-categories: 技术
+categories: 他玉集
 mathjax: false
 date: 2023-09-05 10:00:52
 tags:
   - 软件环境
   - Windows
-  - 计算机
 description: 爽快的开发感从这里开始！
 ---
 Fork from: [汇尘轩 - 锦恢的博客 (kirigaya.cn)](https://kirigaya.cn/blog/article?seq=28)
