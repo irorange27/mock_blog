@@ -53,8 +53,8 @@
 
 <script setup>
 useSeoMeta({
-  title: 'Home',
-  description: 'Home page description'
+  title: "niina's blog homepage",
+  description: "niina's blog homepage。",
 })
 
 const currentPage = ref(1)
