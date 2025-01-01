@@ -41,8 +41,8 @@
         :class="[
           'px-4 py-2 rounded-lg',
           currentPage === page 
-            ? 'bg-blue-600 text-white' 
-            : 'bg-white text-gray-700 hover:bg-gray-100'
+            ? 'bg-blue-300 text-white dark:bg-blue-500' 
+            : 'bg-white text-gray-700 hover:bg-gray-100 dark:bg-gray-700 dark:text-gray-300 dark:hover:bg-gray-600',
         ]"
       >
         {{ page }}
