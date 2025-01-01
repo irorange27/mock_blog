@@ -53,7 +53,7 @@
 
 <script setup>
 useSeoMeta({
-  title: "niina's blog homepage",
+  title: "niina's blog",
   description: "niina's blog homepage。",
 })
 
