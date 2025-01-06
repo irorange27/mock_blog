@@ -49,7 +49,7 @@ const theme = useColorMode()
     </div>
     <footer class="bg-white dark:bg-gray-800 py-6 mt-12">
       <div class="container mx-auto px-4 text-center text-gray-600 dark:text-gray-300 mt-auto">
-        © 2024 Niina's Blog. All rights reserved.
+        &copy; 2024 - 2025 Niina's Blog. All rights reserved.
       </div>
     </footer>
   </div>
