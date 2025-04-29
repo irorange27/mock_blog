@@ -4,6 +4,8 @@ import type { Post } from '../types/post'
 export const usePostData = () => {
   const DEFAULT_CATEGORY = '默认'
   const posts = ref<Post[]>([])
+  const isLoading = ref(false)
+  const error = ref<Error | null>(null)
 
   // 处理文章数据，确保每篇文章都有分类和标签
   const normalizePost = (post: Post): Post => {
@@ -19,15 +21,30 @@ export const usePostData = () => {
   }
 
   // 获取所有文章
-  const getPosts = async () => {
+  const getPosts = async (forceRefresh = false) => {
     try {
+      isLoading.value = true
+      error.value = null
       console.log('Fetching posts...')
-      const { data } = await useAsyncData('posts-list', () => 
+      
+      // 使用更具体的缓存键，包含时间戳以确保直接访问时获取新数据
+      const cacheKey = forceRefresh ? 
+        `posts-list-${Date.now()}` : 
+        'posts-list'
+      
+      const { data } = await useAsyncData(cacheKey, () => 
         queryContent('posts')
         .sort({ date: -1 })
-        .find()
+        .find(),
+        {
+          // 确保在直接访问路由时能够获取到数据
+          server: true,
+          immediate: true,
+          default: () => []
+        }
       )
-      if (data.value) {
+      
+      if (data.value && data.value.length > 0) {
         posts.value = data.value.map(post => {
           const normalizedPost = normalizePost(post)
           if (!normalizedPost.date) {
@@ -37,13 +54,16 @@ export const usePostData = () => {
         })
         console.log('Fetched posts:', posts.value)
       } else {
-        console.warn('No posts found')
+        console.warn('No posts found or empty data array')
         posts.value = []
       }
       return posts.value
     } catch (error) {
       console.error('Error fetching posts:', error)
+      error.value = error instanceof Error ? error : new Error('Failed to fetch posts')
       return []
+    } finally {
+      isLoading.value = false
     }
   }
 
@@ -75,12 +95,20 @@ export const usePostData = () => {
       .sort((a, b) => b.count - a.count)
   }
 
+  // 刷新数据的方法，用于直接访问路由时
+  const refreshPosts = () => {
+    return getPosts(true)
+  }
+
   return {
     normalizePost,
     getPosts,
+    refreshPosts,
     getCategories,
     getTags,
     DEFAULT_CATEGORY,
-    posts // 公开 posts 以便在其他组件中使用
+    posts,
+    isLoading,
+    error
   }
 }
