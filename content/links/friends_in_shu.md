@@ -8,4 +8,8 @@ links:
     url: 'https://nazuki.ac.cn'
     avatar: 'https://flag.moe/source/p/saki.jpg'
     description: '赛博世界的探险者'
+  - name: 'Hutiger'
+    url: 'https://hutiger9.github.io'
+    avatar: 'https://avatars.githubusercontent.com/u/129509580'
+    description: '忧郁的小说家'
 ---
