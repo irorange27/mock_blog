@@ -1,6 +1,8 @@
 token
 .obsidian
 
+content/draft
+
 # Nuxt dev/build outputs
 .output
 .data
