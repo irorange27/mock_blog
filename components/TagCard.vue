@@ -25,7 +25,7 @@
         ]"
       >
         {{ tag.name }}
-        <span class="text-sm ml-1">({{ tag.count }})</span>
+        <span class="text-sm ml-1 text-gray-400">{{ tag.count }}</span>
       </NuxtLink>
     </div>
   </div>
