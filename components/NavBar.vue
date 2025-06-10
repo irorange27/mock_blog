@@ -50,6 +50,7 @@
 </template>
 
 <script setup>
+const { theme } = ref()
 const navItems = [
   { name: '首页', path: '/' },
   { name: '分类', path: '/categories' },
