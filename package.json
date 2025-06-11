@@ -3,6 +3,7 @@
   "private": true,
   "type": "module",
   "scripts": {
+    "new-post": "node scripts/new-post.js",
     "build": "nuxt build",
     "dev": "nuxt dev",
     "test": "vitest",
@@ -20,8 +21,6 @@
     "nuxt-app": "file:",
     "nuxt-feed": "^0.0.2",
     "nuxt-icon": "1.0.0-beta.7",
-    "remark-gfm": "^4.0.1",
-    "remark-github-admonitions-to-directives": "^2.1.0",
     "rss": "^1.2.2",
     "vercel": "^41.7.8",
     "vue": "latest",
