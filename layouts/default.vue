@@ -1,7 +1,5 @@
 <script setup>
-
 const theme = useColorMode()
-
 </script>
 
 <template>
@@ -10,9 +8,14 @@ const theme = useColorMode()
     <main class="container mx-auto max-w-7xl px-4 py-8">
       <!-- 主要内容区域 -->
       <div class="grid grid-cols-1 lg:grid-cols-4 gap-8">
-        <!-- 大屏幕时的侧边栏 -->
-        <aside class="hidden lg:block lg:col-span-1">
-          <div class="space-y-8 sticky top-8">
+        <!-- 内容区域 - 在小屏幕显示在上方 -->
+        <div class="order-1 col-span-1 lg:col-span-3 lg:order-2">
+          <slot />
+        </div>
+        
+        <!-- 侧边栏 - 在小屏幕显示在内容区域的下方 -->
+        <aside class="order-2 col-span-1 space-y-8 mb-8 lg:order-1">
+          <div class="space-y-8 lg:sticky lg:top-8">
             <ProfileCard
               avatar="/avatar.png"
               github="https://github.com/irorange27"
@@ -22,22 +25,6 @@ const theme = useColorMode()
             <TagCard />
           </div>
         </aside>
-
-        <!-- 内容区域 -->
-        <div class="lg:col-span-3">
-          <slot />
-        </div>
-
-        <!-- 小屏幕时的个人信息卡片 -->
-        <div class="block space-y-8 lg:hidden mb-8">
-            <ProfileCard 
-            avatar="/avatar.png"
-            github="https://github.com/irorange27"
-            name="Niina"
-            />
-            <CategoriesCard />
-            <TagCard />
-        </div>
       </div>
     </main>
 
