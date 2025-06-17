@@ -16,7 +16,7 @@ export const usePostData = () => {
       tags: Array.isArray(post.tags) ? post.tags : [],
       date: post.date || new Date().toISOString()
     }
-    console.log('Normalized post:', normalized)
+    // console.log('Normalized post:', normalized)
     return normalized
   }
 
@@ -25,7 +25,7 @@ export const usePostData = () => {
     try {
       isLoading.value = true
       error.value = null
-      console.log('Fetching posts...')
+      // console.log('Fetching posts...')
       
       // 使用更具体的缓存键，包含时间戳以确保直接访问时获取新数据
       const cacheKey = forceRefresh ? 
@@ -52,7 +52,7 @@ export const usePostData = () => {
           }
           return normalizedPost
         })
-        console.log('Fetched posts:', posts.value)
+        // console.log('Fetched posts:', posts.value)
       } else {
         console.warn('No posts found or empty data array')
         posts.value = []
