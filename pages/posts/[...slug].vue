@@ -149,6 +149,15 @@ const scrollToHeading = (id) => {
   text-decoration: none;
 }
 
+.prose a:hover {
+  text-decoration: underline;
+  color: #2563eb; /* Tailwind's blue-600 */
+}
+
+.prose a:visited {
+  color: #4f46e5; /* Tailwind's indigo-600 */
+}
+
 /* 代码块样式 */
 .prose pre {
   background-color: var(--tw-prose-pre-bg);
