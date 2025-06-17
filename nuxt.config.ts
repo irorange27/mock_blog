@@ -8,6 +8,7 @@ export default defineNuxtConfig({
     '@nuxt/icon',
     '@nuxt/test-utils/module',
     '@nuxtjs/color-mode',
+    'nuxt-toc',
   ],
   nitro: {
     prerender: {
@@ -22,17 +23,21 @@ export default defineNuxtConfig({
     }
   },
   content: {
-    markdown: {
-      toc: { depth: 3},
-        remarkPlugins: [],
-        rehypePlugins: [],
-    },
+      markdown: {
+        toc: { 
+          depth: 3,
+        },
+          remarkPlugins: [
+            'remark-gfm',
+          ],
+          rehypePlugins: [],
+      },
       highlight: {
         theme: {
           default: 'github-light',
           dark: 'github-dark',  
         },
-        preload: ['js', 'ts', 'css', 'html', 'bash', 'vue']
+        preload: ['js', 'ts', 'css', 'html', 'bash', 'vue', 'shell', 'mdc', 'md', 'yaml']
     }
   },
   // Tailwind 配置

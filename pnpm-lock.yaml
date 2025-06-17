@@ -35,6 +35,12 @@ importers:
       nuxt-icon:
         specifier: 1.0.0-beta.7
         version: 1.0.0-beta.7(magicast@0.3.5)(vite@6.3.5(@types/node@16.18.11)(jiti@2.4.2)(terser@5.42.0)(yaml@2.8.0))(vue@3.5.16(typescript@4.9.5))
+      nuxt-toc:
+        specifier: 2.7.2
+        version: 2.7.2(magicast@0.3.5)
+      remark-gfm:
+        specifier: ^4.0.1
+        version: 4.0.1
       rss:
         specifier: ^1.2.2
         version: 1.2.2
@@ -4496,6 +4502,9 @@ packages:
 
   nuxt-icon@1.0.0-beta.7:
     resolution: {integrity: sha512-HdEn1sZGmkIX44L5rZ8YUMdIdVCpeBXycO2DdrqZmFilixcHax0XYdehc1VD6Kl9Sxg8B7sKPMelmDXVTbDwIw==}
+
+  nuxt-toc@2.7.2:
+    resolution: {integrity: sha512-KfMeXO7E9zXNoP3s7cVhIVbBXdo4yKq0lcaE6p4n5e04zsc5ivaTUKjLDwaY1HJKT+BIQtFptE7eOxD7AgJSeg==}
 
   nuxt@3.17.5:
     resolution: {integrity: sha512-HWTWpM1/RDcCt9DlnzrPcNvUmGqc62IhlZJvr7COSfnJq2lKYiBKIIesEaOF+57Qjw7TfLPc1DQVBNtxfKBxEw==}
@@ -11972,6 +11981,7 @@ snapshots:
       nuxt: 3.17.5(@parcel/watcher@2.5.1)(@types/node@16.18.11)(db0@0.3.2)(ioredis@5.6.1)(magicast@0.3.5)(rollup@4.43.0)(terser@5.42.0)(typescript@4.9.5)(vite@6.3.5(@types/node@16.18.11)(jiti@2.4.2)(terser@5.42.0)(yaml@2.8.0))(yaml@2.8.0)
       nuxt-feed: 0.0.2
       nuxt-icon: 1.0.0-beta.7(magicast@0.3.5)(vite@6.3.5(@types/node@16.18.11)(jiti@2.4.2)(terser@5.42.0)(yaml@2.8.0))(vue@3.5.16(typescript@4.9.5))
+      remark-gfm: 4.0.1
       rss: 1.2.2
       vercel: 41.7.8(rollup@4.43.0)
       vue: 3.5.16(typescript@4.9.5)
@@ -12058,6 +12068,12 @@ snapshots:
       - supports-color
       - vite
       - vue
+
+  nuxt-toc@2.7.2(magicast@0.3.5):
+    dependencies:
+      '@nuxt/kit': 3.17.5(magicast@0.3.5)
+    transitivePeerDependencies:
+      - magicast
 
   nuxt@3.17.5(@parcel/watcher@2.5.1)(@types/node@16.18.11)(db0@0.3.2)(ioredis@5.6.1)(magicast@0.3.5)(rollup@4.43.0)(terser@5.42.0)(typescript@4.9.5)(vite@6.3.5(@types/node@16.18.11)(jiti@2.4.2)(terser@5.42.0)(yaml@2.8.0))(yaml@2.8.0):
     dependencies:

@@ -26,9 +26,9 @@
       </div>
     </header>
 
-
     <!-- 文章内容 -->
     <div class="prose prose-lg max-w-none dark:text-gray-100 dark:prose-invert">
+      <TableOfContents :toc="data.body.toc" :title="目录"/>
       <ContentRenderer :value="data" />
     </div>
 
@@ -159,27 +159,51 @@ const scrollToHeading = (id) => {
 }
 
 /* 代码块样式 */
-.prose pre {
+.light-mode .prose pre {
   background-color: var(--tw-prose-pre-bg);
   border-radius: 0.375rem;
   padding: 1rem;
   overflow-x: auto;
 }
 
+.dark-mode .prose pre {
+  background-color: oklch(0.2 0.04 250);
+  border-radius: 0.375rem;
+  padding: 1rem;
+  overflow-x: auto;
+  color: #e5e7eb; /* Tailwind's gray-200 */
+}
+
 /* 行内代码样式 */
-.prose code:not(pre code) {
+.light-mode .prose code:not(pre code) {
   background-color: #f3f4f6;
   padding: 0.2em 0.4em;
   border-radius: 0.25rem;
   font-size: 0.875em;
 }
 
+.dark-mode .prose code:not(pre code) {
+  background-color: #374151; /* Tailwind's gray-700 */
+  color: #f3f4f6; /* Tailwind's gray-200 */
+  padding: 0.2em 0.4em;
+  border-radius: 0.25rem;
+  font-size: 0.875em;
+}
+
 /* 引用块样式 */
-.prose blockquote {
+.light-mode .prose blockquote {
   border-left-width: 4px;
   border-left-color: #e5e7eb;
   padding-left: 1rem;
   font-style: italic;
+}
+
+.dark-mode .prose blockquote {
+  border-left-width: 4px;
+  border-left-color: #4b5563; /* Tailwind's gray-600 */
+  padding-left: 1rem;
+  font-style: italic;
+  color: #d1d5db; /* Tailwind's gray-300 */
 }
 
 /* 表格样式 */
