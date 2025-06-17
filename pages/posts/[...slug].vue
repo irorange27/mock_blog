@@ -28,7 +28,7 @@
 
     <!-- 文章内容 -->
     <div class="prose prose-lg max-w-none dark:text-gray-100 dark:prose-invert">
-      <TableOfContents :toc="data.body.toc" :title="目录"/>
+      <TableOfContents :toc="data.body.toc" :title="data.title"/><hr>
       <ContentRenderer :value="data" />
     </div>
 
@@ -73,7 +73,7 @@ const { data } = await useAsyncData(`content-${route.path}`, () => {
   return queryContent(route.path).findOne()
 })
 
-console.log(data?.value.body.children) // 检查文章内容
+// console.log(data?.value.body.children) // 检查文章内容
 
 const formatDate = (date) => {
   if (!date) return ''
@@ -84,36 +84,36 @@ const formatDate = (date) => {
   })
 }
 
-// Extract headings from content
-const headings = computed(() => {
-  const content = data.value?.body || {}
-  const matches = []
+// // Extract headings from content
+// const headings = computed(() => {
+//   const content = data.value?.body || {}
+//   const matches = []
 
-  const extractHeadings = (node) => {
-    if (node.type === 'element' && ['h1', 'h2', 'h3', 'h4', 'h5', 'h6'].includes(node.tag)) {
-      const text = node.props.id || node.children[0].value
-      const id = text.toLowerCase().replace(/\s+/g, '-')
-      matches.push({ level: node.tag, text, id})
-    }
-    if (node.children) {
-      node.children.forEach(extractHeadings)
-    }
-  }
-  if (content.children) {
-    content.children.forEach(extractHeadings)
-  }
+//   const extractHeadings = (node) => {
+//     if (node.type === 'element' && ['h1', 'h2', 'h3', 'h4', 'h5', 'h6'].includes(node.tag)) {
+//       const text = node.props.id || node.children[0].value
+//       const id = text.toLowerCase().replace(/\s+/g, '-')
+//       matches.push({ level: node.tag, text, id})
+//     }
+//     if (node.children) {
+//       node.children.forEach(extractHeadings)
+//     }
+//   }
+//   if (content.children) {
+//     content.children.forEach(extractHeadings)
+//   }
 
-  console.log('Matched:',matches) // 检查提取的标题
-  return matches
-})
+//   console.log('Matched:',matches) // 检查提取的标题
+//   return matches
+// })
 
-console.log('Headings:', headings) // 检查提取的标题
-const scrollToHeading = (id) => {
-  const element = document.getElementById(id)
-  if (element) {
-    element.scrollIntoView({ behavior: 'smooth' })
-  }
-}
+// console.log('Headings:', headings) // 检查提取的标题
+// const scrollToHeading = (id) => {
+//   const element = document.getElementById(id)
+//   if (element) {
+//     element.scrollIntoView({ behavior: 'smooth' })
+//   }
+// }
 </script>
 
 <style>
