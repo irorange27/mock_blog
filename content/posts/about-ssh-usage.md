@@ -60,7 +60,7 @@ Host example
 
 ## 端口转发（Port Transportings）
 
-SSH 配置 TCP 端口转发的格式为 [bind_address:]port:host:hostport，SSH 支持三种端口转发：
+SSH 配置 TCP 端口转发的格式为 \[bind_address:]port:host:hostport，SSH 支持三种端口转发：
 
 ### 动态端口转发（Dynamic port forwarding）
 
@@ -120,6 +120,8 @@ export http_proxy=socks5h://127.0.0.1:1220 https_proxy=socks5h://127.0.0.1:1220 
 ```bash
 ssh -J jumpuser1@jumphost1,jumpuser2@jumphost2,...,jumpuserN@jumphostN user@host
 ```
+
+登陆到 `—J` 指定的 `jumpuser1@jumphost1`，再从 `jumphost1` 登陆到 `jumpuser2@jumphost2`，以此类推来登陆到目标远程主机。在网络环境直接与目标主机隔离的时候有用，比如可以将 AWS 海外服务器作为跳板登陆其他海外的服务器。
 
 ## 连接复用
 
