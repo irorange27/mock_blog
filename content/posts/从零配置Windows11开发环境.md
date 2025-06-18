@@ -178,7 +178,7 @@ Set-PSReadlineKeyHandler -Key Tab -Function MenuComplete
 
 **以管理员身份**打开windows terminal
 
-```powershell
+```shell
 # 开启VM组件 开启后需要重启电脑
 Enable-WindowsOptionalFeature -Online -FeatureName VirtualMachinePlatform
 
