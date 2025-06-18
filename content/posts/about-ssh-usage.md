@@ -96,9 +96,19 @@ ssh -L 0.0.0.0:8000:localhost:8000 host -N
 
 让服务器使用本机的SSH密钥和网络环境。
 
+一行命令。
+
 ```shell
-ssh -A -D 1134 localhost -t ssh -A -R 1220:localhost:1134 remote-server
-export http_proxy=socks5://127.0.0.1:1220 https_proxy=socks5://127.0.0.1:1220 all_proxy=socks5://127.0.0.1:1220
+ssh -A -D 1134 localhost -t ssh -A -R 1220:localhost:1134 [user]@remote_server -t http_proxy=socks5h://127.0.0.1:1220 https_proxy=socks5h://127.0.0.1:1220 all_proxy=socks5h://127.0.0.1:1220 bash
+```
+
+这里使用了嵌套式的 SSH 命令连接远程主机。首先在本地使用动态端口转发启动一个 SOCKS 服务器，然后通过远程端口转发把本地 SOCKS 服务器端口转发到远程服务器，并且直接设置好代理的环境变量，这里设置了 SOCKS5H 协议，让远程服务器也使用本机的 DNS 解析。这样实现了让远程服务器使用本地的 SSH 密钥和网络环境的功能。
+
+其中 `-A` 开启 SSH Agent 转发，用于转发添加到 SSH Agent 的密钥到远程服务器，`-D 1134 localhost` 在本地开启一个端口在 `1134` 的服务器，`-t` 强制 tty 分配，用于命令执行。
+
+```shell
+ssh -A -D 1134 localhost -t ssh -A -R 1220:localhost:1134 [user]@remote-server
+export http_proxy=socks5h://127.0.0.1:1220 https_proxy=socks5h://127.0.0.1:1220 all_proxy=socks5h://127.0.0.1:1220
 ```
 
 可以使用 `ssh -v <URL>`，查看日志来观察是否远程服务器使用了本机的密钥。
