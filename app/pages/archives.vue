@@ -55,6 +55,11 @@
 </template>
 
 <script setup>
+useSeoMeta({
+  title: '归档 | Niina\'s Blog',
+  description: '所有文章按时间归档。',
+})
+
 const { posts, status, error, refresh } = useBlogData()
 
 const groupedPosts = computed(() => groupPostsByYearAndMonth(posts.value))

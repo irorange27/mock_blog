@@ -44,4 +44,9 @@ const route = useRoute()
 const { getPostsByTag } = useBlogData()
 
 const taggedPosts = computed(() => getPostsByTag(route.params.tag))
+
+useSeoMeta({
+  title: () => `${route.params.tag} | Niina's Blog`,
+  description: () => `标签「${route.params.tag}」下的所有文章。`,
+})
 </script>

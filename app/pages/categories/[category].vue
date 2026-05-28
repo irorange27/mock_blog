@@ -42,4 +42,9 @@ const route = useRoute()
 const { getPostsByCategory } = useBlogData()
 
 const filteredPosts = computed(() => getPostsByCategory(route.params.category))
+
+useSeoMeta({
+  title: () => `${route.params.category} | Niina's Blog`,
+  description: () => `分类「${route.params.category}」下的所有文章。`,
+})
 </script>

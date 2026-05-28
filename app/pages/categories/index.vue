@@ -33,5 +33,10 @@
 </template>
 
 <script setup>
+useSeoMeta({
+  title: '分类与标签 | Niina\'s Blog',
+  description: '所有文章分类和标签。',
+})
+
 const { categories, tags } = useBlogData()
 </script>

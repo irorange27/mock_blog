@@ -21,6 +21,11 @@
 </template>
 
 <script setup>
+useSeoMeta({
+  title: '友链 | Niina\'s Blog',
+  description: '友情链接列表。',
+})
+
 const { data: linksData, pending } = await useAsyncData('links', async () => {
   const allLinks = await queryContent('/links')
     .only(['links'])

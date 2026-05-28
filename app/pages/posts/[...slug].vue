@@ -38,6 +38,16 @@ const route = useRoute()
 const { data } = await useAsyncData(`content-${route.path}`, () => {
   return queryContent(route.path).findOne()
 })
+
+useSeoMeta({
+  title: () => data.value?.title ? `${data.value.title} | Niina's Blog` : "Niina's Blog",
+  description: () => data.value?.description || data.value?.title || '',
+  ogTitle: () => data.value?.title,
+  ogDescription: () => data.value?.description || data.value?.title || '',
+  ogType: 'article',
+  articlePublishedTime: () => data.value?.date,
+  articleTag: () => data.value?.tags || [],
+})
 </script>
 
 <style>

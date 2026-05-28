@@ -11,56 +11,69 @@
 ## Directory Structure
 
 ```
-pages/              # File-based routing
-  index.vue         # Home — paginated post list
-  posts/[...slug].vue  # Post detail with TOC
-  categories/       # Category list + filtered view
-  tags/[tag].vue    # Tag-filtered post list
-  archives.vue      # Year/month archive view
-  links/            # Friend links
-  about.vue         # About page
+app/                 # Application source (srcDir)
+├── app.vue          # (optional — not present, uses pages/ only)
+├── components/      # Auto-imported Vue components
+│   ├── NavBar.vue
+│   ├── ProfileCard.vue
+│   ├── CategoriesCard.vue
+│   ├── TagCard.vue
+│   ├── ColorModeSwitch.vue
+│   ├── FriendLinkItem.vue
+│   └── TableOfContents.vue
+├── composables/     # Auto-imported composables
+│   └── useBlogData.ts   # Single source of truth for all post data
+├── layouts/
+│   ├── default.vue   # Main layout with sidebar
+│   └── 404.vue       # Minimal layout for 404
+├── pages/           # File-based routing
+│   ├── index.vue
+│   ├── about.vue
+│   ├── archives.vue
+│   ├── posts/[...slug].vue
+│   ├── categories/index.vue
+│   ├── categories/[category].vue
+│   ├── tags/[tag].vue
+│   ├── links/index.vue
+│   └── [...404].vue
+├── types/
+│   └── post.ts      # Post TypeScript interface
+├── utils/
+│   └── blog.ts      # Pure functions: formatDate, groupPosts, stats
+└── assets/
+    └── css/main.css  # Font-face definitions
 
-components/         # Reusable Vue components
-  NavBar.vue        # Top navigation bar
-  ProfileCard.vue   # Sidebar profile with avatar + GitHub
-  CategoriesCard.vue # Sidebar categories
-  TagCard.vue       # Sidebar tags
-  ColorModeSwitch.vue # Dark/light toggle
-  FriendLinkItem.vue  # Single friend link card
-  TableOfContents.vue # Post TOC renderer
+content/             # Markdown source (Nuxt Content)
+├── posts/
+├── links/
+└── about.md
 
-composables/        # Shared composable functions
-  useBlogData.ts    # Singleton data layer (posts, categories, tags)
-  useErrorHandler.ts # Standardized error handling + retry
+server/              # Nitro server
+└── routes/rss.xml.ts
 
-utils/
-  blog.ts           # Pure functions: formatDate, groupPosts, stats
+public/              # Static assets
+├── avatar.png
+├── favicon.ico
+└── robots.txt
 
-types/
-  post.ts           # Post TypeScript interface
-
-content/            # Markdown source files
-  posts/            # Blog posts (frontmatter: title, date, categories, tags)
-  links/            # Friend link definitions
-  about.md          # About page content
-
-server/routes/
-  rss.xml.ts        # RSS feed endpoint
+tests/               # Test files (root-level)
+├── composables/useBlogData.test.ts
+└── utils/blog.test.ts
 ```
 
 ## Data Flow
 
 ```
-Components
-  └─ useBlogData()          ← singleton via useState
-       ├─ posts             ← shared reactive state
-       ├─ categories        ← computed from posts
-       ├─ tags              ← computed from posts
-       └─ fetchPosts()      ← calls queryContent('posts')
-            └─ Nuxt Content → markdown files
+Components (auto-imported from app/components/)
+  └─ useBlogData()              ← composable (auto-imported)
+       └─ useAsyncData()        ← Nuxt built-in: handles fetch, cache, SSR, status, error
+            └─ queryContent()   ← Nuxt Content: reads markdown files
+       ├─ posts     ← computed, normalized from raw data
+       ├─ categories ← computed, derived from posts
+       └─ tags       ← computed, derived from posts
 ```
 
-**Key invariant**: `useBlogData()` is called from many components (NavBar, sidebar, pages), but `useState` ensures a single shared state. Categories and tags are derived (computed) from posts, never fetched independently.
+**Key invariant**: `useBlogData()` wraps a single `useAsyncData` call. All data, loading state, and errors flow through Nuxt's built-in mechanisms. Categories and tags are derived (computed) from posts, never fetched independently. Multiple components calling `useBlogData()` share the same cached data via Nuxt's hydration.
 
 ## Frontmatter Schema
 
