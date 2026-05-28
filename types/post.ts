@@ -5,9 +5,18 @@ export interface Post {
   categories?: string
   tags?: string[]
   description?: string
-}
-
-interface CategoryCount {
-  name: string
-  count: number
+  content?: string
+  body?: {
+    toc?: Array<{
+      id: string
+      text: string
+      level: string
+      children?: Array<{
+        id: string
+        text: string
+        level: string
+        children?: any[]
+      }>
+    }>
+  }
 }

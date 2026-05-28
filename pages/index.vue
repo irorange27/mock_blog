@@ -1,6 +1,4 @@
 <template>
-
-  <!-- 文章列表 -->
   <div class="space-y-6">
     <article v-for="post in currentPosts" :key="post._path" 
       class="bg-white dark:bg-gray-800 dark:text-gray-100 rounded-lg shadow-md p-6 hover:shadow-lg transition">
@@ -27,12 +25,11 @@
         </div>
 
         <div class="text-gray-600 dark:text-gray-400 prose-sm line-clamp-3">
-          {{ post.description || post.excerpt }}
+          {{ post.description }}
         </div>
       </div>
     </article>
 
-    <!-- 分页 -->
     <div v-if="totalPages > 1" class="flex justify-center space-x-2 mt-8">
       <button 
         v-for="page in totalPages" 
@@ -52,6 +49,8 @@
 </template>
 
 <script setup>
+import { formatDate } from '~/utils/blog'
+
 useSeoMeta({
   title: "niina's blog",
   description: "niina's blog homepage。",
@@ -59,36 +58,16 @@ useSeoMeta({
 
 const currentPage = ref(1)
 const postsPerPage = 10
-const posts = ref([])
-const totalPages = ref(1)
 
-// 获取文章列表
-const { data } = await useAsyncData('posts-list', () => 
-  queryContent('posts')
-    .sort({ date: -1 }) // 按日期降序排序
-    .where({ _partial: false }) // 排除部分内容
-    .find()
-)
+const { posts, fetchPosts } = useBlogData()
+await fetchPosts()
 
-posts.value = data.value
-totalPages.value = Math.ceil(posts.value.length / postsPerPage)
+const totalPages = computed(() => Math.ceil(posts.value.length / postsPerPage))
 
-// 计算当前页面显示的文章
 const currentPosts = computed(() => {
   const start = (currentPage.value - 1) * postsPerPage
-  const end = start + postsPerPage
-  return posts.value.slice(start, end)
+  return posts.value.slice(start, start + postsPerPage)
 })
-
-// 格式化日期
-const formatDate = (date) => {
-  if (!date) return ''
-  return new Date(date).toLocaleDateString('zh-CN', {
-    year: 'numeric',
-    month: 'long',
-    day: 'numeric'
-  })
-}
 </script>
 
 <style scoped>

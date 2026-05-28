@@ -25,12 +25,12 @@
           <span class="mx-2">·</span>
           <div class="flex gap-2">
             <NuxtLink 
-              v-for="tag in post.tags" 
-              :key="tag"
-              :to="`/tags/${tag}`"
+              v-for="t in post.tags" 
+              :key="t"
+              :to="`/tags/${t}`"
               class="px-2 py-1 bg-gray-100 dark:bg-gray-700 rounded-full hover:bg-gray-200 dark:hover:bg-gray-600"
             >
-              {{ tag }}
+              {{ t }}
             </NuxtLink>
           </div>
         </div>
@@ -40,23 +40,12 @@
 </template>
 
 <script setup>
+import { formatDate } from '~/utils/blog'
+
 const route = useRoute()
-const { getPosts } = usePostData()
-const taggedPosts = ref([])
+const { fetchPosts, getPostsByTag } = useBlogData()
 
-onMounted(async () => {
-  const allPosts = await getPosts()
-  // Filter posts by the current tag
-  taggedPosts.value = allPosts.filter(post => 
-    post.tags && post.tags.includes(route.params.tag)
-  )
-})
+await fetchPosts()
 
-const formatDate = (date) => {
-  return new Date(date).toLocaleDateString('zh-CN', {
-    year: 'numeric',
-    month: 'long',
-    day: 'numeric'
-  })
-}
+const taggedPosts = computed(() => getPostsByTag(route.params.tag))
 </script>

@@ -27,10 +27,10 @@ export default defineNuxtConfig({
         toc: { 
           depth: 3,
         },
-          remarkPlugins: [
-            'remark-gfm',
-          ],
-          rehypePlugins: [],
+        remarkPlugins: [
+          'remark-gfm',
+        ],
+        rehypePlugins: [],
       },
       highlight: {
         theme: {

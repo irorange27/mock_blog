@@ -1,6 +1,5 @@
 <template>
   <div class="space-y-8">
-    <!-- 分类列表 -->
     <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-8">
       <h2 class="text-2xl font-bold mb-6 dark:text-gray-100">分类</h2>
       <div class="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
@@ -17,6 +16,7 @@
     </div>
 
     <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-8">
+      <h2 class="text-2xl font-bold mb-6 dark:text-gray-100">标签</h2>
       <div class="flex flex-wrap gap-3">
         <NuxtLink
           v-for="tag in tags"
@@ -33,13 +33,7 @@
 </template>
 
 <script setup>
-const { getCategories, getTags } = usePostData()
+const { categories, tags, fetchPosts } = useBlogData()
 
-const categories = ref([])
-const tags = ref([])
-
-onMounted(async () => {
-  categories.value = await getCategories()
-  tags.value = await getTags()
-})
-</script> 
+await fetchPosts()
+</script>

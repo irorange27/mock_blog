@@ -5,12 +5,12 @@
         分类: {{ route.params.category }}
       </h1>
       <p class="text-gray-600 dark:text-gray-400">
-        共 {{ categoryCount }} 篇文章
+        共 {{ filteredPosts.length }} 篇文章
       </p>
     </header>
 
     <div class="space-y-6">
-      <article v-for="post in posts" :key="post._path" 
+      <article v-for="post in filteredPosts" :key="post._path" 
         class="pb-6 border-b last:border-0">
         <NuxtLink :to="post._path">
           <h2 class="text-xl font-bold dark:text-gray-100 mb-2 hover:text-blue-600 dark:hover:text-blue-400">
@@ -38,26 +38,12 @@
 </template>
 
 <script setup>
+import { formatDate } from '~/utils/blog'
+
 const route = useRoute()
-const { getPosts, getCategories } = usePostData()
-const posts = ref([])
-const categoryCount = ref(0)
+const { posts, fetchPosts, getPostsByCategory } = useBlogData()
 
-onMounted(async () => {
-  const allPosts = await getPosts()
-  posts.value = allPosts.filter(post => post.categories === route.params.category)
-  const categories = await getCategories()
-  const category = categories.find(c => c.name === route.params.category)
-  categoryCount.value = category.count
-})
+await fetchPosts()
 
-
-
-const formatDate = (date) => {
-  return new Date(date).toLocaleDateString('zh-CN', {
-    year: 'numeric',
-    month: 'long',
-    day: 'numeric'
-  })
-}
-</script> 
+const filteredPosts = computed(() => getPostsByCategory(route.params.category))
+</script>
