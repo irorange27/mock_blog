@@ -33,7 +33,7 @@ const avatarError = ref(false)
         :href="link.url" 
         target="_blank" 
         rel="noopener noreferrer"
-        class="text-lg font-semibold text-gray-800 dark:text-gray-100 hover:text-blue-600 transition-colors"
+        class="text-lg font-semibold text-gray-800 dark:text-gray-100 hover:text-blue-500 transition-colors"
       >
         {{ link.name }}
       </a>

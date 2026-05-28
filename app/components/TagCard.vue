@@ -1,9 +1,13 @@
+<script setup lang="ts">
+const { tags, status, error, refresh } = useBlogData()
+</script>
+
 <template>
-  <div class="bg-white dark:bg-gray-800 p-8 rounded-lg shadow-md dark:text-gray-100">
-    <h2 class="text-2xl font-bold mb-4 border-l-4 border-blue-200 pl-2">标签</h2>
+  <div class="bg-white dark:bg-gray-800 p-8 rounded-lg dark:text-gray-100">
+    <h2 class="text-lg font-bold mb-4 border-l-4 border-blue-200 dark:border-blue-400 pl-2">标签</h2>
     
     <div v-if="status === 'pending'" class="flex justify-center items-center py-4">
-      <div class="animate-spin rounded-full h-6 w-6 border-t-2 border-b-2 border-blue-500"></div>
+      <div class="animate-spin rounded-full h-6 w-6 border-t-2 border-b-2 border-blue-400"></div>
     </div>
     
     <div v-else-if="error" class="text-red-500 py-4">
@@ -28,7 +32,3 @@
     </div>
   </div>
 </template>
-
-<script setup>
-const { tags, status, error, refresh } = useBlogData()
-</script>

@@ -50,7 +50,7 @@ const headings = computed<FlatHeading[]>(() => {
       >
         <a
           :href="`#${heading.id}`"
-          class="text-gray-600 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
+          class="text-gray-600 dark:text-gray-300 hover:text-blue-500 dark:hover:text-blue-400 transition-colors"
         >
           {{ heading.text }}
         </a>

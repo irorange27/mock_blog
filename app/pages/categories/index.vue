@@ -1,6 +1,15 @@
+<script setup lang="ts">
+useSeoMeta({
+  title: '分类与标签 | Niina\'s Blog',
+  description: '所有文章分类和标签。',
+})
+
+const { categories, tags } = useBlogData()
+</script>
+
 <template>
   <div class="space-y-8">
-    <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-8">
+    <div class="bg-white dark:bg-gray-800 rounded-lg p-8">
       <h2 class="text-2xl font-bold mb-6 dark:text-gray-100">分类</h2>
       <div class="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
         <NuxtLink
@@ -15,7 +24,7 @@
       </div>
     </div>
 
-    <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-8">
+    <div class="bg-white dark:bg-gray-800 rounded-lg p-8">
       <h2 class="text-2xl font-bold mb-6 dark:text-gray-100">标签</h2>
       <div class="flex flex-wrap gap-3">
         <NuxtLink
@@ -31,12 +40,3 @@
     </div>
   </div>
 </template>
-
-<script setup>
-useSeoMeta({
-  title: '分类与标签 | Niina\'s Blog',
-  description: '所有文章分类和标签。',
-})
-
-const { categories, tags } = useBlogData()
-</script>

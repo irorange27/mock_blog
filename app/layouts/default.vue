@@ -3,7 +3,7 @@ const currentYear = new Date().getFullYear()
 </script>
 
 <template>
-  <div class="min-h-screen bg-gray-50 dark:bg-gray-900">
+  <div class="min-h-screen bg-slate-100 dark:bg-slate-900">
     <NavBar class="mx-auto max-w-7xl px-4 rounded-lg sm:px-6 lg:px-8 " />
     <main class="container mx-auto max-w-7xl px-4 py-8">
       <div class="grid grid-cols-1 lg:grid-cols-4 gap-8">

@@ -11,9 +11,9 @@ useSeoMeta({
 </script>
 
 <template>
-  <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-8">
+  <div class="bg-white dark:bg-gray-800 rounded-lg p-8">
     <header class="mb-8">
-      <h1 class="text-3xl font-bold mb-2 dark:text-gray-100">
+      <h1 class="text-lg font-bold mb-2 dark:text-gray-100">
         标签: {{ route.params.tag }}
       </h1>
       <p class="text-gray-600 dark:text-gray-400">
@@ -23,9 +23,9 @@ useSeoMeta({
 
     <div class="space-y-6">
       <article v-for="post in taggedPosts" :key="post._path" 
-        class="pb-6 border-b last:border-0">
+        class="pb-6 border-b border-gray-200 dark:border-gray-700 last:border-0">
         <NuxtLink :to="post._path">
-          <h2 class="text-xl font-bold dark:text-gray-100 mb-2 hover:text-blue-600 dark:hover:text-blue-400">
+          <h2 class="text-lg font-bold dark:text-gray-100 mb-2 hover:text-blue-500 dark:hover:text-blue-400">
             {{ post.title }}
           </h2>
         </NuxtLink>
@@ -40,7 +40,7 @@ useSeoMeta({
               v-for="t in post.tags" 
               :key="t"
               :to="`/tags/${t}`"
-              class="px-2 py-1 bg-gray-100 dark:bg-gray-700 rounded-full hover:bg-gray-200 dark:hover:bg-gray-600"
+              class="px-2 py-1 bg-blue-50 dark:bg-blue-950 text-blue-600 dark:text-blue-300 rounded-full hover:bg-blue-100 dark:hover:bg-blue-900"
             >
               {{ t }}
             </NuxtLink>

@@ -18,12 +18,12 @@ const currentPosts = computed(() => {
 </script>
 
 <template>
-  <div class="space-y-6">
+  <div class="space-y-4">
     <article v-for="post in currentPosts" :key="post._path" 
-      class="bg-white dark:bg-gray-800 dark:text-gray-100 rounded-lg shadow-md p-6 hover:shadow-lg transition">
+      class="bg-white dark:bg-gray-800 dark:text-gray-100 rounded-lg p-6 hover:shadow-lg transition">
       <div>
         <NuxtLink :to="post._path" class="block mb-4">
-          <h2 class="text-2xl font-bold mb-2 hover:text-blue-600 dark:hover:text-blue-400">
+          <h2 class="text-lg font-bold mb-2 hover:text-blue-500 dark:hover:text-blue-400">
             {{ post.title }}
           </h2>
         </NuxtLink>
@@ -36,7 +36,7 @@ const currentPosts = computed(() => {
               v-for="tag in post.tags" 
               :key="tag"
               :to="`/tags/${tag}`"
-              class="px-2 py-1 bg-gray-100 dark:bg-gray-700 rounded-full hover:bg-gray-200 dark:hover:bg-gray-600"
+              class="px-2 py-1 bg-blue-50 dark:bg-blue-950 text-blue-600 dark:text-blue-300 rounded-full hover:bg-blue-100 dark:hover:bg-blue-900"
             >
               {{ tag }}
             </NuxtLink>
@@ -57,7 +57,7 @@ const currentPosts = computed(() => {
         :class="[
           'px-4 py-2 rounded-lg',
           currentPage === page 
-            ? 'bg-blue-300 text-white dark:bg-blue-500' 
+            ? 'bg-blue-400 text-white dark:bg-blue-400' 
             : 'bg-white text-gray-700 hover:bg-gray-100 dark:bg-gray-700 dark:text-gray-300 dark:hover:bg-gray-600',
         ]"
       >

@@ -1,3 +1,18 @@
+<script setup lang="ts">
+const navItems = [
+  { name: '首页', path: '/' },
+  { name: '分类', path: '/categories' },
+  { name: '归档', path: '/archives' },
+  { name: '友链', path: '/links' },
+  { name: '关于', path: '/about' }
+]
+
+const isMobileMenuOpen = ref(false)
+const toggleMobileMenu = () => {
+  isMobileMenuOpen.value = !isMobileMenuOpen.value
+}
+</script>
+
 <template>
   <nav class="bg-white dark:bg-gray-800 shadow-md sticky top-0 z-50">
     <div class="container mx-auto px-4">
@@ -12,8 +27,8 @@
             v-for="item in navItems" 
             :key="item.path"
             :to="item.path"
-            class="font-bold text-gray-600 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
-            active-class="text-blue-600 dark:text-blue-400"
+            class="font-bold text-gray-600 dark:text-gray-300 hover:text-blue-500 dark:hover:text-blue-400 transition-colors"
+            active-class="text-blue-500 dark:text-blue-400"
           >
             {{ item.name }}
           </NuxtLink>
@@ -38,8 +53,8 @@
         v-for="item in navItems" 
         :key="item.path"
         :to="item.path"
-        class="block font-bold px-4 py-3 text-gray-600 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
-        active-class="bg-gray-100 dark:bg-gray-700 text-blue-600 dark:text-blue-400"
+        class="block font-bold px-4 py-3 text-gray-600 dark:text-gray-300 hover:text-blue-500 dark:hover:text-blue-400 transition-colors"
+        active-class="bg-gray-100 dark:bg-gray-700 text-blue-500 dark:text-blue-400"
         @click="isMobileMenuOpen = false"
       >
         {{ item.name }}
@@ -47,18 +62,3 @@
     </div>
   </nav>
 </template>
-
-<script setup>
-const navItems = [
-  { name: '首页', path: '/' },
-  { name: '分类', path: '/categories' },
-  { name: '归档', path: '/archives' },
-  { name: '友链', path: '/links' },
-  { name: '关于', path: '/about' }
-]
-
-const isMobileMenuOpen = ref(false)
-const toggleMobileMenu = () => {
-  isMobileMenuOpen.value = !isMobileMenuOpen.value
-}
-</script>

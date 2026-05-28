@@ -7,7 +7,7 @@ defineProps<{
 </script>
 
 <template>
-  <div class="flex items-center justify-center p-6 bg-white dark:bg-gray-800 rounded-lg shadow-md">
+  <div class="flex items-center justify-center p-6 bg-white dark:bg-gray-800 rounded-lg">
     <div class="flex flex-col items-center space-y-4">
       <img 
         :src="avatar" 

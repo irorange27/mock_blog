@@ -1,6 +1,4 @@
 <script setup lang="ts">
-import type { Post } from '~/types/post'
-
 const route = useRoute()
 const { data } = await useAsyncData(`content-${route.path}`, () => {
   return queryContent(route.path).findOne()
@@ -18,15 +16,15 @@ useSeoMeta({
 </script>
 
 <template>
-  <article class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-8">
-    <header class="mb-8 pb-8 border-b">
-      <h1 class="text-3xl dark:text-gray-100 font-bold mb-4">{{ data?.title }}</h1>
-      <div class="flex items-center text-gray-500 dark:text-gray-100 dark:bg-gray-700 text-sm">
+  <article class="bg-white dark:bg-gray-800 rounded-lg p-8">
+    <header class="mb-8 pb-8 border-b border-gray-200 dark:border-gray-700">
+      <h1 class="text-lg dark:text-gray-100 font-bold mb-4">{{ data?.title }}</h1>
+      <div class="flex items-center text-gray-500 dark:text-gray-400 text-sm">
         <span>{{ formatDate(data?.date) }}</span>
         <span class="mx-2">·</span>
         <NuxtLink
           :to="`/categories/${data?.categories || '默认'}`"
-          class="dark:hover:text-blue-400 hover:text-blue-600"
+          class="dark:hover:text-blue-400 hover:text-blue-500"
         >
           {{ data?.categories || '默认' }}
         </NuxtLink>
@@ -36,7 +34,7 @@ useSeoMeta({
             v-for="tag in data?.tags"
             :key="tag"
             :to="`/tags/${tag}`"
-            class="px-2 py-1 bg-gray-100 dark:bg-gray-700 rounded-full hover:bg-gray-200 dark:hover:bg-gray-600"
+            class="px-2 py-1 bg-blue-50 dark:bg-blue-950 text-blue-600 dark:text-blue-300 rounded-full hover:bg-blue-100 dark:hover:bg-blue-900"
           >
             {{ tag }}
           </NuxtLink>
@@ -90,6 +88,18 @@ useSeoMeta({
   --tw-prose-pre-code: #e5e7eb;
   --tw-prose-pre-bg: oklch(0.2 0.04 250);
   --tw-prose-blockquote: #9ca3af;
+}
+
+.dark .prose a {
+  color: #60a5fa;
+}
+
+.dark .prose a:hover {
+  color: #93bbfd;
+}
+
+.dark .prose a:visited {
+  color: #818cf8;
 }
 
 .light .prose pre {
