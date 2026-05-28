@@ -1,6 +1,9 @@
 token
 .obsidian
 
+.agents/
+skills-lock.json
+
 content/draft
 
 # Nuxt dev/build outputs
