@@ -1,3 +1,15 @@
+<script setup lang="ts">
+const route = useRoute()
+const { getPostsByTag } = useBlogData()
+
+const taggedPosts = getPostsByTag(route.params.tag as string)
+
+useSeoMeta({
+  title: () => `${route.params.tag} | Niina's Blog`,
+  description: () => `标签「${route.params.tag}」下的所有文章。`,
+})
+</script>
+
 <template>
   <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-8">
     <header class="mb-8">
@@ -38,15 +50,3 @@
     </div>
   </div>
 </template>
-
-<script setup>
-const route = useRoute()
-const { getPostsByTag } = useBlogData()
-
-const taggedPosts = computed(() => getPostsByTag(route.params.tag))
-
-useSeoMeta({
-  title: () => `${route.params.tag} | Niina's Blog`,
-  description: () => `标签「${route.params.tag}」下的所有文章。`,
-})
-</script>

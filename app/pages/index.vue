@@ -1,3 +1,22 @@
+<script setup lang="ts">
+useSeoMeta({
+  title: "niina's blog",
+  description: "niina's blog homepage。",
+})
+
+const currentPage = ref(1)
+const postsPerPage = 10
+
+const { posts } = useBlogData()
+
+const totalPages = computed(() => Math.ceil(posts.value.length / postsPerPage))
+
+const currentPosts = computed(() => {
+  const start = (currentPage.value - 1) * postsPerPage
+  return posts.value.slice(start, start + postsPerPage)
+})
+</script>
+
 <template>
   <div class="space-y-6">
     <article v-for="post in currentPosts" :key="post._path" 
@@ -47,25 +66,6 @@
     </div>
   </div>
 </template>
-
-<script setup>
-useSeoMeta({
-  title: "niina's blog",
-  description: "niina's blog homepage。",
-})
-
-const currentPage = ref(1)
-const postsPerPage = 10
-
-const { posts } = useBlogData()
-
-const totalPages = computed(() => Math.ceil(posts.value.length / postsPerPage))
-
-const currentPosts = computed(() => {
-  const start = (currentPage.value - 1) * postsPerPage
-  return posts.value.slice(start, start + postsPerPage)
-})
-</script>
 
 <style scoped>
 .prose-sm {

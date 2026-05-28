@@ -7,16 +7,30 @@ export interface Post {
   description?: string
   content?: string
   body?: {
-    toc?: Array<{
-      id: string
-      text: string
-      level: string
-      children?: Array<{
-        id: string
-        text: string
-        level: string
-        children?: any[]
-      }>
-    }>
+    toc?: TableOfContentsItem[]
   }
+}
+
+export interface TableOfContentsItem {
+  id: string
+  text: string
+  level: string
+  children?: TableOfContentsItem[]
+}
+
+export interface FriendLink {
+  name: string
+  url: string
+  avatar: string
+  description: string
+}
+
+export interface CategoryCount {
+  name: string
+  count: number
+}
+
+export interface TagCount {
+  name: string
+  count: number
 }

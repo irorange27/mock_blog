@@ -1,3 +1,39 @@
+<script setup lang="ts">
+import type { TableOfContentsItem } from '~/types/post'
+
+const props = defineProps<{
+  toc?: TableOfContentsItem[]
+  title?: string
+}>()
+
+interface FlatHeading {
+  id: string
+  text: string
+  level: string
+}
+
+const headings = computed<FlatHeading[]>(() => {
+  if (!props.toc || !Array.isArray(props.toc)) return []
+
+  const flatten = (items: TableOfContentsItem[]): FlatHeading[] => {
+    const result: FlatHeading[] = []
+    for (const item of items) {
+      result.push({
+        id: item.id,
+        text: item.text,
+        level: item.level || item.tag
+      })
+      if (item.children?.length) {
+        result.push(...flatten(item.children))
+      }
+    }
+    return result
+  }
+
+  return flatten(props.toc)
+})
+</script>
+
 <template>
   <nav v-if="headings.length" class="mb-8 p-4 bg-gray-50 dark:bg-gray-700/50 rounded-lg border border-gray-200 dark:border-gray-600">
     <h2 class="text-lg font-bold mb-3 dark:text-gray-100">{{ title || '目录' }}</h2>
@@ -22,37 +58,3 @@
     </ul>
   </nav>
 </template>
-
-<script setup>
-const props = defineProps({
-  toc: {
-    type: Array,
-    default: () => []
-  },
-  title: {
-    type: String,
-    default: ''
-  }
-})
-
-const headings = computed(() => {
-  if (!props.toc || !Array.isArray(props.toc)) return []
-  
-  const flatten = (items) => {
-    const result = []
-    for (const item of items) {
-      result.push({
-        id: item.id,
-        text: item.text,
-        level: item.level || item.tag
-      })
-      if (item.children && item.children.length) {
-        result.push(...flatten(item.children))
-      }
-    }
-    return result
-  }
-  
-  return flatten(props.toc)
-})
-</script>

@@ -14,8 +14,10 @@ export default defineNuxtConfig({
     '@nuxt/icon',
     '@nuxt/test-utils/module',
     '@nuxtjs/color-mode',
-    'nuxt-toc',
   ],
+  icon: {
+    collections: ['mdi'],
+  },
   content: {
     sources: {
       content: {

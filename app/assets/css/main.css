@@ -1,13 +1,11 @@
 @font-face {
-    font-family: 'LXGWWenKai', 'Sans-serif';
-    src: url('~/assets/LXGWWenKai-Regular.ttf') format('truetype');
-
+    font-family: 'LXGWWenKai';
+    src: url('~/assets/LXGWWenKai-Regular.woff2') format('woff2');
     font-weight: normal;
     font-style: normal;
-  }
-  
-  /* 设置全局默认字体
-  body {
-    font-family: 'LXGWWenKai';
-  } */
-  
+    font-display: swap;
+}
+
+body {
+    font-family: 'LXGWWenKai', sans-serif;
+}

@@ -1,3 +1,22 @@
+<script setup lang="ts">
+import type { Post } from '~/types/post'
+
+const route = useRoute()
+const { data } = await useAsyncData(`content-${route.path}`, () => {
+  return queryContent(route.path).findOne()
+})
+
+useSeoMeta({
+  title: () => data.value?.title ? `${data.value.title} | Niina's Blog` : "Niina's Blog",
+  description: () => data.value?.description || data.value?.title || '',
+  ogTitle: () => data.value?.title,
+  ogDescription: () => data.value?.description || data.value?.title || '',
+  ogType: 'article',
+  articlePublishedTime: () => data.value?.date,
+  articleTag: () => data.value?.tags || [],
+})
+</script>
+
 <template>
   <article class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-8">
     <header class="mb-8 pb-8 border-b">
@@ -32,23 +51,6 @@
     </div>
   </article>
 </template>
-
-<script setup>
-const route = useRoute()
-const { data } = await useAsyncData(`content-${route.path}`, () => {
-  return queryContent(route.path).findOne()
-})
-
-useSeoMeta({
-  title: () => data.value?.title ? `${data.value.title} | Niina's Blog` : "Niina's Blog",
-  description: () => data.value?.description || data.value?.title || '',
-  ogTitle: () => data.value?.title,
-  ogDescription: () => data.value?.description || data.value?.title || '',
-  ogType: 'article',
-  articlePublishedTime: () => data.value?.date,
-  articleTag: () => data.value?.tags || [],
-})
-</script>
 
 <style>
 .prose {

@@ -1,13 +1,14 @@
-import type { Post } from '~/types/post'
+import type { Post, CategoryCount, TagCount } from '~/types/post'
+import type { QueryBuilderParams } from '@nuxt/content'
 
-const normalizePost = (post: any): Post => ({
-  ...post,
-  _path: post._path || '',
-  categories: post.categories || '默认',
-  tags: Array.isArray(post.tags) ? post.tags : [],
-  date: post.date || new Date().toISOString(),
-  title: post.title || 'Untitled',
-  description: post.description || ''
+const normalizePost = (post: Record<string, unknown>): Post => ({
+  _path: (post._path as string) || '',
+  categories: (post.categories as string) || '默认',
+  tags: Array.isArray(post.tags) ? (post.tags as string[]) : [],
+  date: (post.date as string) || new Date().toISOString(),
+  title: (post.title as string) || 'Untitled',
+  description: (post.description as string) || '',
+  body: post.body as Post['body'],
 })
 
 export function useBlogData() {
@@ -19,7 +20,7 @@ export function useBlogData() {
     (data.value || []).map(normalizePost)
   )
 
-  const categories = computed(() => {
+  const categories = computed<CategoryCount[]>(() => {
     const counts: Record<string, number> = {}
     for (const post of posts.value) {
       const cat = post.categories || '默认'
@@ -30,7 +31,7 @@ export function useBlogData() {
       .sort((a, b) => b.count - a.count)
   })
 
-  const tags = computed(() => {
+  const tags = computed<TagCount[]>(() => {
     const counts: Record<string, number> = {}
     for (const post of posts.value) {
       for (const tag of post.tags || []) {
@@ -43,10 +44,10 @@ export function useBlogData() {
   })
 
   const getPostsByCategory = (category: string) =>
-    posts.value.filter(post => post.categories === category)
+    computed(() => posts.value.filter(post => post.categories === category))
 
   const getPostsByTag = (tag: string) =>
-    posts.value.filter(post => post.tags?.includes(tag))
+    computed(() => posts.value.filter(post => post.tags?.includes(tag)))
 
   return {
     posts,

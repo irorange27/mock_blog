@@ -1,4 +1,4 @@
-<script setup>
+<script setup lang="ts">
 const currentYear = new Date().getFullYear()
 </script>
 
@@ -18,8 +18,8 @@ const currentYear = new Date().getFullYear()
               github="https://github.com/irorange27"
               name="Niina"
             />
-            <CategoriesCard />
-            <TagCard />
+            <LazyCategoriesCard />
+            <LazyTagCard />
           </div>
         </aside>
       </div>

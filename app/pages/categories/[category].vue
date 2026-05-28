@@ -1,3 +1,15 @@
+<script setup lang="ts">
+const route = useRoute()
+const { getPostsByCategory } = useBlogData()
+
+const filteredPosts = getPostsByCategory(route.params.category as string)
+
+useSeoMeta({
+  title: () => `${route.params.category} | Niina's Blog`,
+  description: () => `分类「${route.params.category}」下的所有文章。`,
+})
+</script>
+
 <template>
   <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-8">
     <header class="mb-8">
@@ -36,15 +48,3 @@
     </div>
   </div>
 </template>
-
-<script setup>
-const route = useRoute()
-const { getPostsByCategory } = useBlogData()
-
-const filteredPosts = computed(() => getPostsByCategory(route.params.category))
-
-useSeoMeta({
-  title: () => `${route.params.category} | Niina's Blog`,
-  description: () => `分类「${route.params.category}」下的所有文章。`,
-})
-</script>
