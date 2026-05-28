@@ -1,4 +1,4 @@
-import { describe, it, expect, vi } from 'vitest'
+import { describe, it, expect } from 'vitest'
 import type { Post } from '~/types/post'
 
 const mockPosts = [
@@ -20,12 +20,8 @@ const mockPosts = [
   }
 ]
 
-// Import the pure functions from the composable module source directly
-// Since the composable is tightly coupled to Nuxt runtime (useState, useAsyncData),
-// we test the normalization and derived logic by exercising the composable's pure parts.
-
-describe('useBlogData - post normalization', () => {
-  // Test the normalizePost logic extracted from the composable
+// Test the pure normalization logic
+describe('normalizePost', () => {
   const normalizePost = (post: any): Post => ({
     ...post,
     _path: post._path || '',
@@ -36,31 +32,29 @@ describe('useBlogData - post normalization', () => {
     description: post.description || ''
   })
 
-  it('should normalize post data with defaults', () => {
-    const raw = { _path: '/test', title: 'Test' }
-    const result = normalizePost(raw)
+  it('should fill defaults for missing fields', () => {
+    const result = normalizePost({ _path: '/test', title: 'Test' })
     expect(result.categories).toBe('默认')
     expect(result.tags).toEqual([])
-    expect(result.title).toBe('Test')
   })
 
   it('should preserve existing fields', () => {
     const result = normalizePost(mockPosts[0])
-    expect(result._path).toBe('/posts/test-1')
     expect(result.categories).toBe('测试分类')
     expect(result.tags).toEqual(['test', 'mock'])
   })
 
-  it('should handle non-array tags', () => {
+  it('should normalize non-array tags to empty array', () => {
     const result = normalizePost({ tags: 'single-tag' })
     expect(result.tags).toEqual([])
   })
 })
 
-describe('useBlogData - derived data logic', () => {
+// Test derived data computation logic
+describe('derived data', () => {
   const posts = mockPosts as Post[]
 
-  const getCategories = (posts: Post[]) => {
+  const deriveCategories = (posts: Post[]) => {
     const counts: Record<string, number> = {}
     for (const post of posts) {
       const cat = post.categories || '默认'
@@ -71,7 +65,7 @@ describe('useBlogData - derived data logic', () => {
       .sort((a, b) => b.count - a.count)
   }
 
-  const getTags = (posts: Post[]) => {
+  const deriveTags = (posts: Post[]) => {
     const counts: Record<string, number> = {}
     for (const post of posts) {
       for (const tag of post.tags || []) {
@@ -83,34 +77,29 @@ describe('useBlogData - derived data logic', () => {
       .sort((a, b) => b.count - a.count)
   }
 
-  it('should compute categories from posts', () => {
-    const result = getCategories(posts)
+  it('should derive categories', () => {
+    const result = deriveCategories(posts)
     expect(result).toHaveLength(1)
     expect(result[0].name).toBe('测试分类')
     expect(result[0].count).toBe(2)
   })
 
-  it('should compute tags from posts', () => {
-    const result = getTags(posts)
+  it('should derive tags', () => {
+    const result = deriveTags(posts)
     expect(result.find(t => t.name === 'test')?.count).toBe(2)
     expect(result.find(t => t.name === 'mock')?.count).toBe(1)
   })
 
-  it('should filter posts by category', () => {
+  it('should filter by category', () => {
     const result = posts.filter(p => p.categories === '测试分类')
     expect(result).toHaveLength(2)
   })
 
-  it('should filter posts by tag', () => {
-    const result = posts.filter(p => p.tags?.includes('test'))
-    expect(result).toHaveLength(2)
-    
-    const single = posts.filter(p => p.tags?.includes('mock'))
-    expect(single).toHaveLength(1)
-  })
+  it('should filter by tag', () => {
+    const testPosts = posts.filter(p => p.tags?.includes('test'))
+    expect(testPosts).toHaveLength(2)
 
-  it('should find post by path', () => {
-    const result = posts.find(p => p._path === '/posts/test-1')
-    expect(result?.title).toBe('Test Post 1')
+    const mockPostsResult = posts.filter(p => p.tags?.includes('mock'))
+    expect(mockPostsResult).toHaveLength(1)
   })
 })

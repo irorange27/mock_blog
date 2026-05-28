@@ -40,12 +40,8 @@
 </template>
 
 <script setup>
-import { formatDate } from '~/utils/blog'
-
 const route = useRoute()
-const { fetchPosts, getPostsByTag } = useBlogData()
-
-await fetchPosts()
+const { getPostsByTag } = useBlogData()
 
 const taggedPosts = computed(() => getPostsByTag(route.params.tag))
 </script>

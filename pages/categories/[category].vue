@@ -38,12 +38,8 @@
 </template>
 
 <script setup>
-import { formatDate } from '~/utils/blog'
-
 const route = useRoute()
-const { posts, fetchPosts, getPostsByCategory } = useBlogData()
-
-await fetchPosts()
+const { getPostsByCategory } = useBlogData()
 
 const filteredPosts = computed(() => getPostsByCategory(route.params.category))
 </script>

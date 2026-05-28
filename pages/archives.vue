@@ -2,13 +2,13 @@
   <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-8">
     <h1 class="text-3xl font-bold dark:text-gray-100 mb-8 border-b pb-4">归档</h1>
     
-    <div v-if="isLoading" class="flex justify-center items-center py-8">
+    <div v-if="status === 'pending'" class="flex justify-center items-center py-8">
       <div class="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-blue-500"></div>
     </div>
     
-    <div v-else-if="isError" class="text-red-500 text-center py-8">
-      <p>{{ errorMessage }}</p>
-      <button @click="retry" class="mt-2 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600">
+    <div v-else-if="error" class="text-red-500 text-center py-8">
+      <p>{{ error.message }}</p>
+      <button @click="refresh" class="mt-2 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600">
         重试
       </button>
     </div>
@@ -55,12 +55,7 @@
 </template>
 
 <script setup>
-import { formatDay, groupPostsByYearAndMonth } from '~/utils/blog'
-
-const { posts, isLoading, fetchPosts } = useBlogData()
-const { error, isError, errorMessage, retry } = useComponentError('归档加载失败')
-
-await fetchPosts()
+const { posts, status, error, refresh } = useBlogData()
 
 const groupedPosts = computed(() => groupPostsByYearAndMonth(posts.value))
 </script>

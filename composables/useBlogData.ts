@@ -1,21 +1,5 @@
 import type { Post } from '~/types/post'
 
-export interface BlogDataState {
-  posts: Post[]
-  isLoading: boolean
-  error: Error | null
-}
-
-export interface BlogDataActions {
-  fetchPosts: (forceRefresh?: boolean) => Promise<Post[]>
-  getPostByPath: (path: string) => Post | undefined
-  getPostsByCategory: (category: string) => Post[]
-  getPostsByTag: (tag: string) => Post[]
-  categories: ComputedRef<Array<{ name: string; count: number }>>
-  tags: ComputedRef<Array<{ name: string; count: number }>>
-  refreshData: () => Promise<Post[]>
-}
-
 const normalizePost = (post: any): Post => ({
   ...post,
   _path: post._path || '',
@@ -26,10 +10,14 @@ const normalizePost = (post: any): Post => ({
   description: post.description || ''
 })
 
-export const useBlogData = (): BlogDataState & BlogDataActions => {
-  const posts = useState<Post[]>('blog-posts', () => [])
-  const isLoading = useState<boolean>('blog-posts-loading', () => false)
-  const error = useState<Error | null>('blog-posts-error', () => null)
+export function useBlogData() {
+  const { data, status, error, refresh } = useAsyncData('blog-posts', () =>
+    queryContent('posts').sort({ date: -1 }).find()
+  )
+
+  const posts = computed(() =>
+    (data.value || []).map(normalizePost)
+  )
 
   const categories = computed(() => {
     const counts: Record<string, number> = {}
@@ -54,61 +42,20 @@ export const useBlogData = (): BlogDataState & BlogDataActions => {
       .sort((a, b) => b.count - a.count)
   })
 
-  const fetchPosts = async (forceRefresh = false): Promise<Post[]> => {
-    if (!forceRefresh && posts.value.length > 0) {
-      return posts.value
-    }
-
-    try {
-      isLoading.value = true
-      error.value = null
-
-      const cacheKey = forceRefresh ? `posts-${Date.now()}` : 'blog-posts-data'
-
-      const { data, error: asyncError } = await useAsyncData(cacheKey, () =>
-        queryContent('posts')
-          .sort({ date: -1 })
-          .find()
-      )
-
-      if (asyncError?.value) {
-        throw asyncError.value
-      }
-
-      posts.value = data.value && Array.isArray(data.value)
-        ? data.value.map(normalizePost)
-        : []
-
-      return posts.value
-    } catch (err) {
-      error.value = err instanceof Error ? err : new Error('Failed to fetch posts')
-      return []
-    } finally {
-      isLoading.value = false
-    }
-  }
-
-  const getPostByPath = (path: string): Post | undefined =>
-    posts.value.find(post => post._path === path)
-
-  const getPostsByCategory = (category: string): Post[] =>
+  const getPostsByCategory = (category: string) =>
     posts.value.filter(post => post.categories === category)
 
-  const getPostsByTag = (tag: string): Post[] =>
-    posts.value.filter(post => Array.isArray(post.tags) && post.tags.includes(tag))
-
-  const refreshData = (): Promise<Post[]> => fetchPosts(true)
+  const getPostsByTag = (tag: string) =>
+    posts.value.filter(post => post.tags?.includes(tag))
 
   return {
     posts,
-    isLoading,
+    status,
     error,
-    fetchPosts,
-    getPostByPath,
-    getPostsByCategory,
-    getPostsByTag,
+    refresh,
     categories,
     tags,
-    refreshData
+    getPostsByCategory,
+    getPostsByTag,
   }
 }

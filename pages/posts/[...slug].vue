@@ -34,8 +34,6 @@
 </template>
 
 <script setup>
-import { formatDate } from '~/utils/blog'
-
 const route = useRoute()
 const { data } = await useAsyncData(`content-${route.path}`, () => {
   return queryContent(route.path).findOne()

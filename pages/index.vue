@@ -49,8 +49,6 @@
 </template>
 
 <script setup>
-import { formatDate } from '~/utils/blog'
-
 useSeoMeta({
   title: "niina's blog",
   description: "niina's blog homepage。",
@@ -59,8 +57,7 @@ useSeoMeta({
 const currentPage = ref(1)
 const postsPerPage = 10
 
-const { posts, fetchPosts } = useBlogData()
-await fetchPosts()
+const { posts } = useBlogData()
 
 const totalPages = computed(() => Math.ceil(posts.value.length / postsPerPage))
 

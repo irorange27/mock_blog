@@ -33,7 +33,5 @@
 </template>
 
 <script setup>
-const { categories, tags, fetchPosts } = useBlogData()
-
-await fetchPosts()
+const { categories, tags } = useBlogData()
 </script>
