@@ -25,42 +25,42 @@ const goToPage = (page: number) => {
 </script>
 
 <template>
-  <div class="space-y-4">
+  <div class="space-y-5">
     <article v-for="post in currentPosts" :key="post._path" 
-      class="bg-white dark:bg-gray-800 dark:text-gray-100 rounded-lg p-6 border border-gray-100 dark:border-gray-700 hover:border-blue-200 dark:hover:border-blue-800 transition-all">
+      class="bg-white dark:bg-gray-800 dark:text-gray-100 rounded-xl p-7 border border-gray-200/60 dark:border-gray-700/60 hover:border-blue-200 dark:hover:border-blue-800 hover:-translate-y-0.5 transition-all duration-200">
       <div>
-        <NuxtLink :to="post._path" class="block mb-4">
-          <h2 class="text-xl font-bold mb-2 hover:text-blue-500 dark:hover:text-blue-400">
+        <NuxtLink :to="post._path" class="block mb-3">
+          <h2 class="text-xl font-bold mb-2 hover:text-blue-500 dark:hover:text-blue-400 transition-colors">
             {{ post.title }}
           </h2>
         </NuxtLink>
         
-        <div class="flex flex-wrap items-center text-gray-500 dark:text-gray-400 text-sm mb-4">
+        <div class="flex flex-wrap items-center text-gray-400 dark:text-gray-500 text-sm mb-3">
           <span>{{ formatDate(post.date) }}</span>
-          <span class="mx-2">·</span>
-          <div class="flex flex-wrap gap-2">
+          <span class="mx-1.5">·</span>
+          <div class="flex flex-wrap gap-1.5">
             <NuxtLink 
               v-for="tag in post.tags" 
               :key="tag"
               :to="`/tags/${tag}`"
-              class="px-2 py-1 bg-blue-50 dark:bg-blue-950 text-blue-600 dark:text-blue-300 rounded-full hover:bg-blue-100 dark:hover:bg-blue-900"
+              class="px-2.5 py-0.5 bg-blue-50 dark:bg-blue-950/60 text-blue-500 dark:text-blue-400 text-xs rounded-full hover:bg-blue-100 dark:hover:bg-blue-900 transition-colors"
             >
               {{ tag }}
             </NuxtLink>
           </div>
         </div>
 
-        <div class="text-gray-600 dark:text-gray-400 prose-sm line-clamp-3">
+        <p class="text-gray-500 dark:text-gray-400 text-sm leading-relaxed line-clamp-2">
           {{ post.description || post.title }}
-        </div>
+        </p>
       </div>
     </article>
 
-    <div v-if="totalPages > 1" class="flex justify-center items-center space-x-2 pt-4">
+    <div v-if="totalPages > 1" class="flex justify-center items-center gap-2 pt-6">
       <button 
         @click="goToPage(currentPage - 1)"
         :disabled="currentPage === 1"
-        class="px-3 py-2 rounded-lg text-sm font-medium transition-all disabled:opacity-40 disabled:cursor-not-allowed bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
+        class="px-3 py-1.5 rounded-lg text-sm transition-all disabled:opacity-30 disabled:cursor-not-allowed text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
       >
         ← 上一页
       </button>
@@ -70,17 +70,17 @@ const goToPage = (page: number) => {
           v-if="page === 1 || page === totalPages || Math.abs(page - currentPage) <= 1"
           @click="goToPage(page)"
           :class="[
-            'px-3 py-2 rounded-lg text-sm font-medium transition-all',
+            'w-8 h-8 rounded-lg text-sm transition-all',
             currentPage === page 
-              ? 'bg-blue-400 text-white dark:bg-blue-500' 
-              : 'bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700',
+              ? 'bg-blue-400 text-white' 
+              : 'text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800',
           ]"
         >
           {{ page }}
         </button>
         <span 
           v-else-if="Math.abs(page - currentPage) === 2" 
-          class="text-gray-400"
+          class="text-gray-300 dark:text-gray-600"
         >
           …
         </span>
@@ -89,17 +89,10 @@ const goToPage = (page: number) => {
       <button 
         @click="goToPage(currentPage + 1)"
         :disabled="currentPage === totalPages"
-        class="px-3 py-2 rounded-lg text-sm font-medium transition-all disabled:opacity-40 disabled:cursor-not-allowed bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
+        class="px-3 py-1.5 rounded-lg text-sm transition-all disabled:opacity-30 disabled:cursor-not-allowed text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
       >
         下一页 →
       </button>
     </div>
   </div>
 </template>
-
-<style scoped>
-.prose-sm {
-  font-size: 0.875rem;
-  line-height: 1.5;
-}
-</style>

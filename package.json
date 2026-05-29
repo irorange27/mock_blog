@@ -20,6 +20,7 @@
     "remark-gfm": "^4.0.1",
     "rss": "^1.2.2",
     "vue": "latest",
+    "vue-easy-lightbox": "^1.19.0",
     "vue-router": "latest"
   },
   "devDependencies": {

@@ -16,32 +16,31 @@ watch(() => route.path, () => {
 </script>
 
 <template>
-  <nav class="bg-white dark:bg-gray-800 shadow-md sticky top-0 z-50">
-    <div class="container mx-auto px-4">
-      <div class="flex items-center justify-between h-16">
-        <NuxtLink to="/" class="text-xl font-bold text-gray-800 dark:text-gray-100">
+  <nav class="sticky top-0 z-50 bg-slate-100/80 dark:bg-slate-900/80 backdrop-blur-md">
+    <div class="container mx-auto max-w-6xl px-4 sm:px-6">
+      <div class="flex items-center justify-between h-14">
+        <NuxtLink to="/" class="text-lg font-bold text-gray-800 dark:text-gray-100">
           Niina's Blog
         </NuxtLink>
         
         <!-- Desktop navigation -->
-        <div class="hidden md:flex items-center space-x-6">
+        <div class="hidden md:flex items-center space-x-5">
           <NuxtLink 
             v-for="item in navItems" 
             :key="item.path"
             :to="item.path"
-            class="font-bold text-gray-600 dark:text-gray-300 hover:text-blue-500 dark:hover:text-blue-400 transition-colors"
-            active-class="text-blue-500 dark:text-blue-400"
+            class="text-sm text-gray-400 dark:text-gray-500 hover:text-gray-800 dark:hover:text-gray-200 transition-colors"
           >
             {{ item.name }}
           </NuxtLink>
-          <ColorModeSwitch class="w-5 h-5 dark:text-gray-100" />
+          <ColorModeSwitch />
         </div>
 
         <!-- Mobile controls -->
         <div class="md:hidden flex items-center space-x-2">
-          <ColorModeSwitch class="w-5 h-5 dark:text-gray-100" />
-          <button @click="toggleMobileMenu" class="p-2">
-            <svg class="w-5 h-5 text-gray-600 dark:text-gray-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <ColorModeSwitch />
+          <button @click="toggleMobileMenu" class="p-2 text-gray-400">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
             </svg>
           </button>
@@ -50,13 +49,12 @@ watch(() => route.path, () => {
     </div>
 
     <!-- Mobile menu -->
-    <div v-if="isMobileMenuOpen" class="md:hidden bg-white dark:bg-gray-800 border-t dark:border-gray-700">
+    <div v-if="isMobileMenuOpen" class="md:hidden bg-white dark:bg-gray-800 border-t border-gray-200/60 dark:border-gray-700/60">
       <NuxtLink 
         v-for="item in navItems" 
         :key="item.path"
         :to="item.path"
-        class="block font-bold px-4 py-3 text-gray-600 dark:text-gray-300 hover:text-blue-500 dark:hover:text-blue-400 transition-colors"
-        active-class="bg-gray-100 dark:bg-gray-700 text-blue-500 dark:text-blue-400"
+        class="block px-4 py-3 text-sm text-gray-400 dark:text-gray-500 hover:text-gray-800 dark:hover:text-gray-200 transition-colors"
         @click="isMobileMenuOpen = false"
       >
         {{ item.name }}
