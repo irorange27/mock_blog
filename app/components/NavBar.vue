@@ -1,4 +1,5 @@
 <script setup lang="ts">
+const route = useRoute()
 const navItems = [
   { name: '首页', path: '/' },
   { name: '分类', path: '/categories' },
@@ -8,9 +9,10 @@ const navItems = [
 ]
 
 const isMobileMenuOpen = ref(false)
-const toggleMobileMenu = () => {
-  isMobileMenuOpen.value = !isMobileMenuOpen.value
-}
+
+watch(() => route.path, () => {
+  isMobileMenuOpen.value = false
+})
 </script>
 
 <template>

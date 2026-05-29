@@ -10,7 +10,7 @@ const groupedPosts = computed(() => groupPostsByYearAndMonth(posts.value))
 </script>
 
 <template>
-  <div class="bg-white dark:bg-gray-800 rounded-lg p-8">
+  <div class="bg-white dark:bg-gray-800 rounded-lg border border-gray-100 dark:border-gray-700 p-8">
     <h1 class="text-lg font-bold dark:text-gray-100 mb-8 border-b pb-4">归档</h1>
     
     <div v-if="status === 'pending'" class="flex justify-center items-center py-8">

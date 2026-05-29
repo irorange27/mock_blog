@@ -3,7 +3,7 @@ const { categories, status, error, refresh } = useBlogData()
 </script>
 
 <template>
-  <div class="bg-white dark:bg-gray-800 rounded-lg p-8">
+  <div class="bg-white dark:bg-gray-800 rounded-lg border border-gray-100 dark:border-gray-700 p-8">
     <h2 class="text-lg dark:text-gray-100 font-bold mb-4 border-l-4 border-blue-200 dark:border-blue-400 pl-2">分类</h2>
     
     <div v-if="status === 'pending'" class="flex justify-center items-center py-4">

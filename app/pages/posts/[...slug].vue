@@ -16,7 +16,7 @@ useSeoMeta({
 </script>
 
 <template>
-  <article class="bg-white dark:bg-gray-800 rounded-lg p-8">
+  <article class="bg-white dark:bg-gray-800 rounded-lg border border-gray-100 dark:border-gray-700 p-8">
     <header class="mb-8 pb-8 border-b border-gray-200 dark:border-gray-700">
       <h1 class="text-lg dark:text-gray-100 font-bold mb-4">{{ data?.title }}</h1>
       <div class="flex items-center text-gray-500 dark:text-gray-400 text-sm">

@@ -9,7 +9,7 @@ const { categories, tags } = useBlogData()
 
 <template>
   <div class="space-y-8">
-    <div class="bg-white dark:bg-gray-800 rounded-lg p-8">
+    <div class="bg-white dark:bg-gray-800 rounded-lg border border-gray-100 dark:border-gray-700 p-8">
       <h2 class="text-2xl font-bold mb-6 dark:text-gray-100">分类</h2>
       <div class="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
         <NuxtLink
@@ -24,7 +24,7 @@ const { categories, tags } = useBlogData()
       </div>
     </div>
 
-    <div class="bg-white dark:bg-gray-800 rounded-lg p-8">
+    <div class="bg-white dark:bg-gray-800 rounded-lg border border-gray-100 dark:border-gray-700 p-8">
       <h2 class="text-2xl font-bold mb-6 dark:text-gray-100">标签</h2>
       <div class="flex flex-wrap gap-3">
         <NuxtLink
