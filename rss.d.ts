@@ -11,6 +11,7 @@ declare module 'rss' {
     url: string
     date: string
     description?: string
+    custom_elements?: Record<string, unknown>[]
   }
 
   class RSS {
