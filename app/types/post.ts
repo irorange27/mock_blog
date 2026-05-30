@@ -14,7 +14,7 @@ export interface Post {
 export interface TableOfContentsItem {
   id: string
   text: string
-  level: string
+  depth: number
   children?: TableOfContentsItem[]
 }
 

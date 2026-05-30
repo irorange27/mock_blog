@@ -1,4 +1,18 @@
 import type { Post } from '~/types/post'
+/**
+ * 将原始文章数据规范化为 Post 类型
+ */
+export const normalizePost = (post: Record<string, unknown>): Post => ({
+  _path: (post._path as string) || '',
+  categories: (post.categories as string) || '默认',
+  tags: Array.isArray(post.tags) ? (post.tags as string[]) : [],
+  date: (post.date as string) || new Date().toISOString(),
+  title: (post.title as string) || 'Untitled',
+  description: (post.description as string) || '',
+  body: post.body as Post['body'],
+})
+
+
 
 /**
  * 格式化日期

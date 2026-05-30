@@ -10,6 +10,10 @@ const navItems = [
 
 const isMobileMenuOpen = ref(false)
 
+const toggleMobileMenu = () => {
+  isMobileMenuOpen.value = !isMobileMenuOpen.value
+}
+
 watch(() => route.path, () => {
   isMobileMenuOpen.value = false
 })

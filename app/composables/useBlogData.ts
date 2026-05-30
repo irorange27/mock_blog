@@ -1,15 +1,6 @@
-import type { Post, CategoryCount, TagCount } from '~/types/post'
+import type { CategoryCount, TagCount } from '~/types/post'
+import { normalizePost } from '~/utils/blog'
 import type { QueryBuilderParams } from '@nuxt/content'
-
-const normalizePost = (post: Record<string, unknown>): Post => ({
-  _path: (post._path as string) || '',
-  categories: (post.categories as string) || '默认',
-  tags: Array.isArray(post.tags) ? (post.tags as string[]) : [],
-  date: (post.date as string) || new Date().toISOString(),
-  title: (post.title as string) || 'Untitled',
-  description: (post.description as string) || '',
-  body: post.body as Post['body'],
-})
 
 export function useBlogData() {
   const { data, status, error, refresh } = useAsyncData('blog-posts', () =>

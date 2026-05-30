@@ -9,7 +9,7 @@ const props = defineProps<{
 interface FlatHeading {
   id: string
   text: string
-  level: string
+  depth: number
 }
 
 const headings = computed<FlatHeading[]>(() => {
@@ -21,7 +21,7 @@ const headings = computed<FlatHeading[]>(() => {
       result.push({
         id: item.id,
         text: item.text,
-        level: item.level || item.tag
+        depth: item.depth
       })
       if (item.children?.length) {
         result.push(...flatten(item.children))
@@ -43,9 +43,9 @@ const headings = computed<FlatHeading[]>(() => {
         :key="heading.id"
         :class="[
           'text-sm',
-          heading.level === 'h2' ? 'pl-2' : '',
-          heading.level === 'h3' ? 'pl-6' : '',
-          heading.level === 'h4' ? 'pl-10' : '',
+          heading.depth === 2 ? 'pl-2' : '',
+          heading.depth === 3 ? 'pl-6' : '',
+          heading.depth === 4 ? 'pl-10' : '',
         ]"
       >
         <a
