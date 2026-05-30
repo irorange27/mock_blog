@@ -2,11 +2,11 @@
 
 ## Stack
 
-- **Framework**: Nuxt 3 + Nuxt Content v2
+- **Framework**: Nuxt 4 + Nuxt Content v2
 - **Styling**: Tailwind CSS + @tailwindcss/typography
 - **Theme**: @nuxtjs/color-mode (dark/light)
 - **Testing**: Vitest + @nuxt/test-utils
-- **Deploy**: GitHub Pages (static generation via `nuxt generate`)
+- **Deploy**: Cloudflare Pages (static generation via `nuxt generate`)
 
 ## Directory Structure
 
@@ -20,7 +20,9 @@ app/                 # Application source (srcDir)
 │   ├── TagCard.vue
 │   ├── ColorModeSwitch.vue
 │   ├── FriendLinkItem.vue
-│   └── TableOfContents.vue
+│   ├── TableOfContents.vue
+│   ├── CodeCopy.vue
+│   └── ImageLightbox.vue
 ├── composables/     # Auto-imported composables
 │   └── useBlogData.ts   # Single source of truth for all post data
 ├── layouts/
@@ -49,7 +51,9 @@ content/             # Markdown source (Nuxt Content)
 └── about.md
 
 server/              # Nitro server
-└── routes/rss.xml.ts
+└── routes/
+    ├── rss.xml.ts
+    └── sitemap.xml.ts
 
 public/              # Static assets
 ├── avatar.png

@@ -1,5 +1,6 @@
 import { describe, it, expect } from 'vitest'
 import type { Post } from '~/types/post'
+import { normalizePost } from '~/utils/blog'
 
 const mockPosts = [
   {
@@ -22,15 +23,6 @@ const mockPosts = [
 
 // Test the pure normalization logic
 describe('normalizePost', () => {
-  const normalizePost = (post: any): Post => ({
-    ...post,
-    _path: post._path || '',
-    categories: post.categories || '默认',
-    tags: Array.isArray(post.tags) ? post.tags : [],
-    date: post.date || new Date().toISOString(),
-    title: post.title || 'Untitled',
-    description: post.description || ''
-  })
 
   it('should fill defaults for missing fields', () => {
     const result = normalizePost({ _path: '/test', title: 'Test' })
