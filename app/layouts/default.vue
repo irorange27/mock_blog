@@ -46,6 +46,7 @@ const currentYear = new Date().getFullYear()
     <ClientOnly>
       <CodeCopy />
       <ImageLightbox />
+      <BackToTop />
     </ClientOnly>
   </div>
 </template>
