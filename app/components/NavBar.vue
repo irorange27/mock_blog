@@ -10,6 +10,11 @@ const navItems = [
 
 const isMobileMenuOpen = ref(false)
 
+const isActive = (path: string) => {
+  if (path === '/') return route.path === '/'
+  return route.path.startsWith(path)
+}
+
 const toggleMobileMenu = () => {
   isMobileMenuOpen.value = !isMobileMenuOpen.value
 }
@@ -29,11 +34,14 @@ watch(() => route.path, () => {
         
         <!-- Desktop navigation -->
         <div class="hidden md:flex items-center space-x-5">
-          <NuxtLink 
-            v-for="item in navItems" 
+          <NuxtLink
+            v-for="item in navItems"
             :key="item.path"
             :to="item.path"
-            class="text-sm text-gray-400 dark:text-gray-500 hover:text-gray-800 dark:hover:text-gray-200 transition-colors"
+            class="text-sm transition-colors"
+            :class="isActive(item.path)
+              ? 'text-gray-800 dark:text-gray-100 font-semibold'
+              : 'text-gray-400 dark:text-gray-500 hover:text-gray-800 dark:hover:text-gray-200'"
           >
             {{ item.name }}
           </NuxtLink>
@@ -54,11 +62,14 @@ watch(() => route.path, () => {
 
     <!-- Mobile menu -->
     <div v-if="isMobileMenuOpen" class="md:hidden bg-white dark:bg-gray-800 border-t border-gray-200/60 dark:border-gray-700/60">
-      <NuxtLink 
-        v-for="item in navItems" 
+      <NuxtLink
+        v-for="item in navItems"
         :key="item.path"
         :to="item.path"
-        class="block px-4 py-3 text-sm text-gray-400 dark:text-gray-500 hover:text-gray-800 dark:hover:text-gray-200 transition-colors"
+        class="block px-4 py-3 text-sm transition-colors"
+        :class="isActive(item.path)
+          ? 'text-gray-800 dark:text-gray-100 font-semibold bg-gray-50 dark:bg-gray-700/50'
+          : 'text-gray-400 dark:text-gray-500 hover:text-gray-800 dark:hover:text-gray-200'"
         @click="isMobileMenuOpen = false"
       >
         {{ item.name }}

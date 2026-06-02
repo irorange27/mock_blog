@@ -4,6 +4,16 @@ const { data } = await useAsyncData(`content-${route.path}`, () => {
   return queryContent(route.path).findOne()
 })
 
+const { posts } = useBlogData()
+const adjacent = computed(() => {
+  const idx = posts.value.findIndex(p => p._path === route.path)
+  if (idx === -1) return { prev: null, next: null }
+  return {
+    prev: idx < posts.value.length - 1 ? posts.value[idx + 1] : null,
+    next: idx > 0 ? posts.value[idx - 1] : null,
+  }
+})
+
 useSeoMeta({
   title: () => data.value?.title ? `${data.value.title} | Niina's Blog` : "Niina's Blog",
   description: () => data.value?.description || data.value?.title || '',
@@ -42,9 +52,35 @@ useSeoMeta({
       </div>
     </header>
 
+    <div v-if="data?.body?.toc?.links?.length" class="mb-8 lg:sticky lg:top-16 z-10">
+      <TableOfContents :toc="data.body.toc.links" :title="data?.title" />
+    </div>
+
     <div class="prose max-w-4xl dark:text-gray-100">
-      <TableOfContents v-if="data?.body?.toc?.links?.length" :toc="data.body.toc.links" :title="data?.title" />
       <ContentRenderer v-if="data" :value="data" />
     </div>
+
+    <nav v-if="adjacent.prev || adjacent.next" class="mt-10 pt-6 border-t border-gray-200 dark:border-gray-700 grid grid-cols-1 sm:grid-cols-2 gap-4">
+      <NuxtLink
+        v-if="adjacent.prev"
+        :to="adjacent.prev._path"
+        class="group p-4 rounded-lg border border-gray-200 dark:border-gray-700 hover:border-blue-200 dark:hover:border-blue-800 transition-colors"
+      >
+        <span class="text-xs text-gray-400 dark:text-gray-500">← 上一篇</span>
+        <p class="mt-1 text-sm font-medium text-gray-700 dark:text-gray-300 group-hover:text-blue-500 dark:group-hover:text-blue-400 transition-colors line-clamp-1">
+          {{ adjacent.prev.title }}
+        </p>
+      </NuxtLink>
+      <NuxtLink
+        v-if="adjacent.next"
+        :to="adjacent.next._path"
+        class="group p-4 rounded-lg border border-gray-200 dark:border-gray-700 hover:border-blue-200 dark:hover:border-blue-800 transition-colors sm:text-right"
+      >
+        <span class="text-xs text-gray-400 dark:text-gray-500">下一篇 →</span>
+        <p class="mt-1 text-sm font-medium text-gray-700 dark:text-gray-300 group-hover:text-blue-500 dark:group-hover:text-blue-400 transition-colors line-clamp-1">
+          {{ adjacent.next.title }}
+        </p>
+      </NuxtLink>
+    </nav>
   </article>
 </template>
