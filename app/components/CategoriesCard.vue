@@ -5,7 +5,7 @@ const { categories, status, error, refresh } = useBlogData()
 <template>
   <div class="rounded-2xl p-5 bg-white/60 dark:bg-gray-800/60">
     <h2 class="text-sm font-bold mb-3 dark:text-gray-100">分类</h2>
-    
+
     <div v-if="status === 'pending'" class="flex justify-center items-center py-4">
       <div class="animate-spin rounded-full h-5 w-5 border-t-2 border-b-2 border-blue-400"></div>
     </div>
@@ -14,7 +14,7 @@ const { categories, status, error, refresh } = useBlogData()
       <p>{{ error.message }}</p>
       <button @click="refresh" class="mt-1 underline text-blue-400">重试</button>
     </div>
-    
+
     <div v-else>
       <NuxtLink
         v-for="category in categories"
@@ -27,10 +27,10 @@ const { categories, status, error, refresh } = useBlogData()
           {{ category.count }}
         </span>
       </NuxtLink>
-      
+
       <div v-if="categories.length === 0" class="text-gray-400 dark:text-gray-600 text-center py-4 text-sm">
         暂无分类
       </div>
     </div>
-  </div> 
+  </div>
 </template>

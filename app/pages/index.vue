@@ -27,7 +27,7 @@ const goToPage = (page: number) => {
 <template>
   <div class="space-y-5">
     <article v-for="post in currentPosts" :key="post._path" 
-      class="bg-white dark:bg-gray-800 dark:text-gray-100 rounded-lg p-7 border border-gray-200/60 dark:border-gray-700/60 hover:border-blue-200 dark:hover:border-blue-800 hover:-translate-y-0.5 transition-all duration-200">
+      class="bg-white dark:bg-gray-800 dark:text-gray-100 rounded-lg p-4 sm:p-7 border border-gray-200/60 dark:border-gray-700/60 hover:border-blue-200 dark:hover:border-blue-800 hover:-translate-y-0.5 transition-all duration-200">
       <div>
         <NuxtLink :to="post._path" class="block mb-3">
           <h2 class="text-xl font-bold mb-2 hover:text-blue-500 dark:hover:text-blue-400 transition-colors">

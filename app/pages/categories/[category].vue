@@ -11,8 +11,8 @@ useSeoMeta({
 </script>
 
 <template>
-  <div class="bg-white dark:bg-gray-800 rounded-lg border border-gray-100 dark:border-gray-700 p-8">
-    <header class="mb-8">
+  <div class="bg-white dark:bg-gray-800 rounded-lg border border-gray-100 dark:border-gray-700 p-4 sm:p-8">
+    <header class="mb-4 sm:mb-8">
       <h1 class="text-lg font-bold mb-2 dark:text-gray-100">
         分类: {{ route.params.category }}
       </h1>

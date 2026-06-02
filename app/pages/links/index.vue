@@ -18,7 +18,7 @@ const links = computed(() => linksData.value?.links || [])
 </script>
 
 <template>
-  <div class="bg-white dark:bg-gray-800 rounded-lg border border-gray-100 dark:border-gray-700 p-8">
+  <div class="bg-white dark:bg-gray-800 rounded-lg border border-gray-100 dark:border-gray-700 p-4 sm:p-8">
     <div v-if="pending" class="text-center dark:text-gray-300">
       加载中...
     </div>

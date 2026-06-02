@@ -10,8 +10,8 @@ const groupedPosts = computed(() => groupPostsByYearAndMonth(posts.value))
 </script>
 
 <template>
-  <div class="bg-white dark:bg-gray-800 rounded-lg border border-gray-100 dark:border-gray-700 p-8">
-    <h1 class="text-lg font-bold dark:text-gray-100 mb-8 border-b pb-4">归档</h1>
+  <div class="bg-white dark:bg-gray-800 rounded-lg border border-gray-100 dark:border-gray-700 p-4 sm:p-8">
+    <h1 class="text-lg font-bold dark:text-gray-100 mb-4 sm:mb-8 border-b pb-4">归档</h1>
     
     <div v-if="status === 'pending'" class="flex justify-center items-center py-8">
       <div class="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-blue-400"></div>
@@ -24,13 +24,13 @@ const groupedPosts = computed(() => groupPostsByYearAndMonth(posts.value))
       </button>
     </div>
     
-    <div v-else-if="Object.keys(groupedPosts).length > 0" class="space-y-8">
+    <div v-else-if="Object.keys(groupedPosts).length > 0" class="space-y-4 sm:space-y-8">
       <div v-for="(months, year) in groupedPosts" :key="year">
         <h2 class="text-lg font-bold dark:text-gray-100 mb-4 border-l-4 border-blue-200 dark:border-blue-400 pl-2">
           {{ year }}
         </h2>
         
-        <div class="space-y-6 ml-4">
+        <div class="space-y-4 sm:space-y-6 ml-2 sm:ml-4">
           <div v-for="(postsByMonth, month) in months" :key="month">
             <h3 class="text-lg font-semibold mb-2 text-gray-700 dark:text-gray-100">
               {{ month }} 月
