@@ -18,22 +18,20 @@ const links = computed(() => linksData.value?.links || [])
 </script>
 
 <template>
-  <div class="min-h-screen bg-white dark:bg-gray-800 rounded-lg border border-gray-100 dark:border-gray-700 py-12 px-4 sm:px-6 lg:px-8">
-    <div class="max-w-6xl mx-auto">
-      <div v-if="pending" class="text-center dark:text-gray-300">
-        加载中...
-      </div>
+  <div class="bg-white dark:bg-gray-800 rounded-lg border border-gray-100 dark:border-gray-700 p-8">
+    <div v-if="pending" class="text-center dark:text-gray-300">
+      加载中...
+    </div>
+    
+    <div v-else>
+      <ContentDoc path="/links" class="prose max-w-none dark:text-gray-100 mb-8" />
       
-      <div v-else>
-        <ContentDoc path="/links" class="prose max-w-none dark:text-gray-100 dark:prose-invert mb-8" />
-        
-        <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
-          <FriendLinkItem
-            v-for="(link, index) in links"
-            :key="index"
-            :link="link"
-          />
-        </div>
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+        <FriendLinkItem
+          v-for="(link, index) in links"
+          :key="index"
+          :link="link"
+        />
       </div>
     </div>
   </div>

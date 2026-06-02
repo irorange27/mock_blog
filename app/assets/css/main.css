@@ -6,6 +6,160 @@
     font-display: swap;
 }
 
-body {
+html, body {
     font-family: 'LXGWWenKai', sans-serif;
+    overflow-x: hidden;
+}
+
+/* ══════════════════════════════════════════
+   Prose typography overrides
+   Global scope — loaded on every page via nuxt.config css.
+   Manual dark-mode via html.dark-mode (matching @nuxtjs/color-mode).
+   ══════════════════════════════════════════ */
+
+/* ── CSS Variables ── */
+.prose {
+  --tw-prose-body: #374151;
+  --tw-prose-headings: #111827;
+  --tw-prose-links: #142854;
+  --tw-prose-bold: #111827;
+  --tw-prose-counters: #6b7280;
+  --tw-prose-bullets: #d1d5db;
+  --tw-prose-hr: #e5e7eb;
+  --tw-prose-quotes: #111827;
+  --tw-prose-quote-borders: #e5e7eb;
+  --tw-prose-code: #111827;
+  --tw-prose-pre-code: #e5e7eb;
+  --tw-prose-pre-bg: #f7faff;
+  --tw-prose-blockquote: #6b7280;
+}
+
+html.dark-mode .prose {
+  --tw-prose-body: #d1d5db;
+  --tw-prose-headings: #f3f4f6;
+  --tw-prose-links: #66ccff;
+  --tw-prose-bold: #f3f4f6;
+  --tw-prose-counters: #9ca3af;
+  --tw-prose-bullets: #6b7280;
+  --tw-prose-hr: #374151;
+  --tw-prose-quotes: #f3f4f6;
+  --tw-prose-quote-borders: #4b5563;
+  --tw-prose-code: #e5e7eb;
+  --tw-prose-pre-code: #e5e7eb;
+  --tw-prose-pre-bg: #0d1117;
+  --tw-prose-blockquote: #9ca3af;
+}
+
+/* ── Headings ── */
+.prose h2, .prose h3, .prose h4, .prose h5, .prose h6 {
+  font-weight: 700;
+}
+
+/* ── Bold ── */
+.prose strong, .prose b {
+  font-weight: 600;
+}
+
+/* ── English font ── */
+.prose {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, 'LXGWWenKai', sans-serif;
+}
+
+/* ── Paragraphs ── */
+.prose p {
+  margin: 1.25em 0;
+}
+
+/* ── Links ── */
+.prose a {
+  text-decoration: none;
+}
+
+.prose a:hover {
+  text-decoration: underline;
+  color: #2563eb;
+}
+
+.prose a:visited {
+  color: #4f46e5;
+}
+
+html.dark-mode .prose a {
+  color: #60a5fa;
+}
+
+html.dark-mode .prose a:hover {
+  color: #93bbfd;
+}
+
+html.dark-mode .prose a:visited {
+  color: #818cf8;
+}
+
+/* ── Overflow control ── */
+/* Prose itself should NOT clip or scroll — its parent grid column constrains width */
+.prose > * {
+  overflow-wrap: break-word;
+  word-wrap: break-word;
+}
+
+/* ── Tables ── */
+.prose table {
+  display: block;
+  overflow-x: auto;
+  max-width: 100%;
+  white-space: normal;
+}
+
+.prose th, .prose td {
+  white-space: normal;
+  word-break: break-word;
+}
+
+/* ── Inline code ── */
+.prose code:not(pre code) {
+  background-color: #f6f8fa;
+  color: #1f2328;
+  padding: 0.15em 0.45em;
+  border-radius: 0.3rem;
+  font-size: 0.875em;
+  word-break: break-all;
+  max-width: 100%;
+  overflow-wrap: break-word;
+}
+.prose code:not(pre code)::before,
+.prose code:not(pre code)::after {
+  content: none;
+}
+
+html.dark-mode .prose code:not(pre code) {
+  background-color: #272b33;
+  color: #e6edf3;
+}
+
+/* ── Code blocks ── */
+.prose pre {
+  border-radius: 0.375rem;
+  padding: 1rem;
+  overflow-x: auto;
+  max-width: 100%;
+  white-space: pre-wrap;
+  word-break: break-all;
+  background-color: var(--tw-prose-pre-bg);
+}
+
+html.dark-mode .prose pre {
+  background-color: #0d1117;
+}
+
+/* ── Blockquote ── */
+.prose blockquote {
+  border-left-width: 4px;
+  padding-left: 1rem;
+  font-style: italic;
+}
+
+html.dark-mode .prose blockquote {
+  border-left-color: #4b5563;
+  color: #d1d5db;
 }
