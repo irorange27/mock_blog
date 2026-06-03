@@ -38,8 +38,12 @@ const currentYear = new Date().getFullYear()
     </main>
 
     <footer class="py-8 mt-4">
-      <div class="container mx-auto max-w-6xl px-4 text-center text-gray-400 dark:text-gray-600 text-sm">
-        &copy; 2024 - {{ currentYear }} Niina's Blog
+      <div class="container mx-auto max-w-6xl px-4 text-center text-gray-400 dark:text-gray-600 text-sm space-y-1">
+        <p>&copy; 2024 - {{ currentYear }} Niina's Blog</p>
+        <a href="/rss.xml" target="_blank" class="inline-flex items-center gap-1 hover:text-gray-600 dark:hover:text-gray-400 transition-colors">
+          <Icon name="mdi:rss" class="w-3.5 h-3.5" />
+          <span>RSS</span>
+        </a>
       </div>
     </footer>
 
