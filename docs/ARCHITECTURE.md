@@ -85,6 +85,7 @@ Components (auto-imported from app/components/)
 ---
 title: string          # required
 date: string           # ISO date, required
+draft: boolean         # defaults to false — set true to hide from listing/RSS
 categories: string     # defaults to '默认'
 tags: string[]         # defaults to []
 description: string    # used in post list

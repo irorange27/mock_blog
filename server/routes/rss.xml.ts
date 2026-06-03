@@ -69,7 +69,7 @@ export default defineEventHandler(async (event) => {
     .where({ _partial: false })
     .find()
 
-  const blogPosts = docs.filter(doc => doc?._path?.startsWith('/posts/'))
+  const blogPosts = docs.filter(doc => doc?._path?.startsWith('/posts/') && !doc?.draft)
 
   for (const doc of blogPosts) {
     const htmlContent = doc.body ? hastToHtml(doc.body) : ''

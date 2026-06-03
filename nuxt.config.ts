@@ -19,6 +19,7 @@ export default defineNuxtConfig({
     collections: ['mdi'],
   },
   content: {
+    contentHead: false,
     sources: {
       content: {
         driver: 'fs',

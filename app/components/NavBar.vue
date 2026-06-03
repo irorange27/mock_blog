@@ -51,7 +51,7 @@ watch(() => route.path, () => {
         <!-- Mobile controls -->
         <div class="md:hidden flex items-center space-x-2">
           <ColorModeSwitch />
-          <button @click="toggleMobileMenu" class="p-2 text-gray-400">
+          <button @click="toggleMobileMenu" class="p-2 text-gray-400" aria-label="菜单">
             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
             </svg>

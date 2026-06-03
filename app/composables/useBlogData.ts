@@ -7,8 +7,12 @@ export function useBlogData() {
     queryContent('posts').sort({ date: -1 }).find()
   )
 
-  const posts = computed(() =>
+  const allPosts = computed(() =>
     (data.value || []).map(normalizePost)
+  )
+
+  const posts = computed(() =>
+    allPosts.value.filter(post => !post.draft)
   )
 
   const categories = computed<CategoryCount[]>(() => {

@@ -51,6 +51,7 @@ date: ${getDate()}
 categories: ''
 tags:
 description: ''
+draft: true
 ---
 `
 

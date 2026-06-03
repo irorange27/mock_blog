@@ -2,6 +2,7 @@ export interface Post {
   _path: string
   title: string
   date: string
+  draft?: boolean
   categories?: string
   tags?: string[]
   description?: string

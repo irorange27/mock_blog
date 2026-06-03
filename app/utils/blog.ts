@@ -4,6 +4,7 @@ import type { Post } from '~/types/post'
  */
 export const normalizePost = (post: Record<string, unknown>): Post => ({
   _path: (post._path as string) || '',
+  draft: (post.draft as boolean) || false,
   categories: (post.categories as string) || '默认',
   tags: Array.isArray(post.tags) ? (post.tags as string[]) : [],
   date: (post.date as string) || new Date().toISOString(),
