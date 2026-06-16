@@ -32,3 +32,8 @@ logs
 !.env.example
 
 .vercel
+
+# Full font source files (only the subset woff2 is committed)
+app/assets/*.ttf
+app/assets/*.otf
+app/assets/*.charset.txt

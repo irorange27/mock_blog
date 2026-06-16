@@ -19,11 +19,15 @@ const args = process.argv.slice(2)
 
 if (args.length === 0) {
   console.error(`Error: No filename argument provided
-Usage: npm run new-post -- <filename>`)
-  process.exit(1) // Terminate the script and return error code 1
+Usage: pnpm new-post <slug> [title]
+  <slug>   - English filename / URL slug (required)
+  [title]  - Display title, can be Chinese (optional, defaults to slug)`)
+  process.exit(1)
 }
 
-let fileName = args[0]
+const slug = args[0]
+const title = args[1] || slug
+let fileName = slug
 
 // Add .md extension if not present
 const fileExtensionRegex = /\.(md|mdx)$/i
@@ -46,7 +50,7 @@ if (!fs.existsSync(dirPath)) {
 }
 
 const content = `---
-title: ${args[0]}
+title: ${title}
 date: ${getDate()}
 categories: ''
 tags:

@@ -32,8 +32,11 @@ export default defineNuxtConfig({
       },
       remarkPlugins: [
         'remark-gfm',
+        'remark-math',
       ],
-      rehypePlugins: [],
+      rehypePlugins: [
+        'rehype-katex',
+      ],
     },
     highlight: {
       theme: {
@@ -59,5 +62,10 @@ export default defineNuxtConfig({
       },
     }
   },
-  css: ['@/assets/css/main.css'],
+  css: ['@/assets/css/main.css', 'katex/dist/katex.min.css'],
+  vite: {
+    optimizeDeps: {
+      include: ['vue-easy-lightbox'],
+    },
+  },
 })

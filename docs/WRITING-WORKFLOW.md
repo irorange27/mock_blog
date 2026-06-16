@@ -3,20 +3,32 @@
 ## 1. 创建新文章骨架
 
 ```bash
-pnpm new-post <文件名>
+pnpm new-post <slug> [title]
 ```
 
-该命令会在 `content/posts/` 下生成一个带 front-matter 的 Markdown 文件，自动填入当前时间：
+- `slug` —— 英文文件名 / URL 路径（必填）
+- `title` —— 显示标题，支持中文（可选，默认同 slug）
+
+示例：
+
+```bash
+pnpm new-post my-thoughts "最近的碎碎念"
+```
+
+生成 `content/posts/my-thoughts.md`：
 
 ```yaml
 ---
-title: <文件名>
+title: 最近的碎碎念
 date: 2026-06-03 08:00:00
 categories: ''
 tags:
 description: ''
+draft: true
 ---
 ```
+
+新建的文章默认 `draft: true`，不会在列表和 RSS 中出现，写完去掉该行即发布。
 
 ## 2. 撰写文章
 
