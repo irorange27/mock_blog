@@ -5,7 +5,7 @@ categories: '色伏集'
 tags:
   - Agent
 description: ''
-draft: true
+draft: False
 ---
 
 10年代以后，GitHub激起来的开源浪潮改变了软件工业；全球的 contributor 通过 GitHub 贡献代码，为开源社区做出贡献。
