@@ -4,6 +4,7 @@
   "type": "module",
   "scripts": {
     "new-post": "node scripts/new-post.js",
+    "subset-font": "bash scripts/subset-font.sh",
     "build": "nuxt build",
     "dev": "nuxt dev",
     "test": "vitest",
