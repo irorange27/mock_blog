@@ -13,6 +13,29 @@ draft: false
 
 Claude Code 用户级的配置文件在 `~/.claude/settings.json`，环境变量通过 `env` 键值对来设置。除此之外常用的键还有 `permissions`、`hooks`、`enabledPlugins` 等。
 
+## 为什么要花心思配它
+
+[The Register 2026 年 4 月那篇 Claude Code 源码分析](https://www.theregister.com/software/2026/04/01/claude-codes-source-reveals-extent-of-system-access/5222658) 出来之后，我把自己的 settings 又调整了一些。几个让我在意的点：
+
+遥测默认开启。CC 每次启动会上报 user ID、session ID、组织 UUID、邮箱、平台、终端类型、当前的 feature gates；网络不通就先落盘到 `~/.claude/telemetry/` 等下次再发送。只有走 Bedrock / Vertex / Foundry 时才默认关闭。错误上报那条路也类似，CC 抛异常时把 cwd 和路径片段一起传上去。目录名本身也是信息，算半个泄露。
+
+更值得注意的是本地留底。每一次 `Read`、`Bash`、`Grep`、`Edit/Write` 的输入输出都以明文 JSONL 写进会话归档。还没正式发布的 autoDream 会去 grep 这堆归档，把摘要写进 `MEMORY.md`，然后 `MEMORY.md` 又会注入下一轮 system prompt。这流程走完，模型看过的文件最终就进了 API 的。
+
+企业部署还多一层 `policySettings`，每小时拉一次，可以热更新 `.env`、`PATH`、`LD_PRELOAD`、permissions 和 feature flag。个人用户用不到，但知道这个通道存在比较好。自动更新走 Statsig / GrowthBook，Anthropic 想禁用某个版本一句话的事，所以保守做法是关闭自动更新、自己锁版本。我自己是 brew 安装的，不 `upgrade` 就停在当前版本上，但只要 `brew upgrade` 一下就直接跳到最新——如果想严格锁版本，还是得用 npm 指定具体版本号安装。
+
+本文后面那些环境变量和 `permissions.deny`、空 `attribution`，本质就是在缩减这个 CC 暴露的信息：
+
+- `CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC` 把 telemetry、错误上报、自动更新和其他后台请求一并关闭，相当于把上面前两条 + 版本远控一起断掉。
+- `permissions.deny` 把 `~/.ssh/`、`./secrets/` 封掉，就算 autoDream 哪天默认开启去扫归档，这些路径它也读不进来。
+- `attribution.commit/pr` 留空，不在 git history 里留 AI 痕迹。顺带一提，源码里有个 `undercover.ts`，在仓库被识别成"明确拒绝 AI 贡献的开源项目"时会主动让 Claude 隐藏作者身份 —— 这个态度本身就挺微妙的。
+
+文章里还提到两个设置，我没用，但还是记一下：
+
+- **`CLAUDE_CODE_DISABLE_AUTO_MEMORY=1`**：关闭所有 memory / telemetry 写入。
+- **`CLAUDE_CODE_SIMPLE`**（`--bare` 模式）：直接关闭 memory 和 autoDream。
+
+下面进入正题。
+
 ## 环境变量（`env`）
 
 ### 行为控制
@@ -94,7 +117,7 @@ Claude Code 用户级的配置文件在 `~/.claude/settings.json`，环境变量
 - `Read(./secrets/**)`：项目本地的密钥目录。
 - `Bash(rm -rf *)`：防止递归删除。
 
-划好这几条红线之后，可以放心打开顶层的 **`skipDangerousModePermissionPrompt: true`** —— 用 `claude --dangerously-skip-permissions`（YOLO 模式）启动时，CLI 默认会弹一个红色确认框让你回车确认，这个开关跳过那一步。前提就是 `deny` 已经把后路堵死，否则跳过确认等于裸奔。
+划好这几条红线之后，可以放心打开顶层的 **`skipDangerousModePermissionPrompt: true`** —— 用 `claude --dangerously-skip-permissions`（YOLO 模式）启动时，CLI 默认会弹一个红色确认框让你回车确认，这个开关跳过那一步。前提就是 `deny` 已经把后路封住，否则跳过确认就毫无防护了。
 
 ## 钩子（`hooks`）
 
