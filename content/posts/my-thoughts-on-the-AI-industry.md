@@ -5,6 +5,7 @@ categories: '色伏集'
 tags:
   - LLMs
   - AI Agent
+  - Agent
 description: '写这篇文章的初衷，是我发觉逐渐忘了前两个月的 AI/LLMs 是什么样的能力和情况了。意识中似乎某些在突然加速，但理性和直觉告诉我这不对，作为行内人，我知道这是一个渐进的、累积的过程。我想自己回忆一下，Agent的发展。'
 draft: false
 ---
