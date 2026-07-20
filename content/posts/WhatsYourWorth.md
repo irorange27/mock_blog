@@ -1,7 +1,7 @@
 ---
 title: 价值、位置
 date: 2024-11-29 02:00:00
-categories: 色伏集
+categories: 生活-情感
 tags:
   - 随笔
 description: 你们的生存究竟有何价值？如果毫无价值，你们究竟为何存在？

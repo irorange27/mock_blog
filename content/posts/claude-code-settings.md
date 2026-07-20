@@ -1,7 +1,7 @@
 ---
 title: Claude Code 配置分享
 date: 2026-06-23 14:22:12
-categories: '殆罔集'
+categories: '技术'
 tags:
   - LLMs
   - AI Agent

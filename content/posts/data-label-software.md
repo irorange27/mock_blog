@@ -1,7 +1,7 @@
 ---
 title: AI数据（自动）标注软件概述
 date: 2024-12-20 14:00:00
-categories: 殆罔集
+categories: 技术
 tags:
   - 数据标注
   - 深度学习

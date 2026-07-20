@@ -1,7 +1,7 @@
 ---
 title: 简单聊聊对 AI Agent 行业的理解
 date: 2026-06-20 13:14:25
-categories: '色伏集'
+categories: '技术杂谈'
 tags:
   - LLMs
   - AI Agent

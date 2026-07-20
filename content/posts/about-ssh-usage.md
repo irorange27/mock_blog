@@ -1,7 +1,7 @@
 ---
 title: 关于SSH的使用——客户端篇
 date: 2025-06-17 02:44:57
-categories: 殆罔集
+categories: 技术
 tags:
   - 工具
 description: 介绍SSH客户端的用法。

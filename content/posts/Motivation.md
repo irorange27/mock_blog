@@ -1,7 +1,7 @@
 ---
 title: 渴求动力
 date: 2025-03-05 00:44:57
-categories: 色伏集
+categories: 生活-情感
 tags:
     - 随笔
 description: 有意识的生活并主动地行动会使得生活更美好。

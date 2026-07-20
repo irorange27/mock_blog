@@ -1,7 +1,7 @@
 ---
 title: 如何开始一个开源项目？
 date: 2025-04-17 18:00:00
-categories: 殆罔集
+categories: 技术杂谈
 tags:
     - 开源
 description: 浅谈我对开源项目的认知。

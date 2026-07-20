@@ -1,7 +1,7 @@
 ---
 title: 2024年终总结
 date: 2025-01-01 01:00:00
-categories: 色伏集
+categories: 生活-情感
 tags:
   - 随笔
 description: 啊，痛彻的时光；啊，悲怆的人！

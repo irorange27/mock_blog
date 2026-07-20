@@ -1,7 +1,7 @@
 ---
 title: RoPE
 date: 2026-06-17 18:31:40
-categories: '殆罔集'
+categories: '技术'
 tags:
   - LLMs
   - Transformer

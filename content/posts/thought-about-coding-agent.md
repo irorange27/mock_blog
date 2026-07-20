@@ -1,7 +1,7 @@
 ---
 title: 关于 Coding Agent 使用的遐思
 date: 2026-06-03 17:54:20
-categories: '色伏集'
+categories: '技术杂谈'
 tags:
   - Agent
 description: ''

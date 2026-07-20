@@ -1,7 +1,7 @@
 ---
 title: 重启博客v2
 date: 2024-11-25 00:00:00
-categories: 色伏集
+categories: 生活-情感
 tags: [博客]
 description: 忙里偷闲学习前端，还是决定结合想法手搓一个自己的博客。
 ---

@@ -1,7 +1,7 @@
 ---
 title: 快速搭建个人VPS
 date: 2024-12-31 19:00:00
-categories: 殆罔集
+categories: 技术
 tags:
   - VPS
 description: 如何快速搭建个人VPS。

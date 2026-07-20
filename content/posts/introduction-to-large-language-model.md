@@ -1,7 +1,7 @@
 ---
 title: 大语言模型入门基础
 date: 2026-06-16 22:36:11
-categories: '殆罔集'
+categories: '技术'
 tags:
   - Transformer
   - LLMs

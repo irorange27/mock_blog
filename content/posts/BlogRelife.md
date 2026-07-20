@@ -1,7 +1,7 @@
 ---
 title: 重启博客
 date: 2024-10-21 20:44:57
-categories: 色伏集
+categories: 生活-情感
 tags:
 description: 在我的表达欲与现实所需(问题解决记录)驱动下，我决定重写博客。
 ---

@@ -1,7 +1,7 @@
 ---
 title: 生活的崩坏与自我毁灭
 date: 2024-12-19 12:00:00
-categories: 色伏集
+categories: 生活-情感
 tags:
   - 随笔
 description: 是什么在牵引着我？我的行为，我的思想？我的感受？我所处的地方？它们在何处？

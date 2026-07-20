@@ -1,7 +1,7 @@
 ---
 title: LLM Agents 课程笔记
 date: 2024-11-30 20:00:00
-categories: 殆罔集
+categories: 技术
 tags:
   - Agent
 description: UCB CS294/194-196 Large Language Model Agents 的课程笔记。
