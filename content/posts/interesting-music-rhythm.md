@@ -1,7 +1,7 @@
 ---
 title: 有趣的音乐节奏
 date: 2026-07-16 12:47:24
-categories: ''
+categories: '音乐'
 tags:
 description: ''
 draft: false
