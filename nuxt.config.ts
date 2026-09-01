@@ -55,7 +55,9 @@ export default defineNuxtConfig({
   app: {
     head: {
       link: [
-        { rel: 'icon', type: 'image/x-icon', href: '/favicon.ico' }
+        { rel: 'icon', type: 'image/x-icon', href: '/favicon.ico' },
+        // 正文字体提前加载，减少 font-display: swap 的回退闪烁窗口
+        { rel: 'preload', as: 'font', type: 'font/woff2', href: '/fonts/LXGWWenKai-Regular.woff2', crossorigin: '' },
       ],
       htmlAttrs: {
         lang: 'zh-CN',

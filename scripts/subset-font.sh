@@ -14,7 +14,8 @@ SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 PROJECT_DIR="$(dirname "$SCRIPT_DIR")"
 ASSETS_DIR="$PROJECT_DIR/app/assets"
 TTF="$ASSETS_DIR/LXGWWenKai-Regular.ttf"
-WOFF2="$ASSETS_DIR/LXGWWenKai-Regular.woff2"
+# 输出到 public/fonts：URL 稳定（无构建 hash），nuxt.config 里的 preload 才能生效
+WOFF2="$PROJECT_DIR/public/fonts/LXGWWenKai-Regular.woff2"
 
 if [ ! -f "$TTF" ]; then
     echo "ERROR: Full font not found at $TTF"

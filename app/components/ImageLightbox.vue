@@ -1,5 +1,8 @@
 <script setup lang="ts">
-import VueEasyLightbox from 'vue-easy-lightbox'
+// vue-easy-lightbox 只在点图时才需要：异步组件避免它的 chunk 进首屏 JS
+import { defineAsyncComponent } from 'vue'
+
+const VueEasyLightbox = defineAsyncComponent(() => import('vue-easy-lightbox'))
 
 const visible = ref(false)
 const imgs = ref<string[]>([])

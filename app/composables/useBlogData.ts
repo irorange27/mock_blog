@@ -3,8 +3,12 @@ import { normalizePost } from '~/utils/blog'
 import type { QueryBuilderParams } from '@nuxt/content'
 
 export function useBlogData() {
+  // 只取列表/侧栏需要的元信息字段：带上 body 会让全站每页 payload 膨胀数百 KB
   const { data, status, error, refresh } = useAsyncData('blog-posts', () =>
-    queryContent('posts').sort({ date: -1 }).find()
+    queryContent('posts')
+      .only(['_path', 'title', 'description', 'date', 'categories', 'tags', 'draft'])
+      .sort({ date: -1 })
+      .find()
   )
 
   const allPosts = computed(() =>
