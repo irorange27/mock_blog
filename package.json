@@ -6,7 +6,7 @@
     "new-post": "node scripts/new-post.js",
     "subset-font": "bash scripts/subset-font.sh",
     "build": "nuxt build",
-    "dev": "nuxt dev",
+    "dev": "node -e 'require(\"node:fs\").rmSync(\".output\", { recursive: true, force: true })' && nuxt dev",
     "test": "vitest",
     "generate": "nuxt generate",
     "preview": "nuxt preview",
@@ -17,6 +17,7 @@
     "@nuxtjs/color-mode": "^3.5.2",
     "@nuxtjs/tailwindcss": "^6.14.0",
     "@tailwindcss/typography": "^0.5.16",
+    "abcjs": "^6.7.0",
     "nuxt": "^4.4.6",
     "rehype-katex": "^7.0.1",
     "remark-gfm": "^4.0.1",
@@ -24,7 +25,8 @@
     "rss": "^1.2.2",
     "vue": "latest",
     "vue-easy-lightbox": "^1.19.0",
-    "vue-router": "latest"
+    "vue-router": "latest",
+    "wavesurfer.js": "^7.12.11"
   },
   "devDependencies": {
     "@iconify-json/mdi": "^1.2.3",
