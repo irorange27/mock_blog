@@ -7,48 +7,177 @@
     unicode-range: U+4E00-9FFF, U+3400-4DBF, U+3000-303F, U+FF00-FFEF, U+2F800-2FA1F;
 }
 
-html, body {
+/* ══════════════════════════════════════════
+   Design tokens — oklch + --hue
+   全站颜色由此派生：改 --hue 即整站换主题色。
+   明暗成对定义；暗色选择器是 color-mode 挂在
+   html 上的 .dark-mode（组件内不再写 dark: 颜色）。
+   语义说明见 DESIGN.md。
+   ══════════════════════════════════════════ */
+
+:root {
+    --hue: 258;
+
+    --primary: oklch(0.55 0.15 var(--hue));
+    --link-visited: oklch(0.50 0.17 290);
+    --danger: oklch(0.55 0.19 25);
+
+    --page-bg: oklch(0.965 0.008 var(--hue));
+    --nav-bg: oklch(0.965 0.008 var(--hue) / 0.8);
+
+    --card-bg: oklch(0.995 0.003 var(--hue));
+    --card-bg-60: oklch(0.995 0.003 var(--hue) / 0.6);
+    --card-bg-80: oklch(0.995 0.003 var(--hue) / 0.8);
+
+    --txt-90: oklch(0.27 0.02 var(--hue));
+    --txt-75: oklch(0.36 0.025 var(--hue));
+    --txt-50: oklch(0.50 0.02 var(--hue));
+    --txt-30: oklch(0.62 0.015 var(--hue));
+    --txt-25: oklch(0.70 0.012 var(--hue));
+
+    --line-color: oklch(0.915 0.012 var(--hue));
+    --line-strong: oklch(0.87 0.03 var(--hue));
+
+    --chip-bg: oklch(0.955 0.025 var(--hue));
+    --chip-bg-hover: oklch(0.915 0.045 var(--hue));
+
+    --panel-bg: oklch(0.972 0.012 var(--hue));
+    --panel-bg-hover: oklch(0.94 0.02 var(--hue));
+
+    --btn-solid-bg: oklch(0.70 0.13 var(--hue));
+    --btn-solid-bg-hover: oklch(0.63 0.15 var(--hue));
+    --btn-solid-fg: oklch(0.995 0.003 var(--hue));
+
+    --inline-code-bg: oklch(0.96 0.012 var(--hue));
+    --pre-bg: oklch(0.975 0.008 var(--hue));
+    --pre-fg: oklch(0.90 0.01 var(--hue));
+
+    --selection-bg: oklch(0.90 0.05 var(--hue));
+}
+
+html.dark-mode {
+    --primary: oklch(0.75 0.13 var(--hue));
+    --link-visited: oklch(0.70 0.13 290);
+    --danger: oklch(0.70 0.17 25);
+
+    --page-bg: oklch(0.17 0.015 var(--hue));
+    --nav-bg: oklch(0.17 0.015 var(--hue) / 0.8);
+
+    --card-bg: oklch(0.235 0.018 var(--hue));
+    --card-bg-60: oklch(0.235 0.018 var(--hue) / 0.6);
+    --card-bg-80: oklch(0.235 0.018 var(--hue) / 0.8);
+
+    --txt-90: oklch(0.93 0.012 var(--hue));
+    --txt-75: oklch(0.82 0.012 var(--hue));
+    --txt-50: oklch(0.68 0.012 var(--hue));
+    --txt-30: oklch(0.56 0.012 var(--hue));
+    --txt-25: oklch(0.46 0.012 var(--hue));
+
+    --line-color: oklch(0.31 0.02 var(--hue));
+    --line-strong: oklch(0.40 0.05 var(--hue));
+
+    --chip-bg: oklch(0.28 0.045 var(--hue));
+    --chip-bg-hover: oklch(0.33 0.065 var(--hue));
+
+    --panel-bg: oklch(0.27 0.02 var(--hue));
+    --panel-bg-hover: oklch(0.31 0.025 var(--hue));
+
+    --btn-solid-bg: oklch(0.68 0.13 var(--hue));
+    --btn-solid-bg-hover: oklch(0.61 0.14 var(--hue));
+    --btn-solid-fg: oklch(0.99 0.005 var(--hue));
+
+    --inline-code-bg: oklch(0.28 0.02 var(--hue));
+    --pre-bg: oklch(0.19 0.015 var(--hue));
+    --pre-fg: oklch(0.90 0.01 var(--hue));
+
+    --selection-bg: oklch(0.40 0.08 var(--hue));
+}
+
+/* overflow-x 只放在 html 上：body 上的 overflow-x:hidden 会让 body
+   成为 sticky 后代的滚动容器，导致 position:sticky 全站失效 */
+html {
     font-family: 'LXGWWenKai', sans-serif;
     overflow-x: hidden;
+}
+
+body {
+    font-family: 'LXGWWenKai', sans-serif;
+}
+
+/* 锚点跳转：平滑滚动，且标题不被 sticky 导航遮住 */
+html {
+    scroll-behavior: smooth;
+}
+
+.prose :is(h1, h2, h3, h4, h5, h6) {
+    scroll-margin-top: 5rem;
+}
+
+/* ── TOC 侧栏：≥2xl 时固定在内容列右侧的留白里 ── */
+.toc-aside {
+    position: fixed;
+    top: 5.5rem;
+    left: calc(50vw + 36rem + 0.75rem);
+    width: calc(50vw - 36rem - 1.5rem);
+    max-height: calc(100vh - 10rem);
+    overflow-y: auto;
+    scrollbar-width: none;
+}
+
+.toc-aside::-webkit-scrollbar {
+    display: none;
+}
+
+::selection {
+    background-color: var(--selection-bg);
+}
+
+/* ══════════════════════════════════════════
+   Shared component classes
+   颜色一律走 token；尺寸间距在组件里用 utility。
+   ══════════════════════════════════════════ */
+
+.card-base {
+    background-color: var(--card-bg);
+    border: 1px solid var(--line-color);
+    border-radius: 0.5rem;
+}
+
+.widget-card {
+    background-color: var(--card-bg-60);
+    border-radius: 1rem;
+}
+
+.chip {
+    background-color: var(--chip-bg);
+    color: var(--primary);
+    transition: background-color 0.15s ease;
+}
+
+.chip:hover {
+    background-color: var(--chip-bg-hover);
 }
 
 /* ══════════════════════════════════════════
    Prose typography overrides
    Global scope — loaded on every page via nuxt.config css.
-   Manual dark-mode via html.dark-mode (matching @nuxtjs/color-mode).
    ══════════════════════════════════════════ */
 
 /* ── CSS Variables ── */
 .prose {
-  --tw-prose-body: #374151;
-  --tw-prose-headings: #111827;
-  --tw-prose-links: #142854;
-  --tw-prose-bold: #111827;
-  --tw-prose-counters: #6b7280;
-  --tw-prose-bullets: #d1d5db;
-  --tw-prose-hr: #e5e7eb;
-  --tw-prose-quotes: #111827;
-  --tw-prose-quote-borders: #e5e7eb;
-  --tw-prose-code: #111827;
-  --tw-prose-pre-code: #e5e7eb;
-  --tw-prose-pre-bg: #f7faff;
-  --tw-prose-blockquote: #6b7280;
-}
-
-html.dark-mode .prose {
-  --tw-prose-body: #d1d5db;
-  --tw-prose-headings: #f3f4f6;
-  --tw-prose-links: #66ccff;
-  --tw-prose-bold: #f3f4f6;
-  --tw-prose-counters: #9ca3af;
-  --tw-prose-bullets: #6b7280;
-  --tw-prose-hr: #374151;
-  --tw-prose-quotes: #f3f4f6;
-  --tw-prose-quote-borders: #4b5563;
-  --tw-prose-code: #e5e7eb;
-  --tw-prose-pre-code: #e5e7eb;
-  --tw-prose-pre-bg: #0d1117;
-  --tw-prose-blockquote: #9ca3af;
+  --tw-prose-body: var(--txt-75);
+  --tw-prose-headings: var(--txt-90);
+  --tw-prose-links: var(--primary);
+  --tw-prose-bold: var(--txt-90);
+  --tw-prose-counters: var(--txt-30);
+  --tw-prose-bullets: var(--line-color);
+  --tw-prose-hr: var(--line-color);
+  --tw-prose-quotes: var(--txt-90);
+  --tw-prose-quote-borders: var(--line-color);
+  --tw-prose-code: var(--txt-90);
+  --tw-prose-pre-code: var(--pre-fg);
+  --tw-prose-pre-bg: var(--pre-bg);
+  --tw-prose-blockquote: var(--txt-30);
 }
 
 /* ── Headings ── */
@@ -78,23 +207,11 @@ html.dark-mode .prose {
 
 .prose a:hover {
   text-decoration: underline;
-  color: #2563eb;
+  color: var(--primary);
 }
 
 .prose a:visited {
-  color: #4f46e5;
-}
-
-html.dark-mode .prose a {
-  color: #60a5fa;
-}
-
-html.dark-mode .prose a:hover {
-  color: #93bbfd;
-}
-
-html.dark-mode .prose a:visited {
-  color: #818cf8;
+  color: var(--link-visited);
 }
 
 /* ── Overflow control ── */
@@ -119,8 +236,8 @@ html.dark-mode .prose a:visited {
 
 /* ── Inline code ── */
 .prose code:not(pre code) {
-  background-color: #f6f8fa;
-  color: #1f2328;
+  background-color: var(--inline-code-bg);
+  color: var(--txt-90);
   padding: 0.15em 0.45em;
   border-radius: 0.3rem;
   font-size: 0.875em;
@@ -133,11 +250,6 @@ html.dark-mode .prose a:visited {
   content: none;
 }
 
-html.dark-mode .prose code:not(pre code) {
-  background-color: #272b33;
-  color: #e6edf3;
-}
-
 /* ── Code blocks ── */
 .prose pre {
   border-radius: 0.375rem;
@@ -146,21 +258,13 @@ html.dark-mode .prose code:not(pre code) {
   max-width: 100%;
   white-space: pre-wrap;
   word-break: break-all;
-  background-color: var(--tw-prose-pre-bg);
-}
-
-html.dark-mode .prose pre {
-  background-color: #0d1117;
+  background-color: var(--pre-bg);
 }
 
 /* ── Blockquote ── */
 .prose blockquote {
   border-left-width: 4px;
+  border-left-color: var(--line-strong);
   padding-left: 1rem;
   font-style: italic;
-}
-
-html.dark-mode .prose blockquote {
-  border-left-color: #4b5563;
-  color: #d1d5db;
 }

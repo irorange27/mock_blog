@@ -3,7 +3,8 @@ const currentYear = new Date().getFullYear()
 </script>
 
 <template>
-  <div class="min-h-screen bg-slate-100 dark:bg-slate-900 overflow-hidden">
+  <!-- 不要在这里加 overflow-hidden：它会让容器成为 sticky 后代的滚动容器，破坏全站 position:sticky（横向溢出已由 html 的 overflow-x:hidden 处理） -->
+  <div class="min-h-screen bg-[var(--page-bg)]">
     <NavBar />
     <main class="container mx-auto max-w-6xl px-3 sm:px-6 py-6 sm:py-10">
       <!-- Mobile: compact profile above content -->
@@ -38,9 +39,9 @@ const currentYear = new Date().getFullYear()
     </main>
 
     <footer class="py-8 mt-4">
-      <div class="container mx-auto max-w-6xl px-4 text-center text-gray-400 dark:text-gray-600 text-sm space-y-1">
+      <div class="container mx-auto max-w-6xl px-4 text-center text-[var(--txt-30)] text-sm space-y-1">
         <p>&copy; 2024 - {{ currentYear }} Niina's Blog</p>
-        <a href="/rss.xml" target="_blank" class="inline-flex items-center gap-1 hover:text-gray-600 dark:hover:text-gray-400 transition-colors" aria-label="RSS 订阅">
+        <a href="/rss.xml" target="_blank" class="inline-flex items-center gap-1 hover:text-[var(--txt-50)] transition-colors" aria-label="RSS 订阅">
           <Icon name="mdi:rss" class="w-3.5 h-3.5" />
           <span>RSS</span>
         </a>

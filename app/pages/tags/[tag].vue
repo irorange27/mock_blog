@@ -11,36 +11,36 @@ useSeoMeta({
 </script>
 
 <template>
-  <div class="bg-white dark:bg-gray-800 rounded-lg border border-gray-100 dark:border-gray-700 p-4 sm:p-8">
+  <div class="card-base p-4 sm:p-8">
     <header class="mb-4 sm:mb-8">
-      <h1 class="text-lg font-bold mb-2 dark:text-gray-100">
+      <h1 class="text-lg font-bold mb-2 text-[var(--txt-90)]">
         标签: {{ route.params.tag }}
       </h1>
-      <p class="text-gray-600 dark:text-gray-400">
+      <p class="text-[var(--txt-50)]">
         共 {{ taggedPosts.length }} 篇文章
       </p>
     </header>
 
     <div class="space-y-6">
-      <article v-for="post in taggedPosts" :key="post._path" 
-        class="pb-6 border-b border-gray-200 dark:border-gray-700 last:border-0">
+      <article v-for="post in taggedPosts" :key="post._path"
+        class="pb-6 border-b border-[var(--line-color)] last:border-0">
         <NuxtLink :to="post._path">
-          <h2 class="text-lg font-bold dark:text-gray-100 mb-2 hover:text-blue-500 dark:hover:text-blue-400">
+          <h2 class="text-lg font-bold text-[var(--txt-90)] mb-2 hover:text-[var(--primary)] transition-colors">
             {{ post.title }}
           </h2>
         </NuxtLink>
-        
-        <div class="flex items-center text-gray-500 dark:text-gray-400 text-sm">
+
+        <div class="flex items-center text-[var(--txt-50)] text-sm">
           <span>{{ formatDate(post.date) }}</span>
           <span class="mx-2">·</span>
           <span>{{ post.categories || '默认' }}</span>
           <span class="mx-2">·</span>
           <div class="flex gap-2">
-            <NuxtLink 
-              v-for="t in post.tags" 
+            <NuxtLink
+              v-for="t in post.tags"
               :key="t"
               :to="`/tags/${t}`"
-              class="px-2 py-1 bg-blue-50 dark:bg-blue-950 text-blue-600 dark:text-blue-300 rounded-full hover:bg-blue-100 dark:hover:bg-blue-900"
+              class="chip px-2 py-1 rounded-full"
             >
               {{ t }}
             </NuxtLink>

@@ -21,7 +21,7 @@ const scrollToTop = () => {
 <template>
   <button
     v-show="visible"
-    class="fixed bottom-6 sm:bottom-8 right-4 sm:right-8 z-40 w-11 h-11 sm:w-10 sm:h-10 rounded-full bg-white/80 dark:bg-gray-800/80 backdrop-blur border border-gray-200 dark:border-gray-700 text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300 hover:border-gray-300 dark:hover:border-gray-600 shadow-md transition-all"
+    class="fixed bottom-6 sm:bottom-8 right-4 sm:right-8 z-40 w-11 h-11 sm:w-10 sm:h-10 rounded-full bg-[var(--card-bg-80)] backdrop-blur border border-[var(--line-color)] text-[var(--txt-30)] hover:text-[var(--primary)] hover:border-[var(--line-strong)] shadow-md transition-all"
     @click="scrollToTop"
     aria-label="返回顶部"
   >

@@ -25,13 +25,13 @@ watch(() => route.path, () => {
 </script>
 
 <template>
-  <nav class="sticky top-0 z-50 bg-slate-100/80 dark:bg-slate-900/80 backdrop-blur-md">
+  <nav class="sticky top-0 z-50 bg-[var(--nav-bg)] backdrop-blur-md">
     <div class="container mx-auto max-w-6xl px-4 sm:px-6">
       <div class="flex items-center justify-between h-14">
-        <NuxtLink to="/" class="text-lg font-bold text-gray-800 dark:text-gray-100">
+        <NuxtLink to="/" class="text-lg font-bold text-[var(--txt-90)]">
           Niina's Blog
         </NuxtLink>
-        
+
         <!-- Desktop navigation -->
         <div class="hidden md:flex items-center space-x-5">
           <NuxtLink
@@ -40,8 +40,8 @@ watch(() => route.path, () => {
             :to="item.path"
             class="text-sm transition-colors"
             :class="isActive(item.path)
-              ? 'text-gray-800 dark:text-gray-100 font-semibold'
-              : 'text-gray-400 dark:text-gray-500 hover:text-gray-800 dark:hover:text-gray-200'"
+              ? 'text-[var(--primary)] font-bold'
+              : 'text-[var(--txt-30)] hover:text-[var(--txt-90)]'"
           >
             {{ item.name }}
           </NuxtLink>
@@ -51,7 +51,7 @@ watch(() => route.path, () => {
         <!-- Mobile controls -->
         <div class="md:hidden flex items-center space-x-2">
           <ColorModeSwitch />
-          <button @click="toggleMobileMenu" class="p-2 text-gray-400" aria-label="菜单">
+          <button @click="toggleMobileMenu" class="p-2 text-[var(--txt-30)]" aria-label="菜单">
             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
             </svg>
@@ -61,15 +61,15 @@ watch(() => route.path, () => {
     </div>
 
     <!-- Mobile menu -->
-    <div v-if="isMobileMenuOpen" class="md:hidden bg-white dark:bg-gray-800 border-t border-gray-200/60 dark:border-gray-700/60">
+    <div v-if="isMobileMenuOpen" class="md:hidden bg-[var(--card-bg)] border-t border-[var(--line-color)]">
       <NuxtLink
         v-for="item in navItems"
         :key="item.path"
         :to="item.path"
         class="block px-4 py-3 text-sm transition-colors"
         :class="isActive(item.path)
-          ? 'text-gray-800 dark:text-gray-100 font-semibold bg-gray-50 dark:bg-gray-700/50'
-          : 'text-gray-400 dark:text-gray-500 hover:text-gray-800 dark:hover:text-gray-200'"
+          ? 'text-[var(--primary)] font-bold bg-[var(--panel-bg)]'
+          : 'text-[var(--txt-30)] hover:text-[var(--txt-90)]'"
         @click="isMobileMenuOpen = false"
       >
         {{ item.name }}

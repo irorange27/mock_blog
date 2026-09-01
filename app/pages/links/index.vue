@@ -18,13 +18,13 @@ const links = computed(() => linksData.value?.links || [])
 </script>
 
 <template>
-  <div class="bg-white dark:bg-gray-800 rounded-lg border border-gray-100 dark:border-gray-700 p-4 sm:p-8">
-    <div v-if="pending" class="text-center dark:text-gray-300">
+  <div class="card-base p-4 sm:p-8">
+    <div v-if="pending" class="text-center text-[var(--txt-75)]">
       加载中...
     </div>
-    
+
     <div v-else>
-      <ContentDoc path="/links" class="prose max-w-none dark:text-gray-100 mb-8" />
+      <ContentDoc path="/links" class="prose max-w-none mb-8" />
       
       <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
         <FriendLinkItem
