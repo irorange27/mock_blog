@@ -53,6 +53,13 @@
     --pre-fg: oklch(0.90 0.01 var(--hue));
 
     --selection-bg: oklch(0.90 0.05 var(--hue));
+
+    /* admonition 语义色（固定色相，不随 --hue） */
+    --adm-tip: oklch(0.58 0.11 175);
+    --adm-note: oklch(0.54 0.12 255);
+    --adm-important: oklch(0.54 0.16 320);
+    --adm-warning: oklch(0.58 0.13 75);
+    --adm-caution: oklch(0.54 0.18 25);
 }
 
 html.dark-mode {
@@ -91,6 +98,12 @@ html.dark-mode {
     --pre-fg: oklch(0.90 0.01 var(--hue));
 
     --selection-bg: oklch(0.40 0.08 var(--hue));
+
+    --adm-tip: oklch(0.72 0.11 175);
+    --adm-note: oklch(0.72 0.12 255);
+    --adm-important: oklch(0.72 0.15 320);
+    --adm-warning: oklch(0.75 0.13 75);
+    --adm-caution: oklch(0.70 0.16 25);
 }
 
 /* overflow-x 只放在 html 上：body 上的 overflow-x:hidden 会让 body
@@ -200,14 +213,27 @@ html {
   margin: 1.25em 0;
 }
 
-/* ── Links ── */
+/* ── Links：主题色下划线，hover 变主色；标题内的锚点链接除外 ── */
 .prose a {
-  text-decoration: none;
+  text-decoration: underline;
+  text-decoration-color: var(--line-strong);
+  text-underline-offset: 3px;
 }
 
 .prose a:hover {
   text-decoration: underline;
   color: var(--primary);
+  text-decoration-color: var(--primary);
+}
+
+.prose :is(h1, h2, h3, h4, h5, h6) a {
+  text-decoration: none;
+  color: inherit;
+}
+
+.prose :is(h1, h2, h3, h4, h5, h6) a:hover {
+  text-decoration: none;
+  color: inherit;
 }
 
 .prose a:visited {
@@ -267,4 +293,81 @@ html {
   border-left-color: var(--line-strong);
   padding-left: 1rem;
   font-style: italic;
+}
+
+/* ══════════════════════════════════════════
+   Markdown 扩展（MDC 组件的样式）
+   ══════════════════════════════════════════ */
+
+/* ── Admonition（::tip / ::note / ... 提示块） ── */
+.adm {
+    --adm-c: var(--adm-note);
+    margin: 1.5em 0;
+    padding: 0.875rem 1.125rem;
+    border-radius: 0.75rem;
+    border: 1px solid color-mix(in oklab, var(--adm-c) 32%, transparent);
+    background: color-mix(in oklab, var(--adm-c) 9%, transparent);
+}
+
+.adm-tip { --adm-c: var(--adm-tip); }
+.adm-note { --adm-c: var(--adm-note); }
+.adm-important { --adm-c: var(--adm-important); }
+.adm-warning { --adm-c: var(--adm-warning); }
+.adm-caution { --adm-c: var(--adm-caution); }
+
+.adm-title {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    color: var(--adm-c);
+    font-weight: 600;
+    font-size: 0.9em;
+}
+
+.adm-body {
+    margin-top: 0.35rem;
+    font-size: 0.95em;
+}
+
+/* 放在 .prose 规则之后，覆盖其段落间距 */
+.adm-body p { margin: 0.4em 0; }
+.adm-body > :first-child { margin-top: 0 !important; }
+.adm-body > :last-child { margin-bottom: 0 !important; }
+
+/* ── Spoiler（:spoiler[...] 遮罩，hover 揭示） ── */
+.spoiler {
+    background: var(--inline-code-bg);
+    border-radius: 0.375rem;
+    padding: 0.05em 0.4em;
+    cursor: help;
+    transition: color 0.15s ease;
+}
+
+.spoiler:not(:hover) {
+    color: transparent;
+}
+
+/* ── GitHub 仓库卡片（:github{repo="owner/name"}） ── */
+.gh-card {
+    display: flex;
+    align-items: center;
+    gap: 0.875rem;
+    margin: 1.25em 0;
+    padding: 0.75rem 1rem;
+    border: 1px solid var(--line-color);
+    border-radius: 0.75rem;
+    background: var(--panel-bg);
+    transition: border-color 0.15s ease, background-color 0.15s ease;
+}
+
+.gh-card:hover {
+    border-color: var(--line-strong);
+    background: var(--panel-bg-hover);
+}
+
+/* 卡片本身是 .prose 里的 <a>，去掉链接下划线与主色 */
+.prose a.gh-card,
+.prose a.gh-card:hover {
+    text-decoration: none;
+    color: inherit;
 }
