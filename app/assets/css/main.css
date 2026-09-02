@@ -1,3 +1,5 @@
+/* 字体源用 public/fonts 的稳定 URL（与 nuxt.config 的 preload 同路径，
+   预加载才能命中；Vite 不解析 CSS url() 里的 ~/ 别名，别改回 ~/assets） */
 @font-face {
     font-family: 'LXGWWenKai';
     src: url('/fonts/LXGWWenKai-Regular.woff2') format('woff2');
@@ -5,6 +7,14 @@
     font-style: normal;
     font-display: swap;
     unicode-range: U+4E00-9FFF, U+3400-4DBF, U+3000-303F, U+FF00-FFEF, U+2F800-2FA1F;
+}
+
+/* 音乐字形（SMuFL）：仅子集了谱号/拍号数字/符头等约 20 个字形，
+   供 ::poly-score 五线谱模式使用；协议见 /fonts/Bravura-OFL.txt */
+@font-face {
+    font-family: 'Bravura';
+    src: url('/fonts/Bravura-subset.woff2') format('woff2');
+    font-display: swap;
 }
 
 /* ══════════════════════════════════════════
@@ -373,7 +383,8 @@ html {
 }
 
 /* ── ABC 乐谱（::abc-score，内嵌无语言围栏代码块） ── */
-.abc-score {
+.abc-score,
+.poly-score {
     margin: 1.5em 0;
     padding: 1rem 1.25rem 0.75rem;
     border: 1px solid var(--line-color);
@@ -381,7 +392,8 @@ html {
     background: var(--panel-bg);
 }
 
-.abc-score-src { display: none; }
+.abc-score-src,
+.poly-score-src { display: none; }
 
 .abc-score-svg {
     overflow-x: auto;
@@ -423,6 +435,108 @@ html {
 
 .abc-score-play-err {
     color: var(--danger);
+}
+
+/* ── 复合节拍谱（::poly-score，SVG 节奏网格） ──
+   图形颜色全部走 token，明暗切换由 CSS 自动生效，无需重绘。 */
+.poly-score-grid {
+    display: flex;
+    gap: 0.75rem;
+    align-items: stretch;
+}
+
+.poly-score-labels {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-around;
+    flex-shrink: 0;
+    min-width: 5.2rem;
+    text-align: right;
+}
+
+.poly-score-label {
+    font-size: 0.8rem;
+    color: var(--txt-50);
+    white-space: nowrap;
+}
+
+.poly-score-rows {
+    position: relative;
+    flex: 1;
+    min-width: 0;
+    overflow-x: auto;
+}
+
+.poly-score-row {
+    display: block;
+    width: 100%;
+    min-width: 560px;
+    height: auto;
+}
+
+.poly-score-strong {
+    fill: var(--primary);
+}
+
+.poly-score-weak {
+    fill: none;
+    stroke: var(--line-strong);
+    stroke-width: 1.5;
+}
+
+.poly-score-barline {
+    stroke: var(--txt-25);
+    stroke-width: 1;
+}
+
+.poly-score-cycle {
+    stroke: var(--line-strong);
+    stroke-width: 1;
+    stroke-dasharray: 3 3;
+}
+
+.poly-score-num {
+    font-size: 11px;
+    fill: var(--txt-25);
+}
+
+.poly-score-head {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    width: 1.5px;
+    background: var(--primary);
+    opacity: 0.75;
+    pointer-events: none;
+}
+
+/* ── ::poly-score 五线谱模式（{staff} 布尔参数） ── */
+.poly-score-glyph {
+    font-family: 'Bravura';
+    /* em = 4 谱距，与 PolyScore 的 S=6 几何常量联动（24 单位） */
+    font-size: 24px;
+}
+
+.poly-score-ink {
+    fill: var(--txt-90);
+}
+
+.poly-score-staffline {
+    stroke: var(--txt-25);
+    stroke-width: 0.8;
+}
+
+.poly-score-note-strong {
+    fill: var(--primary);
+}
+
+.poly-score-note-weak {
+    fill: var(--txt-75);
+}
+
+.poly-score-barline-fill {
+    fill: var(--txt-25);
 }
 
 /* ── 音频播放器（::music-player，wavesurfer 波形） ── */
