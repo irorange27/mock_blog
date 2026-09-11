@@ -16,25 +16,37 @@ GPT6出来之后，体感上很多人都很焦虑迷茫，真的到了AGI time�
 
 路线大概是这样：从 MHA 出发，一路看到 Linear Attention，看每一代分别在砍哪一项成本。
 
-$$\boxed{\text{现代 LLM 架构的主线，是不断消除 memory 和 compute 的冗余。}}$$
+$$
+\boxed{\text{现代 LLM 架构的主线，是不断消除 memory 和 compute 的冗余。}}
+$$
 
 ## MHA 与 KV Cache
 
 MHA（Multi-Head Attention）是这一切的起点，2017 年《Attention Is All You Need》里提出来的。数学上它就是多个独立的单头注意力拼起来。假设输入向量序列是 $x_1, x_2, \cdots, x_l$，其中 $x_i \in \mathbb{R}^d$。$h$ 是 head 数，$(s)$ 是 head 的下标，$s = 1, 2, \cdots, h$。那么：
 
-$$o_t = [o_t^{(1)}, o_t^{(2)}, \cdots, o_t^{(h)}]$$
+$$
+o_t = [o_t^{(1)}, o_t^{(2)}, \cdots, o_t^{(h)}]
+$$
 
-$$o_t^{(s)} = \mathrm{Attention}(q_t^{(s)}, k^{(s)}_{\le t}, v^{(s)}_{\le t}) \triangleq \frac{\sum_{i \le t} \exp(q_t^{(s)} k_i^{(s)\top}) v_i^{(s)}}{\sum_{i \le t} \exp(q_t^{(s)} k_i^{(s)\top})}$$
+$$
+o_t^{(s)} = \mathrm{Attention}(q_t^{(s)}, k^{(s)}_{\le t}, v^{(s)}_{\le t}) \triangleq \frac{\sum_{i \le t} \exp(q_t^{(s)} k_i^{(s)\top}) v_i^{(s)}}{\sum_{i \le t} \exp(q_t^{(s)} k_i^{(s)\top})}
+$$
 
-$$q_i^{(s)} = x_i W_q^{(s)} \in \mathbb{R}^{d_k}, \quad k_i^{(s)} = x_i W_k^{(s)} \in \mathbb{R}^{d_k}, \quad v_i^{(s)} = x_i W_v^{(s)} \in \mathbb{R}^{d_v}$$
+$$
+q_i^{(s)} = x_i W_q^{(s)} \in \mathbb{R}^{d_k}, \quad k_i^{(s)} = x_i W_k^{(s)} \in \mathbb{R}^{d_k}, \quad v_i^{(s)} = x_i W_v^{(s)} \in \mathbb{R}^{d_v}
+$$
 
 （省略了缩放因子。常见设置是 $d_k = d_v = d/h$。）关键在因果性。自回归生成时，新预测出来的第 $t+1$ 个 token 不会影响已经算好的 $k^{(s)}_{\le t}$ 和 $v^{(s)}_{\le t}$，所以这部分可以缓存下来，避免重复计算。这就是 KV Cache。它的大小约等于：
 
-$$2 \times L \times h \times d_k \times N \times \text{bytes}$$
+$$
+2 \times L \times h \times d_k \times N \times \text{bytes}
+$$
 
 其中 $L$ 是层数，$N$ 是序列长度。注意这里面的 $N$。模型参数是个常数，选定模型就不再变了；但 KV Cache 随 $N$ 线性增长。Context 足够长的时候，它会变成显存里的主导项，可能超出一张卡甚至一台机（8 张卡）的总显存。举个数。按 GPT-3 的配置算：96 层，96 个 attention head，每个 head 维度 128。单个 token 的 KV Cache 是
 
-$$2 \times 96 \times 96 \times 128 \approx 2.36\text{M}$$
+$$
+2 \times 96 \times 96 \times 128 \approx 2.36\text{M}
+$$
 
 个参数。按 2 字节精度存，就是 4.7 MB。一个 token 4.7 MB。128k context 就是 600 GB 量级。这个数字基本说明了为什么长上下文不是"再多加个位置编码"就能解决的。它是个显存和带宽问题。而 GPU 部署有个很不讲道理的原则：能一张卡放下的，就不要跨多张卡；能一台机放下的，就不要跨多台机。因为卡内通信带宽 > 卡间通信带宽 > 机间通信带宽。木桶效应，跨的设备越多，被最慢那段拖累得越狠。
 
@@ -50,7 +62,9 @@ $$2 \times 96 \times 96 \times 128 \approx 2.36\text{M}$$
 
 后面 V4.1 那一节会把这两个瓶颈各自的账算一遍。最后把账单写全：
 
-$$C_{\text{total}} = C_{\text{attention}} + C_{\text{FFN/MoE}} + C_{\text{memory movement}}$$
+$$
+C_{\text{total}} = C_{\text{attention}} + C_{\text{FFN/MoE}} + C_{\text{memory movement}}
+$$
 
 账单上还有另外两项，而且它们经常被无视。第二项 $C_{\text{FFN/MoE}}$ 是前馈层的计算。MoE（Mixture of Experts）就是把这层换成多个专家网络，每个 token 只激活其中少数几个。它跟序列长度 $N$ 成正比，跟模型宽度 $d$ 的平方成正比，所以量级是 $O(Nd^2)$。attention 那项是 $O(N^2 d)$。注意这两个量级里的指数位置不一样。
 
@@ -74,11 +88,15 @@ $N$ 小的时候，$N^2 d$ 打不过 $Nd^2$；$N$ 大起来之后才反过来。
 
 记第 $s$ 个 head 属于第 $\gamma(s)$ 组：
 
-$$\gamma(s) = \left\lceil \frac{sg}{h} \right\rceil$$
+$$
+\gamma(s) = \left\lceil \frac{sg}{h} \right\rceil
+$$
 
 （就是按顺序平均切开：前 $h/g$ 个 head 一组，接着 $h/g$ 个一组，以此类推。）于是 attention 写成：
 
-$$o_t^{(s)} = \mathrm{Attention}\left(q_t^{(s)},\ k^{(\gamma(s))}_{\le t},\ v^{(\gamma(s))}_{\le t}\right)$$
+$$
+o_t^{(s)} = \mathrm{Attention}\left(q_t^{(s)},\ k^{(\gamma(s))}_{\le t},\ v^{(\gamma(s))}_{\le t}\right)
+$$
 
 注意 Q 仍然是每个 head 一份，只有 K、V 被分组共用。这个不对称就是 GQA 的全部内容。举个具体的数。$h = 8$、$g = 2$ 时，第 1 到第 4 个 head 共用一对 K、V，第 5 到第 8 个 head 共用另一对。$g = h$ 时每个 head 各自一对，退化成 MHA；$g = 1$ 时所有 head 共用一对，退化成 MQA。
 
@@ -100,21 +118,29 @@ MLA（Multi-head Latent Attention）是 DeepSeek-V2 在 2024 年 5 月提出来�
 
 把这个拼起来的向量记作 $c_i$。它由 $g$ 组 K、V 依次首尾相接而成：
 
-$$c_i = [k_i^{(1)}, \cdots, k_i^{(g)}, v_i^{(1)}, \cdots, v_i^{(g)}] \in \mathbb{R}^{g(d_k + d_v)}$$
+$$
+c_i = [k_i^{(1)}, \cdots, k_i^{(g)}, v_i^{(1)}, \cdots, v_i^{(g)}] \in \mathbb{R}^{g(d_k + d_v)}
+$$
 
 而它整个是由 $x_i$ 一次矩阵乘法得到的。把各组投影矩阵横向拼起来记作 $W_c$：
 
-$$c_i = x_i W_c, \qquad W_c = [W_k^{(1)}, \cdots, W_k^{(g)}, W_v^{(1)}, \cdots, W_v^{(g)}] \in \mathbb{R}^{d \times g(d_k + d_v)}$$
+$$
+c_i = x_i W_c, \qquad W_c = [W_k^{(1)}, \cdots, W_k^{(g)}, W_v^{(1)}, \cdots, W_v^{(g)}] \in \mathbb{R}^{d \times g(d_k + d_v)}
+$$
 
 因为 $d_c = g(d_k + d_v) < d$，这一步就是在把维度压小。所以 $x_i \to c_i$ 本来就是低秩投影。也就是说，光看"低秩投影"这一步，GQA 和 MLA 没有区别。MLA 的本质改进不在低秩投影，而在**低秩投影之后做了什么**。GQA 投影之后干的事很简单：把向量对半分成 K 和 V，每一份再均分成 $g$ 份，每份复制 $h/g$ 次，凑够 $h$ 个 head。分割和复制都是极简的线性变换。
 
 MLA 的第一步想法就是把它们换成一般的线性变换，让每个 head 拿到的 K、V 各不相同：
 
-$$k_i^{(s)} = c_i W_k^{(s)} \in \mathbb{R}^{d_k}, \quad v_i^{(s)} = c_i W_v^{(s)} \in \mathbb{R}^{d_v}$$
+$$
+k_i^{(s)} = c_i W_k^{(s)} \in \mathbb{R}^{d_k}, \quad v_i^{(s)} = c_i W_v^{(s)} \in \mathbb{R}^{d_v}
+$$
 
 但这样问题就来了。我们缓存的是投影后的 $k_i, v_i$，一旦它们各不相同，KV Cache 就恢复成 MHA 那么大，GQA 的初衷全丢了。MLA 的做法是找一个恒等变换绕过去。在推理阶段：
 
-$$q_t^{(s)} k_i^{(s)\top} = (x_t W_q^{(s)})(c_i W_k^{(s)})^\top = x_t (W_q^{(s)} W_k^{(s)\top}) c_i^\top$$
+$$
+q_t^{(s)} k_i^{(s)\top} = (x_t W_q^{(s)})(c_i W_k^{(s)})^\top = x_t (W_q^{(s)} W_k^{(s)\top}) c_i^\top
+$$
 
 这意味着可以把 $W_q^{(s)} W_k^{(s)\top}$ 合并起来当作 Q 的投影矩阵，那么 $c_i$ 就取代了 $k_i$。同理 $v_i^{(s)} = c_i W_v^{(s)}$ 里的 $W_v^{(s)}$ 也能吸收进后面的输出投影，$v_i$ 也可以用 $c_i$ 代替。于是推理时 KV Cache 只需要存 $c_i$。而 $c_i$ 与 $(s)$ 无关，是所有 head 共享的。
 
@@ -132,7 +158,9 @@ $$q_t^{(s)} k_i^{(s)\top} = (x_t W_q^{(s)})(c_i W_k^{(s)})^\top = x_t (W_q^{(s)}
 
 不过别急。到这里 MLA 有个绕不开的缺陷：**不兼容 RoPE**。前面那步恒等变换能成立，关键在于 $W_q^{(s)} W_k^{(s)\top}$ 是一个跟位置无关的固定矩阵。加上 RoPE 之后就不行了：
 
-$$q_t^{(s)} k_i^{(s)\top} = (x_t W_q^{(s)} R_t)(c_i W_k^{(s)} R_i)^\top = x_t (W_q^{(s)} R_{t-i} W_k^{(s)\top}) c_i^\top$$
+$$
+q_t^{(s)} k_i^{(s)\top} = (x_t W_q^{(s)} R_t)(c_i W_k^{(s)} R_i)^\top = x_t (W_q^{(s)} R_{t-i} W_k^{(s)\top}) c_i^\top
+$$
 
 $W_q^{(s)} R_{t-i} W_k^{(s)\top}$ 跟位置差 $t - i$ 相关，无法合并成一个固定矩阵。放弃 RoPE 换 ALIBI 之类的 attention bias 是一种办法，但实验显示明显不如 RoPE。最后 MLA 采取的是混合方案：每个 head 的 Q、K 新增 $d_r$ 个维度专门用来加 RoPE，其中 K 新增的这部分在 head 间共享。
 
@@ -158,7 +186,9 @@ $W_q^{(s)} R_{t-i} W_k^{(s)\top}$ 跟位置差 $t - i$ 相关，无法合并成�
 
 用 roofline 分析一下。H100 SXM 的 BF16 算力约 989 TFLOPS，HBM3 带宽 3.35 TB/s，拐点在：
 
-$$\frac{989\ \text{TFLOPS}}{3.35\ \text{TB/s}} \approx 295\ \text{FLOP/byte}$$
+$$
+\frac{989\ \text{TFLOPS}}{3.35\ \text{TB/s}} \approx 295\ \text{FLOP/byte}
+$$
 
 算术强度低于 295 就是 memory bound，高于才是 compute bound。
 
@@ -172,15 +202,21 @@ $$\frac{989\ \text{TFLOPS}}{3.35\ \text{TB/s}} \approx 295\ \text{FLOP/byte}$$
 
 算术强度就是一个字节要承担多少次浮点运算：
 
-$$\text{AI}(N) = \frac{2P + c_{\text{flop}} \cdot L \cdot N}{W + c_{\text{kv}} \cdot L \cdot N}$$
+$$
+\text{AI}(N) = \frac{2P + c_{\text{flop}} \cdot L \cdot N}{W + c_{\text{kv}} \cdot L \cdot N}
+$$
 
 分子是每个 token 要做的浮点次数：权重矩阵乘 $2P$，加上 attention 那部分。分母是要搬的字节：权重 $W$，加上 KV。代进数字：
 
-$$\text{AI}(N) = \frac{42 \times 10^9 + 278528 \times 60 \times N}{42 \times 10^9 + 1152 \times 60 \times N}$$
+$$
+\text{AI}(N) = \frac{42 \times 10^9 + 278528 \times 60 \times N}{42 \times 10^9 + 1152 \times 60 \times N}
+$$
 
 $N$ 一大，分子分母里那两项权重就被 KV 和 attention 项压过去了，于是有上界：
 
-$$\lim_{N \to \infty} \text{AI}(N) = \frac{c_{\text{flop}}}{c_{\text{kv}}} = \frac{278528}{1152} \approx 242\ \text{FLOP/byte}$$
+$$
+\lim_{N \to \infty} \text{AI}(N) = \frac{c_{\text{flop}}}{c_{\text{kv}}} = \frac{278528}{1152} \approx 242\ \text{FLOP/byte}
+$$
 
 注意 $L$ 被约掉了。**无论多少层，这个上限都一样**，因为 KV 和 attention 计算都随层数线性增长。
 
@@ -201,11 +237,15 @@ $$\lim_{N \to \infty} \text{AI}(N) = \frac{c_{\text{flop}}}{c_{\text{kv}}} = \fr
 
 原因很直接：权重每一步只需要读一次，然后同时喂给 batch 里所有序列；KV 读取却是一条序列一份。把 $B$ 写进去：
 
-$$\text{AI}(B, N) = \frac{B\left(2P + c_{\text{flop}} L N\right)}{W + B \cdot c_{\text{kv}} L N}$$
+$$
+\text{AI}(B, N) = \frac{B\left(2P + c_{\text{flop}} L N\right)}{W + B \cdot c_{\text{kv}} L N}
+$$
 
 $B$ 一大，分母里的 $W$ 就被摊薄，算术强度趋近于：
 
-$$\text{AI}(\infty, N) = \frac{2P + c_{\text{flop}} L N}{c_{\text{kv}} L N}$$
+$$
+\text{AI}(\infty, N) = \frac{2P + c_{\text{flop}} L N}{c_{\text{kv}} L N}
+$$
 
 代进数字：
 
@@ -233,9 +273,13 @@ $$\text{AI}(\infty, N) = \frac{2P + c_{\text{flop}} L N}{c_{\text{kv}} L N}$$
 
 那"划算"的刻度在哪里？MLA 省的是字节，而字节由权重和 KV 两部分组成。KV 读取追平权重的位置：
 
-$$\text{MHA：}\ 3.93\ \text{MB} \times N = 42\ \text{GB} \Rightarrow N \approx 1.1\ \text{万}$$
+$$
+\text{MHA：}\ 3.93\ \text{MB} \times N = 42\ \text{GB} \Rightarrow N \approx 1.1\ \text{万}
+$$
 
-$$\text{MLA：}\ 69.1\ \text{KB} \times N = 42\ \text{GB} \Rightarrow N \approx 61\ \text{万}$$
+$$
+\text{MLA：}\ 69.1\ \text{KB} \times N = 42\ \text{GB} \Rightarrow N \approx 61\ \text{万}
+$$
 
 既然两边都是 memory bound，加速比就等于字节数之比：
 
@@ -254,7 +298,9 @@ $$\text{MLA：}\ 69.1\ \text{KB} \times N = 42\ \text{GB} \Rightarrow N \approx 
 
 因为 MLA 的 KV Cache 大小跟 $h$ 无关。增大 $h$ 只增加计算量和提升模型能力，不增加 KV Cache，所以不会带来速度瓶颈。MLA 完成的思想升级可以写成一句话：
 
-$$\boxed{\text{从离散的 head sharing，到连续的 representation compression}}$$
+$$
+\boxed{\text{从离散的 head sharing，到连续的 representation compression}}
+$$
 
 ## CSA 与 HCA
 
@@ -266,7 +312,9 @@ MLA 压小的是每个 token 存的东西。但 $c_1, c_2, \cdots, c_N$ 仍然�
 
 把 KV Cache 想成一个二维矩阵：
 
-$$\text{Sequence} \times \text{Feature}$$
+$$
+\text{Sequence} \times \text{Feature}
+$$
 
 MQA、GQA、MLA 压的都是 Feature 轴。V4 开始压 Sequence 轴。V4 改成了三类 attention：
 
@@ -280,11 +328,17 @@ MQA、GQA、MLA 压的都是 Feature 轴。V4 开始压 Sequence 轴。V4 改成
 
 所以最近的一段必须原样保留。三类 attention 不是三个可以互相替代的方案，而是三段分工：最近的原样看，中间挑着看，最远的粗着看。这个分工其实很符合直觉。人读一篇长文档也是这样：最后一段逐字读，中间扫小标题，开头的细节早忘了，只记得大意。于是 attention 不再是简单的 $N \times N$，而是三种东西的叠加（记局部窗口大小为 $W$，每个 query 选中的 block 数为 $B$，压缩率为 $r$）：
 
-$$N \times W \quad \text{（局部窗口）}$$
+$$
+N \times W \quad \text{（局部窗口）}
+$$
 
-$$N \times B \quad \text{（稀疏选中的 compressed blocks）}$$
+$$
+N \times B \quad \text{（稀疏选中的 compressed blocks）}
+$$
 
-$$N \times \frac{N}{r} \quad \text{（高度压缩的 global branch）}$$
+$$
+N \times \frac{N}{r} \quad \text{（高度压缩的 global branch）}
+$$
 
 ### 复杂度没有变成 O(N)
 
@@ -294,7 +348,9 @@ $$N \times \frac{N}{r} \quad \text{（高度压缩的 global branch）}$$
 
 但工程量级已经差很多。而 CSA 的 sparse branch 更接近：
 
-$$O(NB), \quad B \ll N$$
+$$
+O(NB), \quad B \ll N
+$$
 
 这才是 V4 真正攻击 quadratic attention 的部分。所以"V4 把 attention 变成线性了"这种说法，把两件事混成了一件。严格结论和工程结论要分开讲。
 
@@ -302,17 +358,25 @@ $$O(NB), \quad B \ll N$$
 
 前面所有方案都建立在同一个前提上：KV 要保存下来。那换个问题。**如果 KV 这么贵，为什么一定要保存它？** RNN 的答案是最极端的：
 
-$$h_t = \tanh(W_x x_t + W_h h_{t-1} + b)$$
+$$
+h_t = \tanh(W_x x_t + W_h h_{t-1} + b)
+$$
 
 过去全部信息压进一个固定大小的状态。不保存 KV，只保存状态。代价是长期记忆很差，而且不能并行。LSTM / GRU 用门控改善了记忆，但没根治，也仍然不能并行。然后 Linear Attention 出现了：
 
-$$S_t = S_{t-1} + \phi(k_t) v_t^\top$$
+$$
+S_t = S_{t-1} + \phi(k_t) v_t^\top
+$$
 
-$$o_t = \phi(q_t)^\top S_t$$
+$$
+o_t = \phi(q_t)^\top S_t
+$$
 
 每步只更新一个 state，复杂度 $O(N)$。看到这个式子会觉得眼熟。它其实是：
 
-$$\boxed{\text{LSTM 式的 recurrent state} + \text{Attention 式的 query-key retrieval}}$$
+$$
+\boxed{\text{LSTM 式的 recurrent state} + \text{Attention 式的 query-key retrieval}}
+$$
 
 所以它像一个"现代 LSTM"是有道理的，不是公式恰巧长得像。它重新选择了**压缩历史，而不是保存历史**。代价是信息碰撞。不同的 key 的信息全挤进同一个 state，容量有限，互相干扰。这件事值得展开一点，因为它是 Linear Attention 的核心缺陷，也是判断它能不能替代 full attention 的关键。state $S_t$ 的大小是固定的，跟 $d_k \times d_v$ 同阶，不随 $N$ 增长。
 
@@ -326,7 +390,9 @@ SSM（State Space Model）是这条线的另一个分支，典型代表是 Mamba
 
 所以往上看，Mamba、RWKV、RetNet、DeltaNet、Gated DeltaNet、Kimi Linear，看起来像一堆论文名字动物园，其实都在回答同一个问题：**怎么用固定大小的记忆，尽可能少地丢掉历史。** 于是有了 Hybrid：大部分层用廉价的 state memory，少数几层保留对完整历史的随机访问。
 
-$$\text{高速压缩记忆} + \text{偶尔随机访问原始信息}$$
+$$
+\text{高速压缩记忆} + \text{偶尔随机访问原始信息}
+$$
 
 有个很漂亮的观察：这不是"RNN 又赢了"，而是大家终于发现 attention 的随机访问能力很好、RNN 的固定状态成本也很好，真正有意思的问题是怎么把两者揉到一起，而不是宗教战争式地选一个。
 
@@ -334,9 +400,13 @@ $$\text{高速压缩记忆} + \text{偶尔随机访问原始信息}$$
 
 到这里可以做一个全文最重要的比较。Kimi 和 DeepSeek 都在压历史，但压完之后的处理方式不一样：
 
-$$\text{Kimi：compress history into state}$$
+$$
+\text{Kimi：compress history into state}
+$$
 
-$$\text{DeepSeek：compress history but keep it retrievable}$$
+$$
+\text{DeepSeek：compress history but keep it retrievable}
+$$
 
 ### State Machine 与 Indexed Memory
 
@@ -364,7 +434,9 @@ sparse attention
 
 我把它们概括成：
 
-$$\boxed{\text{State Machine}} \quad \text{vs.} \quad \boxed{\text{Indexed Memory}}$$
+$$
+\boxed{\text{State Machine}} \quad \text{vs.} \quad \boxed{\text{Indexed Memory}}
+$$
 
 这比说"Linear Attention vs Sparse Attention"有解释力。因为后者的区别看起来只是稀疏程度不同，而前者是两种根本不同的 memory 哲学：一个是**把历史变成状态**，一个是**把历史变成可检索的索引**。有一个细节能说明 Kimi 这边并不只是"换了个 attention"。
 
@@ -376,7 +448,9 @@ K3 的技术报告把 refined training and data recipes、general/agentic/coding
 
 那这两条路线谁能赢？我觉得决胜点不在复杂度写 $O(N)$ 还是 $O(NB)$，而在更朴素的地方：
 
-$$\boxed{\text{在同样的显存带宽和 FLOPs 下，谁还能准确找回 50 万 token 前那个关键细节。}}$$
+$$
+\boxed{\text{在同样的显存带宽和 FLOPs 下，谁还能准确找回 50 万 token 前那个关键细节。}}
+$$
 
 这才是长上下文模型最难骗 benchmark 的地方。
 
@@ -384,19 +458,29 @@ $$\boxed{\text{在同样的显存带宽和 FLOPs 下，谁还能准确找回 50 
 
 把前面的方案合起来看，它们动的其实是同一个三维对象，也就是 KV 的形状：
 
-$$\boxed{L \times N \times D}$$
+$$
+\boxed{L \times N \times D}
+$$
 
 $L$ 是层数，$N$ 是序列长度，$D$ 是每个 token 存下来的表示宽度。于是整条 DeepSeek 路线可以重新写成：
 
-$$\text{GQA / MLA：压 } D$$
+$$
+\text{GQA / MLA：压 } D
+$$
 
-$$\text{V4（CSA / HCA）：压 } N$$
+$$
+\text{V4（CSA / HCA）：压 } N
+$$
 
-$$\text{V4.1：压 } L \text{ 和 compute path}$$
+$$
+\text{V4.1：压 } L \text{ 和 compute path}
+$$
 
 到 V4.1，问题变成了：
 
-$$\boxed{\text{既然历史已经压缩过一次，为什么每一层还要重复为它付费？}}$$
+$$
+\boxed{\text{既然历史已经压缩过一次，为什么每一层还要重复为它付费？}}
+$$
 
 ds4.1f 采用的是一个新架构族：552B MoE，Causal-Encoder-Decoder，输入侧约 8B activated、输出侧约 16B activated。这个不对称的计算预算是关键。要理解为什么 8B 和 16B 是分开的两个数，得把那两个瓶颈各自的账算一遍。先定符号。$P$ 是参数量（MoE 里指 activated 部分），$b$ 是每个参数的字节数，$N$ 是序列长度。**输入侧**面对的是长 prompt。
 
@@ -406,7 +490,9 @@ $N$ 到百万量级时，算术强度能到几千 FLOPs/byte，早就超过了�
 
 拿 16B activated、BF16 存储来算：
 
-$$16\text{B} \times 2\ \text{bytes} = 32\ \text{GB}$$
+$$
+16\text{B} \times 2\ \text{bytes} = 32\ \text{GB}
+$$
 
 每生成一个 token，光权重就要搬 32 GB。而这一个 token 的计算量是 $2 \times 16\text{B} = 32$ GFLOPs。算术强度大约是 $1$ FLOP/byte。现代 GPU 的算力带宽比是几十到几百 FLOP/byte。差了将近两个数量级，意味着算力几乎全程在等内存。所以在 decode 这一侧，多算一点几乎不花钱。反正算力在空转等数据。既然这样，就没有理由在生成端省参数量。**16B 是这么来的。**
 
@@ -414,13 +500,17 @@ $$16\text{B} \times 2\ \text{bytes} = 32\ \text{GB}$$
 
 speculative decoding 甚至更吃带宽，草稿模型本身要读一遍权重，验证阶段还要再读主模型。）
 
-$$\boxed{\text{Compute bound 的那一侧压计算，memory bound 的那一侧压不住，那就把能力堆上去。}}$$
+$$
+\boxed{\text{Compute bound 的那一侧压计算，memory bound 的那一侧压不住，那就把能力堆上去。}}
+$$
 
 （这个读法是我的理解，不是官方给出的设计理由。但 8B 和 16B 正好落在 prefill 和 decode 两侧，而且方向符合各自的瓶颈，我觉得不像是巧合。）传统 decoder-only LLM 对 prompt 里每个 token 和 decode token 用几乎同一套昂贵 backbone，等于强迫两个瓶颈完全不同的阶段共用一套参数。
 
 如果输入有 $N = 1\text{M}$，那么即使 attention 已经 sparse 或 compressed，你依然需要对百万 token 做很多层计算。V4.1 攻击的不只是 attention matrix：
 
-$$QK^\top$$
+$$
+QK^\top
+$$
 
 还攻击整个长序列每层 FFN/MoE 的计算。这一点非常重要，因为前面那张账单上的第二项，一直被 $N^2$ 的光环盖着。attention 那项是 $O(N^2 d)$，FFN/MoE 那项是 $O(Nd^2)$。$N$ 大到百万量级、$N^2$ 又被打下来之后，后者因为每一层都要对每个 token 算一遍，纹丝不动。
 
@@ -467,15 +557,21 @@ $$QK^\top$$
 
 B200 的 BF16 / FP8 / FP4 dense 算力分别是 2250 / 4500 / 9000 TFLOP/s，HBM3e 带宽 8 TB/s。FP4 的拐点是：
 
-$$\frac{9000\ \text{TFLOPS}}{8\ \text{TB/s}} = 1125\ \text{FLOP/byte}$$
+$$
+\frac{9000\ \text{TFLOPS}}{8\ \text{TB/s}} = 1125\ \text{FLOP/byte}
+$$
 
 decode 侧每 token 要搬多少？16B activated，FP4 存储：
 
-$$16\text{B} \times 0.5\ \text{字节} = 8\ \text{GB}$$
+$$
+16\text{B} \times 0.5\ \text{字节} = 8\ \text{GB}
+$$
 
 KV 那边，1M context 时是 $890 \times 10^6 \approx 0.93$ GB。加起来 8.93 GB。算术强度：
 
-$$\text{AI} = \frac{2 \times 16\text{B}}{8.93\ \text{GB}} \approx 3.6\ \text{FLOP/byte}$$
+$$
+\text{AI} = \frac{2 \times 16\text{B}}{8.93\ \text{GB}} \approx 3.6\ \text{FLOP/byte}
+$$
 
 按 8 TB/s 的带宽上限，单流大约 900 token/s。
 
@@ -517,7 +613,9 @@ ds4.1f 把 KV 压到 890 字节 / token 之后，就算跑到 1M context，它�
 
 再看容量。单卡 172 GB 可用显存，按 890 字节 / token：
 
-$$\frac{172\ \text{GB}}{890\ \text{B}} \approx 1.93\ \text{亿 token}$$
+$$
+\frac{172\ \text{GB}}{890\ \text{B}} \approx 1.93\ \text{亿 token}
+$$
 
 一张卡装得下 1.93 亿 token 的 global KV。
 
@@ -529,7 +627,9 @@ $$\frac{172\ \text{GB}}{890\ \text{B}} \approx 1.93\ \text{亿 token}$$
 
 batch 能不能救？批处理把权重摊薄，但同时把 KV 按 batch 复制：
 
-$$\text{AI}(B, N) = \frac{B \times 2 \times 16\text{B}}{8\ \text{GB} + B \times 890 \times N}$$
+$$
+\text{AI}(B, N) = \frac{B \times 2 \times 16\text{B}}{8\ \text{GB} + B \times 890 \times N}
+$$
 
 代进不同长度：
 
@@ -561,7 +661,9 @@ $N$ 一大就更没戏。$B \to \infty$ 时 $\text{AI} \to 2P / (890N)$，1M con
 
 **总吞吐有上限，因为它最终被 KV 的带宽锁住：**
 
-$$\text{吞吐}_{\max} \to \frac{8\ \text{TB/s}}{890\ \text{B} \times N}$$
+$$
+\text{吞吐}_{\max} \to \frac{8\ \text{TB/s}}{890\ \text{B} \times N}
+$$
 
 | $N$ | 4k | 32k | 128k | 1M |
 |---|---|---|---|---|
@@ -588,19 +690,27 @@ $$\text{吞吐}_{\max} \to \frac{8\ \text{TB/s}}{890\ \text{B} \times N}$$
 
 **常驻**：552B 个专家参数必须都在显存里。TP4 把每个权重矩阵切成四份、每卡持一份，所以是
 
-$$\frac{552\text{B} \times 0.5\ \text{字节}}{4} = 69\ \text{GB}$$
+$$
+\frac{552\text{B} \times 0.5\ \text{字节}}{4} = 69\ \text{GB}
+$$
 
 **每步读**：一个 token 只激活其中 16B。整机每步要读
 
-$$16\text{B} \times 0.5\ \text{字节} = 8\ \text{GB}$$
+$$
+16\text{B} \times 0.5\ \text{字节} = 8\ \text{GB}
+$$
 
 而这 16B 激活参数同样散在四张卡上，各卡只读自己那一份，所以每卡读四分之一：
 
-$$\frac{8\ \text{GB}}{4} = 2\ \text{GB}$$
+$$
+\frac{8\ \text{GB}}{4} = 2\ \text{GB}
+$$
 
 KV 是同一个道理。TP 把 KV head 也分到四张卡上，每卡只存自己那部分，也就只读自己那部分：
 
-$$\frac{890\ \text{B} \times 10^6}{4} = 0.23\ \text{GB}$$
+$$
+\frac{890\ \text{B} \times 10^6}{4} = 0.23\ \text{GB}
+$$
 
 **两项加起来，KV 只占 10%。** 和前面 batch 1 的结论一致，TP 不改变这个比例。
 
@@ -632,11 +742,17 @@ Cognition 的 [SWE-2](https://cognition.com/blog/swe-2) 更能说明分工。它
 
 第三个例子是 DeepSeek V4-Flash-0731。它的模型结构和尺寸与 Preview 保持一致，只重新做了后训练，但 Agent benchmark 大幅提升：
 
-$$\text{DeepSWE: } 7.3 \rightarrow 54.4$$
+$$
+\text{DeepSWE: } 7.3 \rightarrow 54.4
+$$
 
-$$\text{CyberGym: } 38.7 \rightarrow 76.7$$
+$$
+\text{CyberGym: } 38.7 \rightarrow 76.7
+$$
 
-$$\text{TerminalBench 2.1: } 61.8 \rightarrow 82.7$$
+$$
+\text{TerminalBench 2.1: } 61.8 \rightarrow 82.7
+$$
 
 模型 backbone 没换。Attention 没换。参数量没换。官方更新日志直接写明结构不变、仅重新后训练。这个例子比任何口号都说明问题：**同一个 backbone 的 post-training 差异，完全可能比两代 architecture 的差异更大。** 所以把"模型进步"拆成四个层次更合适：
 
@@ -649,23 +765,33 @@ $$\text{TerminalBench 2.1: } 61.8 \rightarrow 82.7$$
 
 Infra 这一层最容易被低估，也最残酷。因为 RL 不是：
 
-$$\text{写个 PPO/GRPO 公式} \rightarrow \text{模型自动变聪明}$$
+$$
+\text{写个 PPO/GRPO 公式} \rightarrow \text{模型自动变聪明}
+$$
 
 而是一条很长的系统：
 
-$$\text{prompt} \rightarrow \text{rollout} \rightarrow \text{tool environment} \rightarrow \text{reward} \rightarrow \text{sampling} \rightarrow \text{advantage} \rightarrow \text{gradient} \rightarrow \text{model update}$$
+$$
+\text{prompt} \rightarrow \text{rollout} \rightarrow \text{tool environment} \rightarrow \text{reward} \rightarrow \text{sampling} \rightarrow \text{advantage} \rightarrow \text{gradient} \rightarrow \text{model update}
+$$
 
 任何地方一个小 bug，最后都会变成同一句话："奇怪，我们这个新的 RL 算法怎么效果一般？" 而那个 bug 可能是 reward 算错、tool state 泄漏、rollout truncation 错、mask 错、sampling distribution 不一致、tokenizer offset 错、advantage normalization 错、stale policy 太严重，或者 sandbox reset 有问题。实际上不是算法一般，是代码在偷偷犯罪。所以更准确的因果链是：
 
-$$\boxed{\text{Architecture} \rightarrow \text{Cost reduction} \rightarrow \text{More effective training} \rightarrow \text{Capability}}$$
+$$
+\boxed{\text{Architecture} \rightarrow \text{Cost reduction} \rightarrow \text{More effective training} \rightarrow \text{Capability}}
+$$
 
 而不是：
 
-$$\boxed{\text{Architecture} \rightarrow \text{Magic intelligence}}$$
+$$
+\boxed{\text{Architecture} \rightarrow \text{Magic intelligence}}
+$$
 
 架构对能力的作用，经常是**间接的**。如果只能从这一节记一句话，我会记这个排序：
 
-$$\boxed{\text{Data} > \text{Post-training/RL} > \text{Eval/Verifier} > \text{Training infra} > \text{Architecture}}$$
+$$
+\boxed{\text{Data} > \text{Post-training/RL} > \text{Eval/Verifier} > \text{Training infra} > \text{Architecture}}
+$$
 
 这不是说 architecture 最不重要。而是如果你问"这一代模型为什么明显更好用了"，答案很多时候在前面几项，而不是"我们把 attention 又改了一个 acronym"。旁边还有一组更好记的说法，把每一层对应到一个"前沿"：
 
@@ -676,45 +802,65 @@ $$\boxed{\text{Data} > \text{Post-training/RL} > \text{Eval/Verifier} > \text{Tr
 
 最后这条听起来最不起眼，实际经常最残酷。一个漂亮的新 loss 写在论文里只需要半页。一个可靠的 million-token agent rollout system，可能需要几十个人跟各种分布式 bug、CUDA bug、环境 bug、数据 bug 打几个月架。论文不会把那些凌晨三点的 NCCL timeout 写进公式里，但模型能力很可能就死在那里。Kimi K3 的 KDA 为什么重要？不是因为 Linear Attention 本身突然赋予模型神秘推理能力。而是它让 1M context、long-horizon rollout、agentic RL 在计算上变得现实：
 
-$$\text{KDA} \rightarrow \text{长上下文更便宜} \rightarrow \text{更多 long-horizon RL rollout} \rightarrow \text{更好的 agent 数据} \rightarrow \text{Agent 能力提高}$$
+$$
+\text{KDA} \rightarrow \text{长上下文更便宜} \rightarrow \text{更多 long-horizon RL rollout} \rightarrow \text{更好的 agent 数据} \rightarrow \text{Agent 能力提高}
+$$
 
 CSA/HCA 也一样。它最漂亮的地方未必是"稀疏 attention 本身理解能力比 MLA 强"，而是 1M context 变得足够便宜。
 
-$$\boxed{\text{架构是 compute multiplier，不是 intelligence generator。}}$$
+$$
+\boxed{\text{架构是 compute multiplier，不是 intelligence generator。}}
+$$
 
 ## 算力预算
 
 如果架构主要在省钱，那"该不该冒架构的险"就变成了一个纯粹的预算问题。假设已验证的 Transformer scaling recipe 能拿到 95 分。新架构理论上能到 100，但有 20% 概率训练炸掉，只剩 70。如果算力富裕，为什么要冒险？把已验证的架构再 scale 10 倍，可能直接拿到 98，而且更可靠。
 
-$$\boxed{\text{scale proven architecture first}}$$
+$$
+\boxed{\text{scale proven architecture first}}
+$$
 
 这其实是一种"富人的保守"。而算力紧张的实验室没有 10× compute 可以挥霍，只能想办法：
 
-$$\boxed{\text{让 } 1\times \text{ compute 做出 } 3\times \text{ compute 的效果}}$$
+$$
+\boxed{\text{让 } 1\times \text{ compute 做出 } 3\times \text{ compute 的效果}}
+$$
 
 于是架构创新的 ROI 突然变得非常高。从优化目标看更直白。算力富裕的一方更接近：
 
-$$\max \text{Capability}, \quad \text{s.t. Compute 很大}$$
+$$
+\max \text{Capability}, \quad \text{s.t. Compute 很大}
+$$
 
 所以可以接受较低的 architecture efficiency，只要 scaling 稳。而算力受限的一方更像：
 
-$$\max \frac{\text{Capability}}{\text{Compute}}$$
+$$
+\max \frac{\text{Capability}}{\text{Compute}}
+$$
 
 于是被逼出 MLA、MoE、Sparse、Linear、各种 compression。这和芯片行业很像。资源充裕时加晶体管，资源受限时改 architecture。所以很多所谓架构路线之争，底层其实是不同算力预算下的经济学。把这件事再拆细一点，会发现竞争其实发生在四种资本上：
 
-$$\boxed{\text{Compute Capital}}$$
+$$
+\boxed{\text{Compute Capital}}
+$$
 
 GPU、HBM、network、datacenter。
 
-$$\boxed{\text{Data Capital}}$$
+$$
+\boxed{\text{Data Capital}}
+$$
 
 真实用户、agent trajectories、enterprise workflow、feedback。
 
-$$\boxed{\text{Algorithmic Capital}}$$
+$$
+\boxed{\text{Algorithmic Capital}}
+$$
 
 architecture、training recipe、RL、verifier。
 
-$$\boxed{\text{Infrastructure Capital}}$$
+$$
+\boxed{\text{Infrastructure Capital}}
+$$
 
 稳定地把几千几万张 GPU、RL environment、rollout 全跑起来。算力富裕的一方在前两项和第四项上有巨大积累；算力受限的一方被迫在第三项特别凶。这也是为什么"美国靠暴力 scaling、中国靠聪明架构"这种说法太简化了。更接近事实的写法是：**一边在用资源优势降低研究风险，另一边在用资源约束提高创新收益。**
 
@@ -724,7 +870,9 @@ $$\boxed{\text{Infrastructure Capital}}$$
 
 一旦某个架构优化被证明有效，情况就变了。DeepSeek 做出 MLA，或者 Kimi 做出成熟的 Linear Attention，算力多的一方并不会因为自己算力多就拒绝使用。它们完全可以：
 
-$$\boxed{\text{更多算力} \times \text{更高效架构}}$$
+$$
+\boxed{\text{更多算力} \times \text{更高效架构}}
+$$
 
 于是原本弱者为了生存开发出来的 efficiency innovation，最后反而可能让强者 scale 得更狠。这才是最残酷的一层。所以问题最后又回到：省下来的钱，值不值得花。
 
@@ -753,21 +901,35 @@ V4.1             压 L 轴和计算阶段：不再每层每步都付同样的钱
 
 同样的路线，换成一连串追问：
 
-$$\text{每个 head 都需要独立 KV 吗？} \quad \rightarrow \quad \text{MQA / GQA}$$
+$$
+\text{每个 head 都需要独立 KV 吗？} \quad \rightarrow \quad \text{MQA / GQA}
+$$
 
-$$\text{每个 token 都需要完整 KV 吗？} \quad \rightarrow \quad \text{MLA}$$
+$$
+\text{每个 token 都需要完整 KV 吗？} \quad \rightarrow \quad \text{MLA}
+$$
 
-$$\text{每个 query 都需要看所有 token 吗？} \quad \rightarrow \quad \text{CSA / HCA}$$
+$$
+\text{每个 query 都需要看所有 token 吗？} \quad \rightarrow \quad \text{CSA / HCA}
+$$
 
-$$\text{每个 token 都需要被永久保存吗？} \quad \rightarrow \quad \text{Linear / SSM}$$
+$$
+\text{每个 token 都需要被永久保存吗？} \quad \rightarrow \quad \text{Linear / SSM}
+$$
 
-$$\text{每个 layer 都需要独立 memory 吗？} \quad \rightarrow \quad \text{V4.1}$$
+$$
+\text{每个 layer 都需要独立 memory 吗？} \quad \rightarrow \quad \text{V4.1}
+$$
 
-$$\text{Prefill 和 Decode 必须用同样计算吗？} \quad \rightarrow \quad \text{V4.1}$$
+$$
+\text{Prefill 和 Decode 必须用同样计算吗？} \quad \rightarrow \quad \text{V4.1}
+$$
 
 每一代都在放松一个假设。而这三个动作一直循环：
 
-$$\boxed{\text{保存信息} \leftrightarrow \text{压缩信息} \leftrightarrow \text{找回信息}}$$
+$$
+\boxed{\text{保存信息} \leftrightarrow \text{压缩信息} \leftrightarrow \text{找回信息}}
+$$
 
 最后那句话还可以再收一下。
 
