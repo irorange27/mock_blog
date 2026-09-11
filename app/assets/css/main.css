@@ -257,6 +257,34 @@ html {
   word-wrap: break-word;
 }
 
+/* ── Display math（行间公式）── */
+/* KaTeX 的行间公式是一整条 nowrap 的长行，宽度只由公式本身决定，经常超过正文列。
+   让每条公式自己横向滚动，而不是把卡片顶宽或溢到卡片外（与 table / pre 一致）：
+   .katex-display 做滚动容器；> .katex 放得下时按正文列宽走（KaTeX 自带的
+   text-align:center 居中，\tag 也仍旧贴正文列右缘），放不下时按公式自身宽度走、
+   从左边开始滚——auto margin 那样居中会把公式开头裁掉，所以用 min-width 兜底。 */
+.prose .katex-display {
+  overflow-x: auto;
+  overflow-y: hidden;
+  /* overflow 的裁剪发生在 padding box 上，而 KaTeX 的行高比盒子矮几像素
+     （\underbrace{}_\text{…} 这类下伸部分），不留内边距会把字底裁掉；
+     内边距与外边距等量互换，公式上下的留白维持原来的 1em 不变。 */
+  padding-block: 0.5em;
+  margin-block: 0.5em;
+}
+
+.prose .katex-display > .katex {
+  width: max-content;
+  min-width: 100%;
+}
+
+/* 打印没有滚动条，滚动容器会把放不下的部分直接裁掉 */
+@media print {
+  .prose .katex-display {
+    overflow: visible;
+  }
+}
+
 /* ── Tables ── */
 .prose table {
   display: block;

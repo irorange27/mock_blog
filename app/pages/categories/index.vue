@@ -18,8 +18,8 @@ const { categories, tags } = useBlogData()
           :to="`/categories/${category.name}`"
           class="flex items-center justify-between p-4 bg-[var(--panel-bg)] rounded-lg hover:bg-[var(--panel-bg-hover)] transition"
         >
-          <span class="font-medium text-[var(--txt-90)]">{{ category.name }}</span>
-          <span class="text-[var(--txt-50)]">{{ category.count }} 篇</span>
+          <span class="font-medium text-[var(--txt-90)] truncate">{{ category.name }}</span>
+          <span class="text-[var(--txt-50)] shrink-0">{{ category.count }} 篇</span>
         </NuxtLink>
       </div>
     </div>

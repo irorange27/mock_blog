@@ -45,10 +45,10 @@ const groupedPosts = computed(() => groupPostsByYearAndMonth(posts.value))
                   :to="post._path"
                   class="flex items-center justify-between space-x-4 p-2"
                 >
-                  <span class="text-[var(--txt-50)] text-sm">
+                  <span class="text-[var(--txt-50)] text-sm shrink-0">
                     {{ formatDay(post.date) }}
                   </span>
-                  <span class="font-medium font-bold text-[var(--txt-90)] hover:text-[var(--primary)] transition-colors">
+                  <span class="font-medium font-bold text-[var(--txt-90)] hover:text-[var(--primary)] transition-colors truncate">
                     {{ post.title }}
                   </span>
                 </NuxtLink>

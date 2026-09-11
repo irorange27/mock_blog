@@ -39,7 +39,7 @@ useSeoMeta({
           {{ data?.categories || '默认' }}
         </NuxtLink>
         <span class="mx-2">·</span>
-        <div class="flex gap-2">
+        <div class="flex flex-wrap gap-2">
           <NuxtLink
             v-for="tag in data?.tags"
             :key="tag"

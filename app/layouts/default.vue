@@ -32,7 +32,10 @@ const currentYear = new Date().getFullYear()
           </div>
         </aside>
 
-        <div class="order-1 lg:order-2">
+        <!-- min-w-0：1fr 栅格列默认的最小尺寸是 min-content，而行间公式是 nowrap 的长行，
+             不收缩就会把正文列整个顶宽、越过 max-w-6xl 撞上右侧固定目录。允许收缩后，
+             列宽只由断点决定，超宽内容各自在列内滚动（见 main.css 的 .katex-display） -->
+        <div class="order-1 lg:order-2 min-w-0">
           <slot />
         </div>
       </div>
