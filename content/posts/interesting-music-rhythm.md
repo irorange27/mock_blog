@@ -42,7 +42,6 @@ draft: false
 
 复合节奏（PolyRhythm）又叫复合速度(PolyTempo)，也就是说在保持强拍一致的情况下，同时存在不同 Tempo 的声部。
 
-
 ::poly-score{staff}
 ```
 4/4 @160 bars=4 inst=tone c4 e4 d4 f4 | c4 e8 c4 b'4. | c4 e4 d4 f4 | c4 e8 c4 b'4 g8

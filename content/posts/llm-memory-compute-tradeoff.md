@@ -14,11 +14,7 @@ draft: false
 
 GPT6出来之后，体感上很多人都很焦虑迷茫，真的到了AGI time，接下来该做什么呢？虽然说Astra用下来，在一些case上还是会overfit，但真的已经能胜任大多数人完成的任务了（在数字世界里）。这两天ds4.1f正式上线了，如此novel的架构让我感到新奇，模型架构与硬件的co-design达到一定水平的杰作，让我们来看一下吧。**这篇由 AI 整理。**
 
-路线大概是这样：从 MHA 出发，一路看到 Linear Attention，看每一代分别在砍哪一项成本。
-
-$$
-\boxed{\text{现代 LLM 架构的主线，是不断消除 memory 和 compute 的冗余。}}
-$$
+从 MHA 出发，一路到 Linear Attention，看每一代分别在砍哪一项成本。
 
 ## MHA 与 KV Cache
 
@@ -36,7 +32,9 @@ $$
 q_i^{(s)} = x_i W_q^{(s)} \in \mathbb{R}^{d_k}, \quad k_i^{(s)} = x_i W_k^{(s)} \in \mathbb{R}^{d_k}, \quad v_i^{(s)} = x_i W_v^{(s)} \in \mathbb{R}^{d_v}
 $$
 
+::note
 （省略了缩放因子。常见设置是 $d_k = d_v = d/h$。）关键在因果性。自回归生成时，新预测出来的第 $t+1$ 个 token 不会影响已经算好的 $k^{(s)}_{\le t}$ 和 $v^{(s)}_{\le t}$，所以这部分可以缓存下来，避免重复计算。这就是 KV Cache。它的大小约等于：
+::
 
 $$
 2 \times L \times h \times d_k \times N \times \text{bytes}
@@ -54,7 +52,7 @@ $$
 
 ## Prefill 与 Decode
 
-还有一件事必须拆开说，因为后面 MLA 的设计直接从这里来。LLM 推理分两个阶段，它们的成本结构完全不是一回事。**Prefill**：把输入的所有 token 并行算一遍，同时把 KV Cache 建起来。所有 token 一起算，矩阵运算排得很满，算力基本能吃满。它是 **compute bound**。**Decode**：之后逐个生成 token。这里有个容易漏掉的点。
+LLM 推理分两个阶段，它们的成本结构不同。**Prefill**：把输入的所有 token 并行算一遍，同时把 KV Cache 建起来。所有 token 一起算，矩阵运算排得很满，算力基本能吃满。它是 **compute bound**。**Decode**：之后逐个生成 token。这里有个容易漏掉的点。
 
 每生成一个 token，计算量很小，但要读的东西一点都不少：**模型权重**要整体过一遍，KV Cache 也要读一遍。
 
@@ -181,7 +179,7 @@ $W_q^{(s)} R_{t-i} W_k^{(s)\top}$ 跟位置差 $t - i$ 相关，无法合并成�
 
 | | MHA | MLA | 比值 |
 | --- | --- | --- | --- |
-| KV 读取 / 层 / token | $65536N$ B | $1152N$ B | **1 : 56.9** |
+| KV 读取 / 层 / token | $65536N$B | $1152N$B | **1 : 56.9** |
 | attention FLOPs / 层 / token | $65536N$ | $278528N$ | **4.25 : 1** |
 
 用 roofline 分析一下。H100 SXM 的 BF16 算力约 989 TFLOPS，HBM3 带宽 3.35 TB/s，拐点在：
@@ -298,9 +296,7 @@ $$
 
 因为 MLA 的 KV Cache 大小跟 $h$ 无关。增大 $h$ 只增加计算量和提升模型能力，不增加 KV Cache，所以不会带来速度瓶颈。MLA 完成的思想升级可以写成一句话：
 
-$$
-\boxed{\text{从离散的 head sharing，到连续的 representation compression}}
-$$
+从离散的 head sharing，到连续的 representation compression
 
 ## CSA 与 HCA
 
