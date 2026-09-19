@@ -53,6 +53,7 @@ const currentYear = new Date().getFullYear()
 
     <ClientOnly>
       <CodeCopy />
+      <CodeRunner />
       <ImageLightbox />
       <BackToTop />
     </ClientOnly>
