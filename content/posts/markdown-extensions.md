@@ -5,7 +5,7 @@ categories: '技术杂谈'
 tags:
   - 博客
 description: 本站 Markdown 支持的扩展语法演示与速查：admonition 提示块、GitHub 仓库卡片、spoiler 遮罩、ABC 乐谱、音频播放器、浏览器可运行代码块。
-draft: false
+draft: true
 ---
 
 本站用 @nuxt/content 的 MDC 语法支持了几个 Markdown 扩展。这篇就是各语法的实际渲染效果，写作时可以直接当速查用。
