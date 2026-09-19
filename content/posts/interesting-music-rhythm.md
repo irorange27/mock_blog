@@ -31,11 +31,13 @@ draft: false
 复合节拍（polymeter）是另一回事：两把"乐器"拍子对拍子、速度一致，但各自数自己的小节，小节线是错开的。也就是说可能一个四拍子的东西，你当作了三拍子听（反之亦然），就是复合节拍的效果。下面给出一个听四打三的例子。
 
 ::poly-score{staff}
-```
+
+```poly-score{staff}
 4/4 @144 b4 c4 d4 e4 | d4 c4 b4 c4 | d4 e4 d4 c4 | b4 c4 d4 e4 |
 3/4 @144 bars=6 | |
 4/4 @144
 ```
+
 ::
 
 ## 复合节奏
@@ -43,19 +45,23 @@ draft: false
 复合节奏（PolyRhythm）又叫复合速度(PolyTempo)，也就是说在保持强拍一致的情况下，同时存在不同 Tempo 的声部。
 
 ::poly-score{staff}
-```
+
+```poly-score{staff}
 4/4 @160 bars=4 inst=tone c4 e4 d4 f4 | c4 e8 c4 b'4. | c4 e4 d4 f4 | c4 e8 c4 b'4 g8
 3/4 @120
 4/4 @160
 ```
+
 ::
 
 速度不同也行，时间轴按真实时间比例拉开，错拍的过程一目了然：
 
 ::poly-score
-```
+
+```poly-score
 4/4 @80
 3/4 @60
 ```
+
 ::
 

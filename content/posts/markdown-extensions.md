@@ -152,7 +152,7 @@ const dot = (a: Vec, b: Vec): number => a.reduce((s, x, i) => s + x * b[i], 0)
 console.log('点积 =', dot([1, 2, 3], [4, 5, 6]))
 ```
 
-Python 侧 `numpy`、`scipy`、`pandas`、`networkx` 在检测到 import 时自动加载，适合放注意力、归一化这类小演示：
+Python 侧代码 import 到的 [Pyodide 内置包](https://pyodide.org/en/stable/usage/packages-in-pyodide.html)（`numpy`、`scipy`、`pandas`、`sympy` 等）会在运行前自动加载，适合放注意力、归一化这类小演示：
 
 ```python
 import numpy as np
