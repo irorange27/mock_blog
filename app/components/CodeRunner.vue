@@ -14,8 +14,10 @@ onMounted(() => {
       el.setAttribute('data-runnable', kind)
 
       const btn = document.createElement('button')
-      btn.textContent = '运行'
+      setButtonIcon(btn, 'mdi:play')
       btn.className = 'code-run-btn'
+      btn.title = '运行'
+      btn.setAttribute('aria-label', '运行代码')
       btn.addEventListener('click', () => execute(el, btn, kind))
       el.appendChild(btn)
     })
@@ -24,12 +26,48 @@ onMounted(() => {
   enhance()
   const observer = new MutationObserver(enhance)
   observer.observe(document.body, { childList: true, subtree: true })
+  document.addEventListener('visibilitychange', onVisibilityChange)
   onUnmounted(() => {
     observer.disconnect()
     disposed = true
     terminateAllWorkers()
+    document.removeEventListener('visibilitychange', onVisibilityChange)
+    stopTitleFlash()
   })
 })
+
+/* ── 后台标签页的结束提醒:交替闪烁标题,切回页面或超时后还原 ── */
+let titleTimer: ReturnType<typeof setInterval> | null = null
+let titleCapTimer: ReturnType<typeof setTimeout> | null = null
+let titleFlashOn = false
+let originalTitle = ''
+
+function onVisibilityChange() {
+  if (!document.hidden) stopTitleFlash()
+}
+
+function stopTitleFlash() {
+  if (titleTimer) clearInterval(titleTimer)
+  if (titleCapTimer) clearTimeout(titleCapTimer)
+  titleTimer = titleCapTimer = null
+  if (titleFlashOn) {
+    document.title = originalTitle
+    titleFlashOn = false
+  }
+}
+
+function startTitleFlash(failed: boolean) {
+  stopTitleFlash()
+  originalTitle = document.title
+  const flashTitle = failed ? '✗ 代码运行出错' : '✓ 代码运行完成'
+  document.title = flashTitle
+  titleFlashOn = true
+  titleTimer = setInterval(() => {
+    document.title = document.title === flashTitle ? originalTitle : flashTitle
+  }, 800)
+  // 最多闪 15 秒,读者离开再久也不一直占着标题(SPA 路由切页同样要写标题)
+  titleCapTimer = setTimeout(stopTitleFlash, 15_000)
+}
 
 function execute(pre: HTMLElement, btn: HTMLButtonElement, kind: RunnerKind) {
   const code = pre.querySelector('code')?.textContent ?? ''
@@ -57,7 +95,10 @@ function execute(pre: HTMLElement, btn: HTMLButtonElement, kind: RunnerKind) {
     if (!row.classList.contains('code-run-close')) row.remove()
   }
 
+  const t0 = performance.now()
+  let hasError = false
   const append = (l: OutputLine) => {
+    if (l.type === 'error') hasError = true
     if (!panel!.isConnected) return
     const row = document.createElement('div')
     row.className = `code-run-line code-run-${l.type}`
@@ -67,12 +108,26 @@ function execute(pre: HTMLElement, btn: HTMLButtonElement, kind: RunnerKind) {
   }
 
   btn.disabled = true
-  btn.textContent = '运行中'
+  setButtonIcon(btn, 'mdi:loading')
+  btn.classList.add('is-loading')
+  btn.title = '运行中'
   runCode(pre, kind, code, append)
     .catch((e: any) => append({ type: 'error', text: `无法执行: ${e?.message ?? e}` }))
     .finally(() => {
       btn.disabled = false
-      btn.textContent = '运行'
+      btn.classList.remove('is-loading')
+      setButtonIcon(btn, 'mdi:play')
+      btn.title = '运行'
+      // 结束提醒:输出末尾标注结果与耗时;标签页在后台时再闪标题。
+      // 秒级内跑完的块输出即时可见,结尾行只是噪音,只在等待过或有报错时给。
+      const elapsed = performance.now() - t0
+      if (hasError || elapsed >= 1000 || document.hidden) {
+        append({
+          type: hasError ? 'error' : 'status',
+          text: `${hasError ? '✗ 运行出错' : '✓ 运行完成'}(${(elapsed / 1000).toFixed(1)} 秒)`,
+        })
+        if (document.hidden) startTitleFlash(hasError)
+      }
     })
 }
 </script>
@@ -85,13 +140,22 @@ function execute(pre: HTMLElement, btn: HTMLButtonElement, kind: RunnerKind) {
   position: absolute;
   top: 8px;
   right: 8px;
-  min-width: 52px;
-  padding: 2px 8px;
-  font-size: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 24px;
+  padding: 0;
   border-radius: 6px;
   cursor: pointer;
   opacity: 0;
   transition: opacity 0.2s;
+}
+
+.code-run-btn svg {
+  display: block;
+  width: 14px;
+  height: 14px;
 }
 
 pre:hover .code-run-btn,
@@ -100,9 +164,17 @@ pre:hover .code-run-btn,
   opacity: 1;
 }
 
+.code-run-btn.is-loading svg {
+  animation: code-run-rotate 0.8s linear infinite;
+}
+
+@keyframes code-run-rotate {
+  to { transform: rotate(360deg); }
+}
+
 /* 有运行键的代码块,复制键左移让位 */
 pre[data-runnable] .code-copy-btn {
-  right: 72px;
+  right: 44px;
 }
 
 html.dark-mode .code-run-btn {

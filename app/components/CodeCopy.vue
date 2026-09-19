@@ -4,16 +4,22 @@ onMounted(() => {
     document.querySelectorAll('pre:not([data-copy-done])').forEach((pre) => {
       pre.setAttribute('data-copy-done', 'true')
       pre.style.position = 'relative'
-      
+
       const btn = document.createElement('button')
-      btn.textContent = '复制'
+      setButtonIcon(btn, 'mdi:content-copy')
       btn.className = 'code-copy-btn'
+      btn.title = '复制代码'
+      btn.setAttribute('aria-label', '复制代码')
       btn.onclick = async () => {
         const code = pre.querySelector('code')
         if (code) {
           await navigator.clipboard.writeText(code.textContent || '')
-          btn.textContent = '已复制'
-          setTimeout(() => { btn.textContent = '复制' }, 2000)
+          setButtonIcon(btn, 'mdi:check')
+          btn.title = '已复制'
+          setTimeout(() => {
+            setButtonIcon(btn, 'mdi:content-copy')
+            btn.title = '复制代码'
+          }, 2000)
         }
       }
       pre.appendChild(btn)
@@ -34,12 +40,22 @@ onMounted(() => {
   position: absolute;
   top: 8px;
   right: 8px;
-  padding: 2px 8px;
-  font-size: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 24px;
+  padding: 0;
   border-radius: 6px;
   cursor: pointer;
   opacity: 0;
   transition: opacity 0.2s;
+}
+
+.code-copy-btn svg {
+  display: block;
+  width: 14px;
+  height: 14px;
 }
 
 /* Dark mode code blocks (github-dark bg: #0d1117) */

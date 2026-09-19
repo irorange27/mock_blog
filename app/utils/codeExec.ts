@@ -3,8 +3,8 @@
  *
  * js / ts:跑在 Blob Worker 里(独立线程、无 DOM),死循环可被 terminate 兜底;
  * ts 先经 sucrase(CDN 懒加载)剥离类型标注再执行。
- * python:跑在 Pyodide(WebAssembly 版 CPython,CDN 懒加载),numpy / scipy /
- * pandas 在检测到 import 时自动加载。
+ * python:跑在 Pyodide(WebAssembly 版 CPython,CDN 懒加载),代码 import 到的
+ * Pyodide 内置包(numpy、scipy、sympy、Pillow 等)自动加载。
  *
  * 只在客户端调用(组件 onMounted 之后),不做任何服务端执行。
  */
@@ -131,8 +131,6 @@ async function stripTypes(code: string): Promise<string> {
 /* ────────────────────────── python ────────────────────────── */
 
 const PYODIDE_BASE = 'https://cdn.jsdelivr.net/pyodide/v314.0.7/full/'
-/** 浏览器里能自动装的 WASM 包;torch 等带原生扩展的不在 Pyodide 发行版里 */
-const PY_PACKAGES = ['numpy', 'scipy', 'pandas', 'networkx'] as const
 
 let pyodidePromise: Promise<any> | null = null
 
@@ -152,23 +150,27 @@ function getPyodide(): Promise<any> {
 async function runPython(code: string, onLine: (l: OutputLine) => void): Promise<void> {
   let py: any
   try {
-    onLine({ type: 'status', text: '正在加载 Python 运行时(Pyodide,首次约 10 MB,之后走缓存)…' })
+    onLine({ type: 'status', text: '正在加载 Python 运行时…' })
     py = await getPyodide()
   } catch (e: any) {
     onLine({ type: 'error', text: `Python 运行时加载失败(需要联网): ${e?.message ?? e}` })
     return
   }
 
-  for (const pkg of PY_PACKAGES) {
-    if (new RegExp(`^\\s*(?:import|from)\\s+${pkg}\\b`, 'm').test(code)) {
-      onLine({ type: 'status', text: `加载 ${pkg} …` })
-      try {
-        await py.loadPackage(pkg)
-      } catch (e: any) {
-        onLine({ type: 'error', text: `${pkg} 加载失败: ${e?.message ?? e}` })
-        return
-      }
-    }
+  // 按 import 语句自动加载 Pyodide 内置包(find_imports + lockfile 的 imports 映射,
+  // PIL→Pillow、cv2→opencv-python 这类 import 名与包名不一致也能对上);
+  // 不认识的 import 会被跳过,留给真正执行时的 ModuleNotFoundError 提示兜底。
+  try {
+    await py.loadPackagesFromImports(code, {
+      messageCallback: (s: string) => {
+        // Loading X → 「加载 X …」;完成时的 "Loaded X" 是重复信息,吞掉
+        const m = s.match(/^(?:Loading|Installing)\s+(.+)$/)
+        if (m) onLine({ type: 'status', text: `加载 ${m[1]} …` })
+      },
+    })
+  } catch (e: any) {
+    onLine({ type: 'error', text: `依赖包加载失败(需要联网): ${e?.message ?? e}` })
+    return
   }
 
   py.setStdout({ batched: (s: string) => onLine({ type: 'log', text: s }) })
@@ -177,7 +179,17 @@ async function runPython(code: string, onLine: (l: OutputLine) => void): Promise
     // 同一页面共享一个解释器:上一篇块里定义的变量,下一个块可以接着用
     await py.runPythonAsync(code)
   } catch (e: any) {
-    onLine({ type: 'error', text: String(e?.message ?? e) })
+    const msg = String(e?.message ?? e)
+    onLine({ type: 'error', text: msg })
+    // torch / tensorflow 等带原生扩展的库不在 Pyodide 发行版里,原始 traceback
+    // 对读者不够直观,补一行可操作的提示。
+    const missing = msg.match(/ModuleNotFoundError: No module named '([^']+)'/)
+    if (missing) {
+      onLine({
+        type: 'error',
+        text: `「${missing[1]}」不在 Pyodide 内置包中,浏览器里无法运行;可用包完整列表见 pyodide.org 文档,torch 等原生扩展库请用 numpy 等价改写。`,
+      })
+    }
   }
 }
 
