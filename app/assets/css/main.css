@@ -32,8 +32,8 @@
     --link-visited: oklch(0.50 0.17 290);
     --danger: oklch(0.55 0.19 25);
 
-    --page-bg: oklch(0.965 0.008 var(--hue));
-    --nav-bg: oklch(0.965 0.008 var(--hue) / 0.8);
+    --page-bg: oklch(0.985 0.008 var(--hue));
+    --nav-bg: oklch(0.985 0.008 var(--hue) / 0.8);
 
     --card-bg: oklch(0.995 0.003 var(--hue));
     --card-bg-60: oklch(0.995 0.003 var(--hue) / 0.6);
@@ -60,7 +60,8 @@
 
     --inline-code-bg: oklch(0.96 0.012 var(--hue));
     --pre-bg: oklch(0.975 0.008 var(--hue));
-    --pre-fg: oklch(0.90 0.01 var(--hue));
+    /* 浅色下代码前景用深墨色（plaintext/无语言块没有 shiki span 兜底，全靠它） */
+    --pre-fg: oklch(0.30 0.015 var(--hue));
 
     --selection-bg: oklch(0.90 0.05 var(--hue));
 
