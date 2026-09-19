@@ -11,7 +11,7 @@
 ## 决策摘要(brainstorming 结论)
 
 | 维度 | 决定 |
-|------|------|
+| ------ | ------ |
 | 渲染库 | **AlphaTab**——直接读 Guitar Pro 原生格式(`.gp`/`.gpx`/`.gp5`),无需转 MusicXML,tab + 五线谱一等公民,自带 SVG 渲染与回放。 |
 | 音频 | **两者都要**:AlphaTab 内置 soundfont 回放(谱面内播放、光标跟随、可转调)+ 单独的 RSE MP3(`<audio controls>`,Guitar Pro 导出的真实音色)。 |
 | Markdown 调用 | **单一组合组件** `::score{src audio layout}`,一次性渲染谱面 + RSE 播放器。 |

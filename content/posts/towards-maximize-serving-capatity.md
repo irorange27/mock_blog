@@ -14,7 +14,7 @@ benchmark的任务类型涵盖chat、长输入、长输出，coding agent等等�
 正式评测共包含 10 个 case：
 
 | Problem ID | 场景说明 |
-|---|---|
+| --- | --- |
 | LLM-A1 | Multilingual Chat: 中英文混合的单轮与多轮对话，考察通用对话服务的吞吐与稳定性。 |
 | LLM-A2 | Long Prefill 64K: 最高 64K 级别的长上下文输入，重点覆盖 prefill、KV cache 与长上下文处理。 |
 | LLM-A3 | Ultra Context 1M: 接近 1M context window 的超长输入，考察超长上下文处理、显存管理与服务稳定性。 |
