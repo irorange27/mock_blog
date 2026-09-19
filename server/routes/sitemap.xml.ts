@@ -8,7 +8,7 @@ export default defineEventHandler(async (event) => {
     .where({ _partial: false })
     .find()
 
-  const staticRoutes = ['/', '/about', '/archives', '/categories', '/links']
+  const staticRoutes = ['/', '/about', '/archives', '/categories', '/links', '/posts']
 
   const postRoutes = docs
     .filter(doc => doc?._path?.startsWith('/posts/'))

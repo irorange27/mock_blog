@@ -52,6 +52,10 @@ export default defineNuxtConfig({
       failOnError: false,
     },
   },
+  // /tags 的汇总在 /categories（分类与标签同页），把直觉 URL 接住
+  routeRules: {
+    '/tags': { redirect: '/categories' },
+  },
   app: {
     head: {
       link: [

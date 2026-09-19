@@ -1,4 +1,8 @@
 <script setup lang="ts">
+useSeoMeta({
+  title: '404 | Niina\'s Blog',
+})
+
 definePageMeta({
     layout: '404'
 })
