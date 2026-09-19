@@ -5,7 +5,7 @@ useSeoMeta({
 })
 
 const currentPage = ref(1)
-const postsPerPage = 7
+const postsPerPage = 9
 
 const { posts } = useBlogData()
 
