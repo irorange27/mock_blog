@@ -325,6 +325,14 @@ html {
   background-color: var(--pre-bg);
 }
 
+/* mdc/shiki 生成的暗色规则挂在 html.dark 上，而本站 color-mode 的类名是
+   dark-mode，规则不命中会让暗色模式套用浅色主题色（深蓝字符串等几乎不可见）。
+   这里补一条映射，让暗色模式真正使用 --shiki-dark 一侧的主题色。 */
+html.dark-mode .shiki span {
+  color: var(--shiki-dark, var(--shiki-default));
+  background: var(--shiki-dark-bg, transparent);
+}
+
 /* ── Blockquote ── */
 .prose blockquote {
   border-left-width: 4px;

@@ -43,7 +43,7 @@ export default defineNuxtConfig({
         default: 'github-light',
         dark: 'github-dark',  
       },
-      preload: ['js', 'ts', 'css', 'html', 'bash', 'vue', 'shell', 'mdc', 'md', 'yaml']
+      preload: ['js', 'ts', 'css', 'html', 'bash', 'vue', 'shell', 'mdc', 'md', 'yaml', 'python', 'py']
     }
   },
   nitro: {
