@@ -131,8 +131,8 @@ async function stripTypes(code: string): Promise<string> {
 /* ────────────────────────── python ────────────────────────── */
 
 const PYODIDE_BASE = 'https://cdn.jsdelivr.net/pyodide/v314.0.7/full/'
-/** 浏览器里能自动装的纯 WASM 包;torch 等带原生扩展的不在 Pyodide 发行版里 */
-const PY_PACKAGES = ['numpy', 'scipy', 'pandas'] as const
+/** 浏览器里能自动装的 WASM 包;torch 等带原生扩展的不在 Pyodide 发行版里 */
+const PY_PACKAGES = ['numpy', 'scipy', 'pandas', 'networkx'] as const
 
 let pyodidePromise: Promise<any> | null = null
 
