@@ -4,13 +4,14 @@
   "type": "module",
   "scripts": {
     "new-post": "node scripts/new-post.js",
+    "media": "node scripts/media.mjs",
     "subset-font": "bash scripts/subset-font.sh",
     "build": "nuxt build",
     "dev": "node -e 'require(\"node:fs\").rmSync(\".output\", { recursive: true, force: true })' && nuxt dev",
     "test": "vitest",
     "generate": "nuxt generate",
     "preview": "nuxt preview",
-    "postinstall": "nuxt prepare"
+    "postinstall": "nuxt prepare && (git config core.hooksPath .githooks || true)"
   },
   "dependencies": {
     "@nuxt/content": "^2.13.4",
@@ -34,6 +35,7 @@
     "@nuxt/test-utils": "^4.0.3",
     "happy-dom": "^15.11.7",
     "playwright-core": "^1.53.0",
+    "sharp": "^0.35.4",
     "vitest": "^4.1.7"
   },
   "packageManager": "pnpm@10.11.0+sha512.6540583f41cc5f628eb3d9773ecee802f4f9ef9923cc45b69890fb47991d4b092964694ec3a4f738a420c918a333062c8b925d312f42e4f0c263eb603551f977",
