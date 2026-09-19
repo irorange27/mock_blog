@@ -38,7 +38,7 @@ draft: true
 ### 草稿控制（两种方式）
 
 | 方式 | 适用场景 |
-|------|----------|
+| --- | --- |
 | `content/draft/` | 随手记录，不想入 Git，本地预览即可 |
 | front-matter 加 `draft: true` | 需要 Git 版本控制、协作、备份，但暂不发布 |
 
@@ -49,7 +49,7 @@ draft: true
 文章是标准 Markdown，需手动填写以下字段：
 
 | 字段 | 说明 | 示例 |
-|------|------|------|
+| ------ | ------ | ------ |
 | `title` | 文章标题（页面标题 & 列表显示） | `渴求动力` |
 | `date` | 发布时间 | `2025-03-05 00:44:57` |
 | `categories` | 分类（未填则归为"默认"） | `色伏集` |
@@ -92,7 +92,7 @@ git push origin main
 
 推送至 `main` 分支后，GitHub Actions 自动执行以下流水线：
 
-```
+```plaintext
 Test → Build (nuxt generate) → Deploy to GitHub Pages
 ```
 
@@ -102,7 +102,7 @@ RSS (`/rss.xml`) 和 sitemap (`/sitemap.xml`) 随构建自动更新。
 
 ## 一图总结
 
-```
+```plaintext
 pnpm new-post     →    撰写 .md     →    pnpm dev (预览)
                           ↓
                     git add + commit
