@@ -1,5 +1,5 @@
 export interface Post {
-  _path: string
+  path: string
   title: string
   date: string
   draft?: boolean

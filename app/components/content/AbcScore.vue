@@ -18,7 +18,8 @@ let synth: any = null
 let endTimer: ReturnType<typeof setTimeout> | null = null
 
 function inkColor() {
-  return getComputedStyle(host.value!).getPropertyValue('--txt-75').trim() || '#000'
+  // 读不到 token 时返回空，让 abcjs 走自身默认前景色，不硬编码颜色值
+  return getComputedStyle(host.value!).getPropertyValue('--txt-75').trim()
 }
 
 // 只能从原始字符串重渲染：传已编译的 visualObj 会渲染失败
@@ -27,7 +28,7 @@ function renderScore() {
   visualObj = abcjs.renderAbc(host.value!, abcCode, {
     responsive: 'resize',
     scale: props.scale,
-    foregroundColor: inkColor(),
+    foregroundColor: inkColor() || undefined,
   })[0] ?? null
 }
 

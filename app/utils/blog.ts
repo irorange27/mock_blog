@@ -3,7 +3,7 @@ import type { Post } from '~/types/post'
  * 将原始文章数据规范化为 Post 类型
  */
 export const normalizePost = (post: Record<string, unknown>): Post => ({
-  _path: (post._path as string) || '',
+  path: (post.path as string) || '',
   draft: (post.draft as boolean) || false,
   categories: (post.categories as string) || '默认',
   tags: Array.isArray(post.tags) ? (post.tags as string[]) : [],

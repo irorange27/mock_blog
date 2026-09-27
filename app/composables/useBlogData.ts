@@ -1,14 +1,13 @@
 import type { CategoryCount, TagCount } from '~/types/post'
 import { normalizePost } from '~/utils/blog'
-import type { QueryBuilderParams } from '@nuxt/content'
 
 export function useBlogData() {
   // 只取列表/侧栏需要的元信息字段：带上 body 会让全站每页 payload 膨胀数百 KB
   const { data, status, error, refresh } = useAsyncData('blog-posts', () =>
-    queryContent('posts')
-      .only(['_path', 'title', 'description', 'date', 'categories', 'tags', 'draft'])
-      .sort({ date: -1 })
-      .find()
+    queryCollection('posts')
+      .select('path', 'title', 'description', 'date', 'categories', 'tags', 'draft')
+      .order('date', 'DESC')
+      .all()
   )
 
   const allPosts = computed(() =>
@@ -42,11 +41,12 @@ export function useBlogData() {
       .sort((a, b) => b.count - a.count)
   })
 
-  const getPostsByCategory = (category: string) =>
-    computed(() => posts.value.filter(post => post.categories === category))
+  // 接受 getter：route.params 变化时筛选结果跟着变
+  const getPostsByCategory = (category: () => string) =>
+    computed(() => posts.value.filter(post => post.categories === category()))
 
-  const getPostsByTag = (tag: string) =>
-    computed(() => posts.value.filter(post => post.tags?.includes(tag)))
+  const getPostsByTag = (tag: () => string) =>
+    computed(() => posts.value.filter(post => post.tags?.includes(tag())))
 
   return {
     posts,

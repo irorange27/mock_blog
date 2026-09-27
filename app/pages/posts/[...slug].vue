@@ -1,12 +1,12 @@
 <script setup lang="ts">
 const route = useRoute()
-const { data } = await useAsyncData(`content-${route.path}`, () => {
-  return queryContent(route.path).findOne()
-})
+const { data } = await useAsyncData(`content-${route.path}`, () =>
+  queryCollection('posts').path(route.path).first()
+)
 
 const { posts } = useBlogData()
 const adjacent = computed(() => {
-  const idx = posts.value.findIndex(p => p._path === route.path)
+  const idx = posts.value.findIndex(p => p.path === route.path)
   if (idx === -1) return { prev: null, next: null }
   return {
     prev: idx < posts.value.length - 1 ? posts.value[idx + 1] : null,
@@ -61,7 +61,7 @@ useSeoMeta({
     <nav v-if="adjacent.prev || adjacent.next" class="mt-10 pt-6 border-t border-[var(--line-color)] grid grid-cols-1 sm:grid-cols-2 gap-4">
       <NuxtLink
         v-if="adjacent.prev"
-        :to="adjacent.prev._path"
+        :to="adjacent.prev.path"
         class="group p-4 rounded-lg border border-[var(--line-color)] hover:border-[var(--line-strong)] transition-colors"
       >
         <span class="text-xs text-[var(--txt-30)]">← 上一篇</span>
@@ -71,7 +71,7 @@ useSeoMeta({
       </NuxtLink>
       <NuxtLink
         v-if="adjacent.next"
-        :to="adjacent.next._path"
+        :to="adjacent.next.path"
         class="group p-4 rounded-lg border border-[var(--line-color)] hover:border-[var(--line-strong)] transition-colors sm:text-right"
       >
         <span class="text-xs text-[var(--txt-30)]">下一篇 →</span>

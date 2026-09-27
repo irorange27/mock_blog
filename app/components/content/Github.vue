@@ -8,12 +8,25 @@ const full = owner && name ? `${owner}/${name}` : cleaned
 
 const meta = ref<{ description?: string; stars?: number } | null>(null)
 
+// GitHub 匿名 API 限额 60 次/小时/IP，多卡页面+反复访问很容易打满；
+// 每仓库结果缓存进 sessionStorage 一小时，打满或离线时静默退化为静态信息
 onMounted(async () => {
+  const cacheKey = `gh-meta:${full}`
+  const TTL = 60 * 60 * 1000
   try {
+    const cached = sessionStorage.getItem(cacheKey)
+    if (cached) {
+      const entry = JSON.parse(cached) as { meta: typeof meta.value; t: number }
+      if (Date.now() - entry.t < TTL) {
+        meta.value = entry.meta
+        return
+      }
+    }
     const res = await fetch(`https://api.github.com/repos/${full}`)
     if (!res.ok) return
     const j = await res.json()
     meta.value = { description: j.description, stars: j.stargazers_count }
+    sessionStorage.setItem(cacheKey, JSON.stringify({ meta: meta.value, t: Date.now() }))
   } catch {
     // 离线或限流时只显示静态信息
   }

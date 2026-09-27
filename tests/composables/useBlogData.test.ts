@@ -4,7 +4,7 @@ import { normalizePost } from '~/utils/blog'
 
 const mockPosts = [
   {
-    _path: '/posts/test-1',
+    path: '/posts/test-1',
     title: 'Test Post 1',
     date: '2024-01-01T00:00:00.000Z',
     categories: '测试分类',
@@ -12,7 +12,7 @@ const mockPosts = [
     description: 'Test description'
   },
   {
-    _path: '/posts/test-2',
+    path: '/posts/test-2',
     title: 'Test Post 2',
     date: '2024-01-02T00:00:00.000Z',
     categories: '测试分类',
@@ -25,7 +25,7 @@ const mockPosts = [
 describe('normalizePost', () => {
 
   it('should fill defaults for missing fields', () => {
-    const result = normalizePost({ _path: '/test', title: 'Test' })
+    const result = normalizePost({ path: '/test', title: 'Test' })
     expect(result.categories).toBe('默认')
     expect(result.tags).toEqual([])
   })

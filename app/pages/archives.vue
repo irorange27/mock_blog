@@ -13,18 +13,8 @@ const groupedPosts = computed(() => groupPostsByYearAndMonth(posts.value))
   <div class="card-base p-4 sm:p-8">
     <h1 class="text-lg font-bold text-[var(--txt-90)] mb-4 sm:mb-8 border-b border-[var(--line-color)] pb-4">归档</h1>
 
-    <div v-if="status === 'pending'" class="flex justify-center items-center py-8">
-      <div class="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-[var(--btn-solid-bg)]"></div>
-    </div>
-
-    <div v-else-if="error" class="text-[var(--danger)] text-center py-8">
-      <p>{{ error.message }}</p>
-      <button @click="refresh" class="mt-2 px-4 py-2 bg-[var(--btn-solid-bg)] text-[var(--btn-solid-fg)] rounded hover:bg-[var(--btn-solid-bg-hover)]">
-        重试
-      </button>
-    </div>
-
-    <div v-else-if="Object.keys(groupedPosts).length > 0" class="space-y-4 sm:space-y-8">
+    <DataState :status="status" :error="error" large @retry="refresh">
+      <div v-if="Object.keys(groupedPosts).length > 0" class="space-y-4 sm:space-y-8">
       <div v-for="(months, year) in groupedPosts" :key="year">
         <h2 class="text-lg font-bold text-[var(--txt-90)] mb-4 border-l-4 border-[var(--line-strong)] pl-2">
           {{ year }}
@@ -38,11 +28,11 @@ const groupedPosts = computed(() => groupPostsByYearAndMonth(posts.value))
             <ul class="space-y-2 ml-4">
               <li
                 v-for="post in postsByMonth"
-                :key="post._path"
+                :key="post.path"
                 class="hover:bg-[var(--panel-bg-hover)] rounded-md transition"
               >
                 <NuxtLink
-                  :to="post._path"
+                  :to="post.path"
                   class="flex items-center justify-between space-x-4 p-2"
                 >
                   <span class="text-[var(--txt-50)] text-sm shrink-0">
@@ -62,5 +52,6 @@ const groupedPosts = computed(() => groupPostsByYearAndMonth(posts.value))
     <div v-else class="text-[var(--txt-50)] text-center py-8">
       暂无文章
     </div>
+    </DataState>
   </div>
 </template>

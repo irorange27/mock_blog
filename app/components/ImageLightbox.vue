@@ -18,14 +18,21 @@ const onHide = () => {
   visible.value = false
 }
 
+const onClick = (e: MouseEvent) => {
+  const target = e.target as HTMLElement
+  // 图片包在链接里时放行跳转，不抢点击
+  if (target.tagName === 'IMG' && target.closest('.prose') && !target.closest('a')) {
+    e.preventDefault()
+    showLightbox((target as HTMLImageElement).src)
+  }
+}
+
 onMounted(() => {
-  document.addEventListener('click', (e) => {
-    const target = e.target as HTMLElement
-    if (target.tagName === 'IMG' && target.closest('.prose')) {
-      e.preventDefault()
-      showLightbox((target as HTMLImageElement).src)
-    }
-  })
+  document.addEventListener('click', onClick)
+})
+
+onUnmounted(() => {
+  document.removeEventListener('click', onClick)
 })
 </script>
 

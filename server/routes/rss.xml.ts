@@ -1,4 +1,4 @@
-import { serverQueryContent } from '#content/server'
+import { queryCollection } from '@nuxt/content/server'
 import RSS from 'rss'
 
 const BASE_URL = 'https://blog.niina.fun'
@@ -17,44 +17,37 @@ function escapeHtml(str: string): string {
     .replace(/'/g, '&#39;')
 }
 
-interface HastNode {
-  type: string
-  tag?: string
-  value?: string
-  props?: Record<string, string>
-  children?: HastNode[]
-}
+// v3 的 body 是 minimark AST：元素为 [tag, props, ...children]，文本为 string
+type MinimarkNode = string | [string, Record<string, unknown>, ...unknown[]]
 
-function hastToHtml(node: HastNode): string {
-  const type = node.type as string
+function nodeToHtml(node: unknown): string {
+  if (typeof node === 'string') return escapeHtml(node)
+  if (!Array.isArray(node)) return ''
+  const [tag, props, ...children] = node as [string, Record<string, unknown>, ...unknown[]]
+  if (typeof tag !== 'string') return ''
 
-  if (type === 'text') {
-    return escapeHtml(node.value ?? '')
-  }
-
-  if (type === 'root' || type === 'element') {
-    const children = node.children ?? []
-
-    if (type === 'root') {
-      return children.map(hastToHtml).join('')
-    }
-
-    const tag = node.tag ?? ''
-    const props = node.props ?? {}
-
-    const attrs = Object.entries(props)
+  const attrs = props && typeof props === 'object'
+    ? Object.entries(props)
       .map(([key, value]) => ` ${key}="${escapeHtml(String(value))}"`)
       .join('')
+    : ''
 
-    if (VOID_ELEMENTS.has(tag)) {
-      return `<${tag}${attrs} />`
-    }
+  const inner = children.map(nodeToHtml).join('')
 
-    const inner = children.map(hastToHtml).join('')
-    return `<${tag}${attrs}>${inner}</${tag}>`
+  if (VOID_ELEMENTS.has(tag.toLowerCase())) {
+    return `<${tag}${attrs} />`
   }
 
-  return ''
+  return `<${tag}${attrs}>${inner}</${tag}>`
+}
+
+function bodyToHtml(body: unknown): string {
+  if (!body || typeof body !== 'object') return ''
+  // MinimalTree = { type: 'minimal', value: MinimarkNode[] }，兼容裸数组形态
+  const nodes = Array.isArray(body)
+    ? body
+    : (body as { value?: unknown[] }).value
+  return Array.isArray(nodes) ? nodes.map(nodeToHtml).join('') : ''
 }
 
 export default defineEventHandler(async (event) => {
@@ -64,23 +57,21 @@ export default defineEventHandler(async (event) => {
     feed_url: `${BASE_URL}/rss.xml`,
   })
 
-  const docs = await serverQueryContent(event)
-    .sort({ date: -1 })
-    .where({ _partial: false })
-    .find()
+  const docs = await queryCollection(event, 'posts')
+    .select('path', 'title', 'date', 'description', 'draft', 'body')
+    .order('date', 'DESC')
+    .all()
 
-  const blogPosts = docs.filter(doc => doc?._path?.startsWith('/posts/') && !doc?.draft)
+  const blogPosts = docs.filter(doc => !doc.draft)
 
   for (const doc of blogPosts) {
-    const htmlContent = doc.body ? hastToHtml(doc.body) : ''
-
     feed.item({
       title: doc.title ?? '-',
-      url: `${BASE_URL}${doc._path}`,
+      url: `${BASE_URL}${doc.path}`,
       date: doc.date,
       description: doc.description,
       custom_elements: [
-        { 'content:encoded': { _cdata: htmlContent } }
+        { 'content:encoded': { _cdata: bodyToHtml(doc.body) } }
       ],
     })
   }

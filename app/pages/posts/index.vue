@@ -15,9 +15,9 @@ const { posts } = useBlogData()
     </div>
 
     <ul class="space-y-0.5">
-      <li v-for="post in posts" :key="post._path">
+      <li v-for="post in posts" :key="post.path">
         <NuxtLink
-          :to="post._path"
+          :to="post.path"
           class="group flex items-baseline gap-3 px-3 py-2 rounded-lg hover:bg-[var(--panel-bg-hover)] transition"
         >
           <span class="text-sm text-[var(--txt-30)] shrink-0 tabular-nums">

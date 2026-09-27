@@ -1,18 +1,16 @@
-import { serverQueryContent } from '#content/server'
+import { queryCollection } from '@nuxt/content/server'
 
 const BASE_URL = 'https://blog.niina.fun'
 
 export default defineEventHandler(async (event) => {
-  const docs = await serverQueryContent(event)
-    .sort({ date: -1 })
-    .where({ _partial: false })
-    .find()
+  const docs = await queryCollection(event, 'posts')
+    .select('path', 'categories', 'tags')
+    .order('date', 'DESC')
+    .all()
 
   const staticRoutes = ['/', '/about', '/archives', '/categories', '/links', '/posts']
 
-  const postRoutes = docs
-    .filter(doc => doc?._path?.startsWith('/posts/'))
-    .map(doc => `${BASE_URL}${doc._path}`)
+  const postRoutes = docs.map(doc => `${BASE_URL}${doc.path}`)
 
   const categoryRoutes = [...new Set(
     docs
@@ -23,7 +21,7 @@ export default defineEventHandler(async (event) => {
   const tagRoutes = [...new Set(
     docs
       .filter(doc => doc?.tags?.length)
-      .flatMap(doc => doc.tags.map((tag: string) => `${BASE_URL}/tags/${tag}`))
+      .flatMap(doc => (doc.tags as string[]).map(tag => `${BASE_URL}/tags/${tag}`))
   )]
 
   const allUrls = [

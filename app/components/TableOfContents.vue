@@ -112,39 +112,7 @@ onUnmounted(() => window.removeEventListener('keydown', onKeydown))
         </svg>
       </button>
     </div>
-    <ul v-if="!isAsideCollapsed">
-      <li v-for="h in numbered" :key="h.id">
-        <a
-          :href="`#${h.id}`"
-          :title="h.text"
-          class="flex items-center gap-2 rounded-lg px-2 py-1.5 text-sm transition-colors hover:bg-[var(--panel-bg-hover)]"
-          :class="[
-            h.level === 1 ? 'pl-4' : '',
-            h.level >= 2 ? 'pl-8' : '',
-            activeId === h.id ? 'text-[var(--primary)] font-bold' : 'text-[var(--txt-50)]',
-          ]"
-        >
-          <span
-            v-if="h.level === 0"
-            class="w-5 h-5 shrink-0 rounded-md text-[11px] flex items-center justify-center font-bold transition-colors"
-            :class="activeId === h.id
-              ? 'bg-[var(--primary)] text-[var(--btn-solid-fg)]'
-              : 'bg-[var(--chip-bg)] text-[var(--primary)]'"
-          >{{ h.badge }}</span>
-          <span
-            v-else-if="h.level === 1"
-            class="w-2 h-2 shrink-0 rounded-full transition-colors"
-            :class="activeId === h.id ? 'bg-[var(--primary)]' : 'bg-[var(--chip-bg-hover)]'"
-          ></span>
-          <span
-            v-else
-            class="w-1.5 h-1.5 shrink-0 rounded-[2px] transition-colors"
-            :class="activeId === h.id ? 'bg-[var(--primary)]' : 'bg-[var(--line-strong)]'"
-          ></span>
-          <span class="truncate">{{ h.text }}</span>
-        </a>
-      </li>
-    </ul>
+    <TableOfContentsList v-if="!isAsideCollapsed" :items="numbered" :active-id="activeId" />
   </aside>
 
   <!-- <2xl：右下角浮动按钮 + 弹出目录面板，不占用正文流 -->
@@ -160,50 +128,14 @@ onUnmounted(() => window.removeEventListener('keydown', onKeydown))
         aria-label="目录"
         class="2xl:hidden fixed z-[70] bottom-36 right-4 sm:right-8 sm:bottom-[9rem] w-72 max-w-[calc(100vw-2rem)] max-h-[55vh] overflow-y-auto widget-card shadow-xl backdrop-blur-md"
       >
-        <ul class="p-2">
-          <li v-for="h in numbered" :key="h.id">
-            <a
-              :href="`#${h.id}`"
-              :title="h.text"
-              class="flex items-center gap-2 rounded-lg px-2 py-1.5 text-sm transition-colors hover:bg-[var(--panel-bg-hover)]"
-              :class="[
-                h.level === 1 ? 'pl-4' : '',
-                h.level >= 2 ? 'pl-8' : '',
-                activeId === h.id ? 'text-[var(--primary)] font-bold' : 'text-[var(--txt-50)]',
-              ]"
-              @click="isPanelOpen = false"
-            >
-              <span
-                v-if="h.level === 0"
-                class="w-5 h-5 shrink-0 rounded-md text-[11px] flex items-center justify-center font-bold transition-colors"
-                :class="activeId === h.id
-                  ? 'bg-[var(--primary)] text-[var(--btn-solid-fg)]'
-                  : 'bg-[var(--chip-bg)] text-[var(--primary)]'"
-              >{{ h.badge }}</span>
-              <span
-                v-else-if="h.level === 1"
-                class="w-2 h-2 shrink-0 rounded-full transition-colors"
-                :class="activeId === h.id ? 'bg-[var(--primary)]' : 'bg-[var(--chip-bg-hover)]'"
-              ></span>
-              <span
-                v-else
-                class="w-1.5 h-1.5 shrink-0 rounded-[2px] transition-colors"
-                :class="activeId === h.id ? 'bg-[var(--primary)]' : 'bg-[var(--line-strong)]'"
-              ></span>
-              <span class="truncate">{{ h.text }}</span>
-            </a>
-          </li>
-        </ul>
+        <TableOfContentsList class="p-2" :items="numbered" :active-id="activeId" @navigate="isPanelOpen = false" />
       </div>
     </Transition>
-    <button
-      class="2xl:hidden fixed z-40 bottom-20 right-4 sm:right-8 sm:bottom-[5.25rem] w-11 h-11 sm:w-10 sm:h-10 rounded-full bg-[var(--card-bg-80)] backdrop-blur border border-[var(--line-color)] text-[var(--txt-30)] hover:text-[var(--primary)] hover:border-[var(--line-strong)] shadow-md transition-all flex items-center justify-center"
-      :aria-expanded="isPanelOpen"
-      aria-label="目录"
-      @click="isPanelOpen = !isPanelOpen"
-    >
-      <Icon name="mdi:format-list-bulleted" class="w-5 h-5 sm:w-4 sm:h-4" />
-    </button>
+    <div class="2xl:hidden fixed z-40 bottom-20 right-4 sm:right-8 sm:bottom-[5.25rem]">
+      <FabButton label="目录" :aria-expanded="isPanelOpen" @click="isPanelOpen = !isPanelOpen">
+        <Icon name="mdi:format-list-bulleted" class="w-5 h-5 sm:w-4 sm:h-4" />
+      </FabButton>
+    </div>
   </template>
 </template>
 

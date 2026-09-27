@@ -4,7 +4,14 @@ useSeoMeta({
   description: "niina's blog homepage。",
 })
 
-const currentPage = ref(1)
+const route = useRoute()
+const router = useRouter()
+
+// 页码进 URL（?page=N），刷新/分享不丢；非法或越界回第 1 页
+const currentPage = computed(() => {
+  const n = Number(route.query.page)
+  return Number.isInteger(n) && n >= 1 && n <= totalPages.value ? n : 1
+})
 const postsPerPage = 9
 
 const { posts } = useBlogData()
@@ -18,7 +25,7 @@ const currentPosts = computed(() => {
 
 const goToPage = (page: number) => {
   if (page >= 1 && page <= totalPages.value) {
-    currentPage.value = page
+    router.push({ query: { ...route.query, page: page > 1 ? String(page) : undefined } })
     window.scrollTo({ top: 0, behavior: 'smooth' })
   }
 }
@@ -26,10 +33,10 @@ const goToPage = (page: number) => {
 
 <template>
   <div class="space-y-5">
-    <article v-for="post in currentPosts" :key="post._path"
+    <article v-for="post in currentPosts" :key="post.path"
       class="card-base p-4 sm:p-7 hover:border-[var(--line-strong)] hover:-translate-y-0.5 transition-all duration-200">
       <div>
-        <NuxtLink :to="post._path" class="block mb-3">
+        <NuxtLink :to="post.path" class="block mb-3">
           <h2 class="text-xl font-bold mb-2 text-[var(--txt-90)] hover:text-[var(--primary)] transition-colors">
             {{ post.title }}
           </h2>

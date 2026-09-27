@@ -2,7 +2,7 @@
 const route = useRoute()
 const { getPostsByTag } = useBlogData()
 
-const taggedPosts = getPostsByTag(route.params.tag as string)
+const taggedPosts = getPostsByTag(() => route.params.tag as string)
 
 useSeoMeta({
   title: () => `${route.params.tag} | Niina's Blog`,
@@ -22,9 +22,9 @@ useSeoMeta({
     </header>
 
     <div class="space-y-6">
-      <article v-for="post in taggedPosts" :key="post._path"
+      <article v-for="post in taggedPosts" :key="post.path"
         class="pb-6 border-b border-[var(--line-color)] last:border-0">
-        <NuxtLink :to="post._path">
+        <NuxtLink :to="post.path">
           <h2 class="text-lg font-bold text-[var(--txt-90)] mb-2 hover:text-[var(--primary)] transition-colors">
             {{ post.title }}
           </h2>

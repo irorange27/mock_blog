@@ -1,88 +1,42 @@
 <script setup lang="ts">
-onMounted(() => {
-  const addCopyButtons = () => {
-    document.querySelectorAll('pre:not([data-copy-done])').forEach((pre) => {
-      pre.setAttribute('data-copy-done', 'true')
-      pre.style.position = 'relative'
+// 与 CodeRunner 是一对：共用 usePreEnhancer 观察器和 main.css 的 .code-btn 基础样式；
+// 有运行键的代码块里本按钮会左移让位（CodeRunner 的 pre[data-runnable] 规则），需同增同删。
+usePreEnhancer(() => {
+  document.querySelectorAll('pre:not([data-copy-done])').forEach((pre) => {
+    pre.setAttribute('data-copy-done', 'true')
+    pre.style.position = 'relative'
 
-      const btn = document.createElement('button')
-      setButtonIcon(btn, 'mdi:content-copy')
-      btn.className = 'code-copy-btn'
-      btn.title = '复制代码'
-      btn.setAttribute('aria-label', '复制代码')
-      btn.onclick = async () => {
-        const code = pre.querySelector('code')
-        if (code) {
-          await navigator.clipboard.writeText(code.textContent || '')
-          setButtonIcon(btn, 'mdi:check')
-          btn.title = '已复制'
-          setTimeout(() => {
-            setButtonIcon(btn, 'mdi:content-copy')
-            btn.title = '复制代码'
-          }, 2000)
-        }
+    const btn = document.createElement('button')
+    setButtonIcon(btn, 'mdi:content-copy')
+    btn.className = 'code-btn code-copy-btn'
+    btn.title = '复制代码'
+    btn.setAttribute('aria-label', '复制代码')
+    btn.onclick = async () => {
+      const code = pre.querySelector('code')
+      if (code) {
+        await navigator.clipboard.writeText(code.textContent || '')
+        setButtonIcon(btn, 'mdi:check')
+        btn.title = '已复制'
+        setTimeout(() => {
+          setButtonIcon(btn, 'mdi:content-copy')
+          btn.title = '复制代码'
+        }, 2000)
       }
-      pre.appendChild(btn)
-    })
-  }
-
-  addCopyButtons()
-  const observer = new MutationObserver(addCopyButtons)
-  observer.observe(document.body, { childList: true, subtree: true })
-  onUnmounted(() => observer.disconnect())
+    }
+    pre.appendChild(btn)
+  })
 })
 </script>
 
 <template><div /></template>
 
 <style>
-.code-copy-btn {
-  position: absolute;
-  top: 8px;
-  right: 8px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 28px;
-  height: 24px;
-  padding: 0;
-  border-radius: 6px;
-  cursor: pointer;
-  opacity: 0;
-  transition: opacity 0.2s;
-}
-
-.code-copy-btn svg {
-  display: block;
-  width: 14px;
-  height: 14px;
-}
-
-/* Dark mode code blocks (github-dark bg: #0d1117) */
-pre:hover .code-copy-btn {
-  opacity: 1;
-}
-
-html.dark-mode .code-copy-btn {
-  background: rgba(255,255,255,0.1);
-  color: rgba(255,255,255,0.5);
-  border: 1px solid rgba(255,255,255,0.1);
+/* 基础外观（位置/尺寸/明暗中性色）在 main.css 的 .code-btn，这里只有 hover 前景色 */
+.code-copy-btn:hover {
+  color: color-mix(in oklab, var(--txt-90) 70%, transparent);
 }
 
 html.dark-mode .code-copy-btn:hover {
-  background: rgba(255,255,255,0.2);
-  color: rgba(255,255,255,0.8);
-}
-
-/* Light mode code blocks (github-light bg: #f7faff) */
-html:not(.dark-mode) .code-copy-btn {
-  background: rgba(0,0,0,0.06);
-  color: rgba(0,0,0,0.4);
-  border: 1px solid rgba(0,0,0,0.08);
-}
-
-html:not(.dark-mode) .code-copy-btn:hover {
-  background: rgba(0,0,0,0.12);
-  color: rgba(0,0,0,0.7);
+  color: color-mix(in oklab, var(--txt-90) 80%, transparent);
 }
 </style>

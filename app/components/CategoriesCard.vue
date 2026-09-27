@@ -6,16 +6,7 @@ const { categories, status, error, refresh } = useBlogData()
   <div class="widget-card p-5">
     <h2 class="text-sm font-bold mb-3 text-[var(--txt-90)]">分类</h2>
 
-    <div v-if="status === 'pending'" class="flex justify-center items-center py-4">
-      <div class="animate-spin rounded-full h-5 w-5 border-t-2 border-b-2 border-[var(--btn-solid-bg)]"></div>
-    </div>
-
-    <div v-else-if="error" class="text-[var(--danger)] py-4 text-sm">
-      <p>{{ error.message }}</p>
-      <button @click="refresh" class="mt-1 underline text-[var(--primary)]">重试</button>
-    </div>
-
-    <div v-else>
+    <DataState :status="status" :error="error" @retry="refresh">
       <NuxtLink
         v-for="category in categories"
         :key="category.name"
@@ -31,6 +22,6 @@ const { categories, status, error, refresh } = useBlogData()
       <div v-if="categories.length === 0" class="text-[var(--txt-30)] text-center py-4 text-sm">
         暂无分类
       </div>
-    </div>
+    </DataState>
   </div>
 </template>

@@ -1,39 +1,36 @@
 <script setup lang="ts">
 // 给 js / ts / python 代码块加「运行」按钮,浏览器本地执行,输出显示在代码块下方。
-// 与 CodeCopy 同一套渲染后 DOM 增强的思路:MutationObserver 兜住路由切换后新出现的 pre。
-let disposed = false
+// 与 CodeCopy 是一对：共用 usePreEnhancer 观察器和 main.css 的 .code-btn 基础样式，
+// 本组件会把 .code-copy-btn 左移让位（样式见下），两者需同增同删。
+
+const enhance = () => {
+  document.querySelectorAll('pre:not([data-run-done])').forEach((pre) => {
+    const el = pre as HTMLElement
+    el.setAttribute('data-run-done', 'true')
+    const kind = detectRunner(el)
+    if (!kind) return
+    el.setAttribute('data-runnable', kind)
+
+    const btn = document.createElement('button')
+    setButtonIcon(btn, 'mdi:play')
+    btn.className = 'code-btn code-run-btn'
+    btn.title = '运行'
+    btn.setAttribute('aria-label', '运行代码')
+    btn.addEventListener('click', () => execute(el, btn, kind))
+    el.appendChild(btn)
+  })
+}
+
+usePreEnhancer(enhance)
 
 onMounted(() => {
-  const enhance = () => {
-    if (disposed) return
-    document.querySelectorAll('pre:not([data-run-done])').forEach((pre) => {
-      const el = pre as HTMLElement
-      el.setAttribute('data-run-done', 'true')
-      const kind = detectRunner(el)
-      if (!kind) return
-      el.setAttribute('data-runnable', kind)
-
-      const btn = document.createElement('button')
-      setButtonIcon(btn, 'mdi:play')
-      btn.className = 'code-run-btn'
-      btn.title = '运行'
-      btn.setAttribute('aria-label', '运行代码')
-      btn.addEventListener('click', () => execute(el, btn, kind))
-      el.appendChild(btn)
-    })
-  }
-
-  enhance()
-  const observer = new MutationObserver(enhance)
-  observer.observe(document.body, { childList: true, subtree: true })
   document.addEventListener('visibilitychange', onVisibilityChange)
-  onUnmounted(() => {
-    observer.disconnect()
-    disposed = true
-    terminateAllWorkers()
-    document.removeEventListener('visibilitychange', onVisibilityChange)
-    stopTitleFlash()
-  })
+})
+
+onUnmounted(() => {
+  terminateAllWorkers()
+  document.removeEventListener('visibilitychange', onVisibilityChange)
+  stopTitleFlash()
 })
 
 /* ── 后台标签页的结束提醒:交替闪烁标题,切回页面或超时后还原 ── */
@@ -135,30 +132,11 @@ function execute(pre: HTMLElement, btn: HTMLButtonElement, kind: RunnerKind) {
 <template><div /></template>
 
 <style>
-/* ── 运行按钮(样式与 .code-copy-btn 同族,hover 用主色) ── */
-.code-run-btn {
-  position: absolute;
-  top: 8px;
-  right: 8px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 28px;
-  height: 24px;
-  padding: 0;
-  border-radius: 6px;
-  cursor: pointer;
-  opacity: 0;
-  transition: opacity 0.2s;
+/* 基础外观在 main.css 的 .code-btn，这里只有运行键自己的差异 */
+.code-run-btn:hover:not(:disabled) {
+  color: var(--primary);
 }
 
-.code-run-btn svg {
-  display: block;
-  width: 14px;
-  height: 14px;
-}
-
-pre:hover .code-run-btn,
 .code-run-btn:focus-visible,
 .code-run-btn:disabled {
   opacity: 1;
@@ -172,31 +150,9 @@ pre:hover .code-run-btn,
   to { transform: rotate(360deg); }
 }
 
-/* 有运行键的代码块,复制键左移让位 */
+/* 有运行键的代码块,复制键左移让位（依赖 CodeCopy 组件存在） */
 pre[data-runnable] .code-copy-btn {
   right: 44px;
-}
-
-html.dark-mode .code-run-btn {
-  background: rgba(255, 255, 255, 0.1);
-  color: rgba(255, 255, 255, 0.5);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-}
-
-html.dark-mode .code-run-btn:hover:not(:disabled) {
-  background: rgba(255, 255, 255, 0.2);
-  color: var(--primary);
-}
-
-html:not(.dark-mode) .code-run-btn {
-  background: rgba(0, 0, 0, 0.06);
-  color: rgba(0, 0, 0, 0.4);
-  border: 1px solid rgba(0, 0, 0, 0.08);
-}
-
-html:not(.dark-mode) .code-run-btn:hover:not(:disabled) {
-  background: rgba(0, 0, 0, 0.12);
-  color: var(--primary);
 }
 
 /* ── 输出面板(与代码块同底的终端式区域) ── */
