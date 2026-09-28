@@ -31,7 +31,7 @@ draft: false
 
 ## 关键概念与术语
 
-![智能体与环境的交互循环](/images/spinning-up-rl-loop.png)
+![智能体与环境的交互循环](/images/spinning-up-rl-loop.png){.dark-ink}
 
 RL 的两个主角是**智能体（agent）和环境（environment）**。环境是智能体身处其中并与之交互的世界。交互的每一步，智能体都会看到世界状态的一个（可能不完整的）观测，然后决定要采取的动作。智能体作用于环境时，环境会随之改变，但它也可能自行变化。
 

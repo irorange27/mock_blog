@@ -57,7 +57,7 @@ for d in [2, 3, 10, 100, 1000]:
 
 ## 二、稀疏自编码器:把混合的激活"解混"
 
-上面说模型把概念稀疏叠加进激活,写成式子就是 $x \approx Wf$:字典 $W \in \mathbb{R}^{d\times m}$ 过完备($m \gg d$),编码 $f$ 稀疏($\|f\|_0 \ll m$)。这正是经典**字典学习(dictionary learning)**的形式,而解混它就是把这个方程反过来解--顺手的工具是 **sparse autoencoder(SAE)**。对模型某一层(这篇是小型 SoLU transformer 的 MLP 层)的激活向量 $x \in \mathbb{R}^{d}$, 训练一个 autoencoder:
+上面说模型把概念稀疏叠加进激活,写成式子就是 $x \approx Wf$:字典 $W \in \mathbb{R}^{d\times m}$ 过完备($m \gg d$),编码 $f$ 稀疏($\|f\|_0 \ll m$)。这正是经典**字典学习**(dictionary learning)的形式,而解混它就是把这个方程反过来解--顺手的工具是 **sparse autoencoder(SAE)**。对模型某一层(这篇是小型 SoLU transformer 的 MLP 层)的激活向量 $x \in \mathbb{R}^{d}$, 训练一个 autoencoder:
 
 $$
 \text{encode: } f = \mathrm{ReLU}(W_{\text{enc}}\, x + b_{\text{enc}}), \qquad \text{decode: } \hat{x} = W_{\text{dec}}\, f + b_{\text{dec}}

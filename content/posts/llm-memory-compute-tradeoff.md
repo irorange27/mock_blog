@@ -1,5 +1,5 @@
 ---
-title: 现代 LLM 的 Memory-Compute Trade-off：从 MHA 到 MLA、Sparse 与 Linear Attention
+title: LLM 的 Memory-Compute Trade-off：从 MHA 到 MLA、Sparse 与 Linear Attention
 date: 2026-09-11 12:00:00
 categories: '技术杂谈'
 tags:
