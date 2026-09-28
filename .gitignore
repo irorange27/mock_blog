@@ -41,3 +41,6 @@ logs
 app/assets/*.ttf
 app/assets/*.otf
 app/assets/*.charset.txt
+
+# zcode ignore 
+.zcodeignore
