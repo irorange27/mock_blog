@@ -8,14 +8,18 @@ const visible = ref(false)
 const imgs = ref<string[]>([])
 const index = ref(0)
 
-const showLightbox = (src: string) => {
+const lightboxDarkInkClass = 'lightbox-dark-ink'
+
+const showLightbox = (src: string, isDarkInk: boolean) => {
   imgs.value = [src]
   index.value = 0
+  document.documentElement.classList.toggle(lightboxDarkInkClass, isDarkInk)
   visible.value = true
 }
 
 const onHide = () => {
   visible.value = false
+  document.documentElement.classList.remove(lightboxDarkInkClass)
 }
 
 const onClick = (e: MouseEvent) => {
@@ -23,7 +27,8 @@ const onClick = (e: MouseEvent) => {
   // 图片包在链接里时放行跳转，不抢点击
   if (target.tagName === 'IMG' && target.closest('.prose') && !target.closest('a')) {
     e.preventDefault()
-    showLightbox((target as HTMLImageElement).src)
+    const image = target as HTMLImageElement
+    showLightbox(image.src, image.classList.contains('dark-ink'))
   }
 }
 
@@ -33,6 +38,7 @@ onMounted(() => {
 
 onUnmounted(() => {
   document.removeEventListener('click', onClick)
+  document.documentElement.classList.remove(lightboxDarkInkClass)
 })
 </script>
 

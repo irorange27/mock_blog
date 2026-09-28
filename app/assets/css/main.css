@@ -392,6 +392,22 @@ html.dark-mode .shiki span {
   font-style: italic;
 }
 
+/* 透明黑色线稿可选择加入 dark-ink；只调整线条，透明区域继续透出当前页面表面。 */
+html.dark-mode .prose img.dark-ink {
+  filter: invert(0.9);
+}
+
+/* 透明线稿在灯箱中透出遮罩背景，不显示组件自带的黑底或矩形投影。 */
+html.lightbox-dark-ink .vel-modal .vel-img {
+  background-color: transparent;
+  box-shadow: none;
+}
+
+/* 暗色主题下再提亮线条；浅色主题保留原始黑线。 */
+html.dark-mode.lightbox-dark-ink .vel-modal .vel-img {
+  filter: invert(0.9);
+}
+
 /* ══════════════════════════════════════════
    Markdown 扩展（MDC 组件的样式）
    ══════════════════════════════════════════ */
