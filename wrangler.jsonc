@@ -1,0 +1,31 @@
+// Cloudflare Workers 一体化部署：静态资产（nuxt generate 产物）+ Worker API + Durable Object 计数。
+// 本地预览：先 pnpm generate，再 pnpm cf:dev；部署：pnpm deploy。详见 docs/pageviews.md。
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "niina-blog",
+  "compatibility_date": "2026-09-01",
+  "main": "worker/index.ts",
+  "assets": {
+    "directory": "./.output/public",
+    "binding": "ASSETS",
+    // 未命中静态资产的请求返回生成的 404 页
+    "not_found_handling": "404-page",
+    // API 路径强制走 Worker，不参与静态资产匹配
+    "run_worker_first": ["/api/*"]
+  },
+  "durable_objects": {
+    "bindings": [
+      {
+        "name": "VIEWS",
+        "class_name": "ViewCounter"
+      }
+    ]
+  },
+  "migrations": [
+    {
+      "tag": "v1",
+      "new_sqlite_classes": ["ViewCounter"]
+    }
+  ],
+  "observability": { "enabled": true }
+}

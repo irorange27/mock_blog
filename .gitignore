@@ -15,6 +15,9 @@ content/draft
 dist
 contents.sqlite
 
+# Wrangler local dev state
+.wrangler
+
 # Node dependencies
 node_modules
 

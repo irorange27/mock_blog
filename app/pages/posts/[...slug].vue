@@ -4,6 +4,13 @@ const { data } = await useAsyncData(`content-${route.path}`, () =>
   queryCollection('posts').path(route.path).first()
 )
 
+const slug = computed(() => {
+  if (!data.value) return ''
+  const p = route.params.slug
+  return (Array.isArray(p) ? p.join('/') : p) ?? ''
+})
+const { views } = usePageViews(() => slug.value)
+
 const { posts } = useBlogData()
 const adjacent = computed(() => {
   const idx = posts.value.findIndex(p => p.path === route.path)
@@ -31,6 +38,13 @@ useSeoMeta({
       <h1 class="text-2xl text-[var(--txt-90)] font-bold mb-4">{{ data?.title }}</h1>
       <div class="flex items-center text-[var(--txt-50)] text-sm">
         <span>{{ formatDate(data?.date) }}</span>
+        <template v-if="views !== null">
+          <span class="mx-2">·</span>
+          <span class="inline-flex items-center gap-1">
+            <Icon name="mdi:eye-outline" class="w-4 h-4" />
+            {{ views }} 次浏览
+          </span>
+        </template>
         <span class="mx-2">·</span>
         <NuxtLink
           :to="`/categories/${data?.categories || '默认'}`"
