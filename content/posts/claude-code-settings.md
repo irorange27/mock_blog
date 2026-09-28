@@ -13,7 +13,7 @@ draft: false
 
 Claude Code 用户级的配置文件在 `~/.claude/settings.json`，环境变量通过 `env` 键值对来设置。除此之外常用的键还有 `permissions`、`hooks`、`enabledPlugins` 等。
 
-## 为什么要花心思配它
+## 这家伙有雷
 
 [The Register 2026 年 4 月那篇 Claude Code 源码分析](https://www.theregister.com/software/2026/04/01/claude-codes-source-reveals-extent-of-system-access/5222658) 出来之后，我把自己的 settings 又调整了一些。几个让我在意的点：
 
@@ -29,7 +29,7 @@ Claude Code 用户级的配置文件在 `~/.claude/settings.json`，环境变量
 - `permissions.deny` 把 `~/.ssh/`、`./secrets/` 封掉，就算 autoDream 哪天默认开启去扫归档，这些路径它也读不进来。
 - `attribution.commit/pr` 留空，不在 git history 里留 AI 痕迹。顺带一提，源码里有个 `undercover.ts`，在仓库被识别成"明确拒绝 AI 贡献的开源项目"时会主动让 Claude 隐藏作者身份 —— 这个态度本身就挺微妙的。
 
-文章里还提到两个设置，我没用，但还是记一下：
+文章里还提到两个设置，但还是记一下：
 
 - **`CLAUDE_CODE_DISABLE_AUTO_MEMORY=1`**：关闭所有 memory / telemetry 写入。
 - **`CLAUDE_CODE_SIMPLE`**（`--bare` 模式）：直接关闭 memory 和 autoDream。
@@ -273,6 +273,15 @@ Claude Code 的插件机制由两部分组成：先在 `extraKnownMarketplaces` 
 }
 ```
 
+## 与其他 Harness 共同协作（AGENTS.md）
+
+Cluade Code 在 v2.1.277 版本（于 2026年9月18日 发布）之前都没有原生支持 AGENTS.md，如果要单独维护一份 CLUADE.md 有点太不优雅了。社区在此前就有两种比较优雅的方法：
+
+1. 将 CLUADE.md 软链接到 AGENTS.md（`ln -s AGENTS.md CLAUDE.md`）
+2. 在 CLUADE.md 使用导入语法导入 AGENTS.md 的内容（@AGENTS.md）
+
+第一种方法对Windows用户不太友好（Windows下 git 默认不启用软链接），第二种方法没有大的缺点，因此我比较推荐第二种方法。
+
 ---
 
-日常用下来，`CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC` + `permissions.allow/deny` + 几个 skill 插件，基本就能覆盖 90% 的需求。
+这样就大概可以保证一个信息安全（或许？）
