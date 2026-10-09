@@ -54,28 +54,51 @@ export const formatDay = (date: string | Date, locale: string = 'zh-CN'): string
 }
 
 /**
- * 按年月分组文章
+ * 按年月分组文章，整体按时间倒序（最新在最上）。
+ *
+ * 不用对象做分组结果：年/月是整数型字符串键，JS 规范规定这类键
+ * 恒按数值升序枚举，无法体现倒序，所以返回有序数组。
  */
-export const groupPostsByYearAndMonth = (posts: Post[]): Record<string, Record<string, Post[]>> => {
+export interface MonthGroup {
+  month: string
+  posts: Post[]
+}
+
+export interface YearGroup {
+  year: string
+  months: MonthGroup[]
+}
+
+export const groupPostsByYearAndMonth = (posts: Post[]): YearGroup[] => {
   const grouped: Record<string, Record<string, Post[]>> = {}
-  
+
   posts.forEach(post => {
     if (!post.date) return
-    
+
     const date = new Date(post.date)
     const year = date.getFullYear().toString()
     const month = (date.getMonth() + 1).toString()
-    
+
     if (!grouped[year]) {
       grouped[year] = {}
     }
-    
+
     if (!grouped[year][month]) {
       grouped[year][month] = []
     }
-    
+
     grouped[year][month].push(post)
   })
-  
-  return grouped
+
+  return Object.keys(grouped)
+    .sort((a, b) => Number(b) - Number(a))
+    .map(year => ({
+      year,
+      months: Object.keys(grouped[year])
+        .sort((a, b) => Number(b) - Number(a))
+        .map(month => ({
+          month,
+          posts: grouped[year][month].sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()),
+        })),
+    }))
 }

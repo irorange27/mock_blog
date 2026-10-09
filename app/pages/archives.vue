@@ -15,19 +15,19 @@ const groupedPosts = computed(() => groupPostsByYearAndMonth(posts.value))
 
     <DataState :status="status" :error="error" large @retry="refresh">
       <div v-if="Object.keys(groupedPosts).length > 0" class="space-y-4 sm:space-y-8">
-      <div v-for="(months, year) in groupedPosts" :key="year">
+      <div v-for="yearGroup in groupedPosts" :key="yearGroup.year">
         <h2 class="text-lg font-bold text-[var(--txt-90)] mb-4 border-l-4 border-[var(--line-strong)] pl-2">
-          {{ year }}
+          {{ yearGroup.year }}
         </h2>
 
         <div class="space-y-4 sm:space-y-6 ml-2 sm:ml-4">
-          <div v-for="(postsByMonth, month) in months" :key="month">
+          <div v-for="monthGroup in yearGroup.months" :key="monthGroup.month">
             <h3 class="text-lg font-semibold mb-2 text-[var(--txt-75)]">
-              {{ month }} 月
+              {{ monthGroup.month }} 月
             </h3>
             <ul class="space-y-2 ml-4">
               <li
-                v-for="post in postsByMonth"
+                v-for="post in monthGroup.posts"
                 :key="post.path"
                 class="hover:bg-[var(--panel-bg-hover)] rounded-md transition"
               >
