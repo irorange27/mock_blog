@@ -30,9 +30,9 @@ const hasSidebar = computed(() => route.path === '/')
         <MomentsCard v-if="hasSidebar" class="mt-6" />
       </div>
 
-      <!-- 只有首页是侧栏 + 正文双栏（1 : 1.67，fr 弹性不写死像素）；其余页面单列居中 -->
+      <!-- 只有首页是侧栏 + 正文双栏（1 : φ≈1.618 黄金分割，fr 弹性不写死像素）；其余页面单列居中 -->
       <div :class="hasSidebar
-        ? 'grid grid-cols-1 lg:grid-cols-[1fr_1.67fr] gap-8 lg:gap-12'
+        ? 'grid grid-cols-1 lg:grid-cols-[1fr_1.618fr] gap-8 lg:gap-12'
         : 'flex justify-center'">
         <aside v-if="hasSidebar" aria-label="侧栏" class="order-2 lg:order-1">
           <div class="space-y-6 lg:sticky lg:top-20">
