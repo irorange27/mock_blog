@@ -23,6 +23,7 @@ defineEmits<{ navigate: [] }>()
       <a
         :href="`#${h.id}`"
         :title="h.text"
+        :aria-current="activeId === h.id ? 'location' : undefined"
         class="flex items-center gap-2 rounded-lg px-2 py-1.5 text-sm transition-colors hover:bg-[var(--panel-bg-hover)]"
         :class="[
           h.level === 1 ? 'pl-4' : '',

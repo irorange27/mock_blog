@@ -390,10 +390,12 @@ onBeforeUnmount(stop)
             {{ p.num }}/{{ p.den }} · ♩={{ p.bpm }}
           </span>
         </div>
-        <div ref="rowsEl" class="poly-score-rows">
+        <div ref="rowsEl" class="poly-score-rows" role="region" aria-label="乐谱（可横向滚动）" tabindex="0">
           <svg
             v-for="(p, i) in parts" :key="i" class="poly-score-row"
-            :viewBox="`0 0 ${vbW} ${ROW_H}`" aria-hidden="true"
+            :viewBox="`0 0 ${vbW} ${ROW_H}`"
+            role="img"
+            :aria-label="`第 ${i + 1} 声部：${p.num}/${p.den} 拍，速度 ♩=${p.bpm}，共 ${p.bars.length} 小节`"
           >
             <template v-if="staffMode">
               <!-- 五线 -->

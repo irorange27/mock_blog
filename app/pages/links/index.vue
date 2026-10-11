@@ -27,7 +27,7 @@ const linksPage = computed(() => (linkDocs.value || []).find(doc => doc.path ===
 
 <template>
   <div class="card-base p-4 sm:p-8">
-    <div v-if="status === 'pending'" class="text-center text-[var(--txt-75)]">
+    <div v-if="status === 'pending'" role="status" class="text-center text-[var(--txt-75)]">
       加载中...
     </div>
 

@@ -30,6 +30,10 @@ function renderScore() {
     scale: props.scale,
     foregroundColor: inkColor() || undefined,
   })[0] ?? null
+  // SVG 图形对读屏零信息（WCAG 1.1.1）：用 ABC 的 T: 行当文本替代
+  const title = /^T:\s*(.+)$/m.exec(abcCode)?.[1]?.trim()
+  host.value!.setAttribute('role', 'img')
+  host.value!.setAttribute('aria-label', title ? `乐谱：${title}` : '乐谱（ABC 记谱）')
 }
 
 onMounted(async () => {

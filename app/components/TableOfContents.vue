@@ -75,13 +75,17 @@ const scrollActiveIntoView = async (container: HTMLElement | null) => {
 
 watch(activeId, () => scrollActiveIntoView(asideRef.value))
 
-// 打开面板时把当前小节滚到可见位置；Esc 关闭
+// 打开面板时把当前小节滚到可见位置、焦点移入面板；Esc 关闭；关闭后焦点回按钮（WCAG 2.4.3）
+const fabRef = ref<HTMLElement | null>(null)
+
 watch(isPanelOpen, (open) => {
   if (open) {
     scrollActiveIntoView(panelRef.value)
+    nextTick(() => panelRef.value?.querySelector('a')?.focus())
     window.addEventListener('keydown', onKeydown)
   } else {
     window.removeEventListener('keydown', onKeydown)
+    fabRef.value?.querySelector('button')?.focus()
   }
 })
 
@@ -118,11 +122,12 @@ onUnmounted(() => window.removeEventListener('keydown', onKeydown))
   <!-- <2xl：右下角浮动按钮 + 弹出目录面板，不占用正文流 -->
   <template v-if="headings.length">
     <Transition name="toc-fade">
-      <div v-if="isPanelOpen" class="2xl:hidden fixed inset-0 z-[60]" @click="isPanelOpen = false" />
+      <div v-if="isPanelOpen" class="2xl:hidden fixed inset-0 z-[60]" aria-hidden="true" @click="isPanelOpen = false" />
     </Transition>
     <Transition name="toc-pop">
       <div
         v-if="isPanelOpen"
+        id="toc-panel"
         ref="panelRef"
         role="dialog"
         aria-label="目录"
@@ -131,9 +136,9 @@ onUnmounted(() => window.removeEventListener('keydown', onKeydown))
         <TableOfContentsList class="p-2" :items="numbered" :active-id="activeId" @navigate="isPanelOpen = false" />
       </div>
     </Transition>
-    <div class="2xl:hidden fixed z-40 bottom-20 right-4 sm:right-8 sm:bottom-[5.25rem]">
-      <FabButton label="目录" :aria-expanded="isPanelOpen" @click="isPanelOpen = !isPanelOpen">
-        <Icon name="mdi:format-list-bulleted" class="w-5 h-5 sm:w-4 sm:h-4" />
+    <div ref="fabRef" class="2xl:hidden fixed z-40 bottom-20 right-4 sm:right-8 sm:bottom-[5.25rem]">
+      <FabButton label="目录" :aria-expanded="isPanelOpen" aria-controls="toc-panel" @click="isPanelOpen = !isPanelOpen">
+        <Icon name="mdi:format-list-bulleted" class="w-5 h-5 sm:w-4 sm:h-4" aria-hidden="true" />
       </FabButton>
     </div>
   </template>

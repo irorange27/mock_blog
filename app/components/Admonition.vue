@@ -16,9 +16,9 @@ const meta = computed(() => META[props.type] ?? META.note)
 </script>
 
 <template>
-  <div class="adm" :class="`adm-${type}`">
+  <div class="adm" :class="`adm-${type}`" role="note" :aria-label="title || meta.label">
     <div class="adm-title">
-      <Icon :name="meta.icon" class="w-4 h-4 shrink-0" />
+      <Icon :name="meta.icon" class="w-4 h-4 shrink-0" aria-hidden="true" />
       <span>{{ title || meta.label }}</span>
     </div>
     <div class="adm-body">

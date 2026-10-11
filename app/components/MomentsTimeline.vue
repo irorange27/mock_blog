@@ -56,7 +56,7 @@ const formatMomentTime = (date: string) => date.slice(11, 16)
       </li>
     </ol>
 
-    <div v-else class="text-[var(--txt-50)] text-center py-8">
+    <div v-else role="status" class="text-[var(--txt-50)] text-center py-8">
       暂无动态
     </div>
   </DataState>

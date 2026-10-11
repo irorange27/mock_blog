@@ -73,11 +73,15 @@ function execute(pre: HTMLElement, btn: HTMLButtonElement, kind: RunnerKind) {
   if (!panel?.classList.contains('code-run-output')) {
     panel = document.createElement('div')
     panel.className = 'code-run-output'
+    // 输出异步插入，role=status 让读屏播报运行结果（WCAG 4.1.3）
+    panel.setAttribute('role', 'status')
+    panel.setAttribute('aria-label', '运行输出')
 
     const close = document.createElement('button')
     close.className = 'code-run-close'
     close.textContent = '✕'
     close.title = '收起输出'
+    close.setAttribute('aria-label', '收起输出')
     close.addEventListener('click', () => {
       terminateWorker(pre)
       panel!.remove()
@@ -137,7 +141,6 @@ function execute(pre: HTMLElement, btn: HTMLButtonElement, kind: RunnerKind) {
   color: var(--primary);
 }
 
-.code-run-btn:focus-visible,
 .code-run-btn:disabled {
   opacity: 1;
 }

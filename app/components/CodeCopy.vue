@@ -11,19 +11,26 @@ usePreEnhancer(() => {
     btn.className = 'code-btn code-copy-btn'
     btn.title = '复制代码'
     btn.setAttribute('aria-label', '复制代码')
+    // 读屏播报复制结果（WCAG 4.1.3）：视觉反馈只改图标，这里额外写 role=status 文本
+    const status = document.createElement('span')
+    status.className = 'sr-only'
+    status.setAttribute('role', 'status')
     btn.onclick = async () => {
       const code = pre.querySelector('code')
       if (code) {
         await navigator.clipboard.writeText(code.textContent || '')
         setButtonIcon(btn, 'mdi:check')
         btn.title = '已复制'
+        status.textContent = '已复制'
         setTimeout(() => {
           setButtonIcon(btn, 'mdi:content-copy')
           btn.title = '复制代码'
+          status.textContent = ''
         }, 2000)
       }
     }
     pre.appendChild(btn)
+    pre.appendChild(status)
   })
 })
 </script>

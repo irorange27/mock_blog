@@ -11,14 +11,15 @@ defineEmits<{ retry: [] }>()
 </script>
 
 <template>
-  <div v-if="status === 'pending'" class="flex justify-center items-center" :class="large ? 'py-8' : 'py-4'">
+  <div v-if="status === 'pending'" role="status" aria-label="加载中" class="flex justify-center items-center" :class="large ? 'py-8' : 'py-4'">
     <div
       class="animate-spin rounded-full border-t-2 border-b-2 border-[var(--btn-solid-bg)]"
       :class="large ? 'h-8 w-8' : 'h-5 w-5'"
+      aria-hidden="true"
     />
   </div>
 
-  <div v-else-if="error" class="text-[var(--danger)]" :class="large ? 'text-center py-8' : 'py-4 text-sm'">
+  <div v-else-if="error" role="alert" class="text-[var(--danger)]" :class="large ? 'text-center py-8' : 'py-4 text-sm'">
     <p>{{ error.message }}</p>
     <button
       class="text-[var(--primary)]"
