@@ -1,4 +1,5 @@
 ---
+title: SHUer
 links:
   - name: 'Errant404'
     url: 'https://github.com/Errant404'

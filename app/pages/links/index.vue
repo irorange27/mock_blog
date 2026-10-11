@@ -13,13 +13,12 @@ const { data: linkDocs, status } = await useAsyncData('links-pages', () =>
   queryCollection('links').select('path', 'title', 'links', 'body').all()
 )
 
-// 按来源文件分组：主文件（/links）平铺不加标题，其他来源（如 friends_in_shu）
-// 用 frontmatter 的 title 作为分组标题，方便不同渠道的友链带自己的标签
+// 按来源文件分组，每组用 frontmatter 的 title 作为分组标题（未写则兜底显示路径）
 const groups = computed(() =>
   (linkDocs.value || [])
     .filter(doc => ((doc.links as FriendLink[]) || []).length > 0)
     .map(doc => ({
-      title: doc.path === '/links' ? '' : (doc.title || doc.path),
+      title: doc.title || doc.path,
       links: (doc.links as FriendLink[]) || [],
     }))
 )
@@ -35,22 +34,24 @@ const linksPage = computed(() => (linkDocs.value || []).find(doc => doc.path ===
     <div v-else>
       <ContentRenderer v-if="linksPage" :value="linksPage" class="prose max-w-none mb-8" />
 
-      <section v-for="group in groups" :key="group.title || 'main'" class="mb-8 last:mb-0">
-        <h2
-          v-if="group.title"
-          class="text-sm font-bold text-[var(--txt-90)] mb-4 flex items-center gap-2"
-        >
-          <span class="w-1 h-4 rounded-full bg-[var(--primary)]" />
+      <!-- 每个友链来源是一个带名字的 section（aria-labelledby 指向组标题），
+           无障碍树和 DevTools 里都能看出「这是一组同来源的友链」 -->
+      <section
+        v-for="(group, gi) in groups"
+        :key="group.title"
+        :aria-labelledby="`links-group-${gi}`"
+        class="mb-8 last:mb-0"
+      >
+        <h2 :id="`links-group-${gi}`" class="text-sm font-bold text-[var(--txt-90)] mb-4">
           {{ group.title }}
         </h2>
 
-        <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
-          <FriendLinkItem
-            v-for="(link, index) in group.links"
-            :key="index"
-            :link="link"
-          />
-        </div>
+        <!-- ul/li：友链组本质是列表，读屏可以播报「N 项列表」 -->
+        <ul class="grid grid-cols-1 sm:grid-cols-2 gap-6 list-none p-0 m-0">
+          <li v-for="link in group.links" :key="link.url">
+            <FriendLinkItem :link="link" />
+          </li>
+        </ul>
       </section>
     </div>
   </div>
