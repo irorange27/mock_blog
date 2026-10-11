@@ -19,10 +19,10 @@ draft: false
 
 ![复合节拍和复合节奏](https://i0.wp.com/ethanhein.com/wp/wp-content/uploads/2024/04/3-to-4-polymeter-vs-3-to-4-polyrhythm.png)
 
-- 复合节拍(Based on Beat)：每一拍是对齐的（或者说grid对齐），但是强拍（小节）不对齐。
-- 复合节奏(Based on Bar)：每一拍不对齐（或者说grid不对齐），但强拍（小节）是对齐的。
+- 复合节拍(Based on Beat)：每一拍是对齐的（或者说 grid 对齐），但是强拍（小节）不对齐。
+- 复合节奏(Based on Bar)：每一拍不对齐（或者说 grid 不对齐），但强拍（小节）是对齐的。
 
-两者显然有很大的区别。Polymeter的情况下，tempo（速度）是不变的，每一个 beat 也是对齐的。我想所谓听三打四、听四打三就是属于复合节拍。
+两者显然有很大的区别。Polymeter 的情况下，tempo（速度）是不变的，每一个 beat 也是对齐的。我想所谓听三打四、听四打三就是属于复合节拍。
 
 而复合节奏的话其实很常见，比如说三连音就是短时的复合节奏。而常说的四对三
 

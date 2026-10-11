@@ -79,7 +79,7 @@ Key takeaways
 
 我们希望：给出问题的基础上得到最大可能的最终答案。
 
-LLM CoT-decoding所做：给出问题的基础上，给出最大可能的 reasoning path 以及最大可能的最终答案。
+LLM CoT-decoding 所做：给出问题的基础上，给出最大可能的 reasoning path 以及最大可能的最终答案。
 
 #### Self-Consistency
 

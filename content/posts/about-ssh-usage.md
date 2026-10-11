@@ -66,7 +66,7 @@ SSH 配置 TCP 端口转发的格式为 \[bind_address:]port:host:hostport，SSH
 
 在本地监听一个端口用作 SOCKS5 代理。
 
-例1 SOCKS服务器
+例 1 SOCKS 服务器
 
 ```bash
 ssh -D 1080 vps -N
@@ -94,7 +94,7 @@ ssh -L 0.0.0.0:8000:localhost:8000 host -N
 
 结合端口转发与代理的例子
 
-让服务器使用本机的SSH密钥和网络环境。
+让服务器使用本机的 SSH 密钥和网络环境。
 
 一行命令。
 
@@ -113,7 +113,7 @@ export http_proxy=socks5h://127.0.0.1:1220 https_proxy=socks5h://127.0.0.1:1220 
 
 可以使用 `ssh -v <URL>`，查看日志来观察是否远程服务器使用了本机的密钥。
 
-使用 `curl -4 ip.sb`，查看远程服务器是否使用了本机作为代理，若成功你应该看到的是本机的IPv4。
+使用 `curl -4 ip.sb`，查看远程服务器是否使用了本机作为代理，若成功你应该看到的是本机的 IPv4。
 
 ## 跳板
 
@@ -125,11 +125,11 @@ ssh -J jumpuser1@jumphost1,jumpuser2@jumphost2,...,jumpuserN@jumphostN user@host
 
 ## 连接复用
 
-## X11转发
+## X11 转发
 
 ## 配置文件
 
-SSH可以在配置文件中使用任意的命令行参数。
+SSH 可以在配置文件中使用任意的命令行参数。
 
 ## Reference
 

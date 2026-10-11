@@ -9,7 +9,7 @@ draft: flase
 
 ## DNS
 
-检测DNS的工具
+检测 DNS 的工具
 
 1. https://ip.net.coffee/dns/
 2. https://browserleaks.com/dns

@@ -23,7 +23,7 @@ bash <(wget -qO- -o- https://git.io/v2ray.sh)
 v2ray add Vmess-TCP-dynamic-port
 ```
 
-此时会得到我们新生成的链接，对于 V2RayN 用户，此时复制粘贴进 V2RayN 即可使用（支持ShadowRocket、V2RayN）。但是对于其他 VPN 客户端，比如 Clash系列来说，并不一定能直接支持，此时需要部署订阅转换服务。
+此时会得到我们新生成的链接，对于 V2RayN 用户，此时复制粘贴进 V2RayN 即可使用（支持 ShadowRocket、V2RayN）。但是对于其他 VPN 客户端，比如 Clash 系列来说，并不一定能直接支持，此时需要部署订阅转换服务。
 
 > **为什么需要自己搭建自己的订阅转换服务而不是使用其他人的？**
 
@@ -35,9 +35,9 @@ v2ray add Vmess-TCP-dynamic-port
 
 ## 使用 CloudFlare 扩展 VPS 网络出口
 
-参见 [Cloudflare WARP 教程：给 VPS 额外添加“原生” IPv4/IPv6 双栈网络出口](https://p3terx.com/archives/use-cloudflare-warp-to-add-extra-ipv4-or-ipv6-network-support-to-vps-servers-for-free.html)。一般而言所购买的服务器只有 IPv4。我们可以通过 warp 添加 IPv6 并调整 v4/v6 的使用优先级，将默认的出站 IP转成 warp 的 IP。
+参见 [Cloudflare WARP 教程：给 VPS 额外添加“原生” IPv4/IPv6 双栈网络出口](https://p3terx.com/archives/use-cloudflare-warp-to-add-extra-ipv4-or-ipv6-network-support-to-vps-servers-for-free.html)。一般而言所购买的服务器只有 IPv4。我们可以通过 warp 添加 IPv6 并调整 v4/v6 的使用优先级，将默认的出站 IP 转成 warp 的 IP。
 
-我的建议是给 IPv4 only 的服务器只添加 IPv6 warp, 并且 IPv6优先于 IPv4（如何确认上述文章有提及）。
+我的建议是给 IPv4 only 的服务器只添加 IPv6 warp, 并且 IPv6 优先于 IPv4（如何确认上述文章有提及）。
 
 ## 部署订阅转换服务（可选）
 
@@ -60,9 +60,9 @@ v2ray add Vmess-TCP-dynamic-port
 ## Reference
 
 1. [V2Ray 一键搭建详细图文教程（小白试用）-233Boy](https://233boy.com/v2ray/v2ray-server/)
-2. [V2Ray搭建详细图文教程 - 233Boy](https://github.com/233boy/v2ray/wiki/V2Ray%E6%90%AD%E5%BB%BA%E8%AF%A6%E7%BB%86%E5%9B%BE%E6%96%87%E6%95%99%E7%A8%8B)
+2. [V2Ray 搭建详细图文教程 - 233Boy](https://github.com/233boy/v2ray/wiki/V2Ray%E6%90%AD%E5%BB%BA%E8%AF%A6%E7%BB%86%E5%9B%BE%E6%96%87%E6%95%99%E7%A8%8B)
 3. [VPS 网速优化](https://www.taurusxin.com/linux-network-optimize/)
 4. 订阅链接汇聚 [cmliu/CF-Workers-SUB](https://github.com/cmliu/CF-Workers-SUB)
 5. [Setup Cloudflare WARP on IPv6 Only VPS](https://www.animmouse.com/p/setup-cloudflare-warp-on-ipv6-only-vps/)
 6. [Cloudflare WARP 教程：给 VPS 额外添加“原生” IPv4/IPv6 双栈网络出口](https://p3terx.com/archives/use-cloudflare-warp-to-add-extra-ipv4-or-ipv6-network-support-to-vps-servers-for-free.html)
-7. [【配置优化】我拿到VPS服务器必做的那些事](https://linux.do/t/topic/160305)
+7. [【配置优化】我拿到 VPS 服务器必做的那些事](https://linux.do/t/topic/160305)

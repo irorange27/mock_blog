@@ -7,9 +7,9 @@ description: ''
 draft: true
 ---
 
-存在一个不可拓展的推理系统，其评价指标是在同样的硬件下最小化用户平均的TTFT和TPOT。评测时根据不同任务，requster会根据任务类型做对应的workload，且requester的并发数恒定。当一个request完成时，便向推理系统发出新的req。
+存在一个不可拓展的推理系统，其评价指标是在同样的硬件下最小化用户平均的 TTFT 和 TPOT。评测时根据不同任务，requster 会根据任务类型做对应的 workload，且 requester 的并发数恒定。当一个 request 完成时，便向推理系统发出新的 req。
 
-benchmark的任务类型涵盖chat、长输入、长输出，coding agent等等场景，详见下表。
+benchmark 的任务类型涵盖 chat、长输入、长输出，coding agent 等等场景，详见下表。
 
 正式评测共包含 10 个 case：
 

@@ -229,15 +229,16 @@ for (const line of singleLineMath) {
       continue
     }
     if (fence) continue
-    // 摘掉行内代码 / 公式 / 链接 URL / 行内 HTML，剩下的才是正文
+    // 摘掉行内代码 / 公式 / 链接 URL / 行内 HTML，剩下的才是正文。
+    // 用非单词占位符，不能用空格——否则会伪造出「word␣、」这类假的全角标点空格
     const text = line
-      .replace(/`[^`]*`/g, ' ')
-      .replace(/\$\$[^$]*\$\$|\$[^$\n]*\$/g, ' ')
+      .replace(/`[^`]*`/g, '\u0000')
+      .replace(/\$\$[^$]*\$\$|\$[^$\n]*\$/g, '\u0000')
       .replace(/\]\([^)]*\)/g, ']')
-      .replace(/https?:\/\/[^\s)]+/g, ' ')
-      .replace(/<[^>]+>/g, ' ')
-      .replace(/::\w+/g, ' ')
-    for (const m of text.matchAll(/(?<![A-Za-z])([A-Za-z][A-Za-z'-]*[A-Za-z]|[A-Za-z])(?![A-Za-z])/g)) {
+      .replace(/https?:\/\/[^\s)]+/g, '\u0000')
+      .replace(/<[^>]+>/g, '\u0000')
+      .replace(/::\w+/g, '\u0000')
+    for (const m of text.matchAll(/(?<![A-Za-z\u00c0-\u024f])([A-Za-z\u00c0-\u024f][A-Za-z\u00c0-\u024f'-]*[A-Za-z\u00c0-\u024f]|[A-Za-z\u00c0-\u024f])(?![A-Za-z\u00c0-\u024f])/g)) {
       const word = m[1]
       if (word.length < 2 && !/[A-Z]/.test(word)) continue
       const before = m.index > 0 ? text[m.index - 1] : ''
@@ -287,8 +288,9 @@ for (const line of singleLineMath) {
       continue
     }
     if (fence) continue
-    const clean = line.replace(/`[^`]*`/g, ' ')
-    for (const m of clean.matchAll(/[\w`]([ \t]+)([，。？！：；、）】」』》…％])|([（【「『《])([ \t]+)(?=\w)/g)) {
+    // 行内代码换成非单词占位符：换成空格会伪造出「word␣、」这类假的全角标点空格
+    const clean = line.replace(/`[^`]*`/g, '\u0000')
+    for (const m of clean.matchAll(/[\w\u0000]([ \t]+)([，。？！：；、）】」』》…％])|([（【「『《])([ \t]+)(?=\w)/g)) {
       problems.push(`全角标点空格 @L${lineNo2}: 「${m[0].replace(/ /g, '␣')}」——半角字符与全角标点 ${m[2] || m[3]} 之间不留空格`)
     }
   }

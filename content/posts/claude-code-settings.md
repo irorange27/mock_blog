@@ -191,7 +191,7 @@ Claude Code 的插件机制由两部分组成：先在 `extraKnownMarketplaces` 
 
 ## 我的配置分享
 
-下面是我在CC-Switch里的通用配置：
+下面是我在 CC-Switch 里的通用配置：
 
 ```json
 {
@@ -275,12 +275,12 @@ Claude Code 的插件机制由两部分组成：先在 `extraKnownMarketplaces` 
 
 ## 与其他 Harness 共同协作（AGENTS.md）
 
-Cluade Code 在 v2.1.277 版本（于 2026年9月18日 发布）之前都没有原生支持 AGENTS.md，如果要单独维护一份 CLUADE.md 有点太不优雅了。社区在此前就有两种比较优雅的方法：
+Cluade Code 在 v2.1.277 版本（于 2026 年 9 月 18 日 发布）之前都没有原生支持 AGENTS.md，如果要单独维护一份 CLUADE.md 有点太不优雅了。社区在此前就有两种比较优雅的方法：
 
 1. 将 CLUADE.md 软链接到 AGENTS.md（`ln -s AGENTS.md CLAUDE.md`）
 2. 在 CLUADE.md 使用导入语法导入 AGENTS.md 的内容（@AGENTS.md）
 
-第一种方法对Windows用户不太友好（Windows下 git 默认不启用软链接），第二种方法没有大的缺点，因此我比较推荐第二种方法。
+第一种方法对 Windows 用户不太友好（Windows 下 git 默认不启用软链接），第二种方法没有大的缺点，因此我比较推荐第二种方法。
 
 ---
 
