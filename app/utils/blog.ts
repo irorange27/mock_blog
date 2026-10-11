@@ -16,19 +16,24 @@ export const normalizePost = (post: Record<string, unknown>): Post => ({
 
 
 /**
- * 格式化日期
+ * 格式化日期，末尾带星期（如 2024年1月15日 周一）。
+ * 星期单独取再拼接：toLocaleDateString 的 weekday 参数拼不出中间的空格。
  */
 export const formatDate = (date: string | Date, locale: string = 'zh-CN'): string => {
   if (!date) return ''
-  
+
   const dateObj = typeof date === 'string' ? new Date(date) : date
-  
+
   try {
-    return dateObj.toLocaleDateString(locale, {
+    const base = dateObj.toLocaleDateString(locale, {
       year: 'numeric',
       month: 'long',
       day: 'numeric'
     })
+    const weekday = dateObj.toLocaleDateString(locale, {
+      weekday: 'short'
+    })
+    return `${base} ${weekday}`
   } catch (error) {
     console.error('Error formatting date:', error)
     return ''

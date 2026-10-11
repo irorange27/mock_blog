@@ -39,6 +39,9 @@ describe('博客工具函数', () => {
       expect(result).toContain('2024')
       expect(result).toContain('1月')
       expect(result).toContain('15')
+      // 2024-01-15 是周一；日期与星期之间有空格
+      expect(result).toContain('周一')
+      expect(result).toMatch(/15日 周一/)
     })
 
     it('should handle empty date', () => {
