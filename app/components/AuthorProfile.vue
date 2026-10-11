@@ -9,7 +9,7 @@ defineProps<{
 
 <template>
   <!-- 平铺无卡片：单行排布（头像 + 名字 + GitHub），信息密度优先 -->
-  <div class="flex items-center gap-3" :class="compact ? '' : 'py-1'">
+  <div class="author-profile flex items-center gap-3" :class="compact ? '' : 'py-1'">
     <img
       :src="avatar"
       :alt="name"

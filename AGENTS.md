@@ -12,3 +12,4 @@
 ## 其他文档
 
 - 写作工作流：`docs/WRITING-WORKFLOW.md`
+- 组件命名与身份 class 约定：[docs/component-naming.md](docs/component-naming.md) —— 新建或改名组件时遵守。

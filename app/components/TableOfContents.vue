@@ -98,7 +98,7 @@ onUnmounted(() => window.removeEventListener('keydown', onKeydown))
 
 <template>
   <!-- ≥2xl：固定在内容区右侧留白处，滚动联动高亮；可折叠并记住偏好 -->
-  <aside v-if="headings.length" ref="asideRef" class="toc-aside hidden 2xl:block" aria-label="目录">
+  <aside v-if="headings.length" ref="asideRef" class="table-of-contents hidden 2xl:block" aria-label="目录">
     <div class="flex items-center justify-between pl-2 pr-1 mb-1">
       <h2 class="text-sm font-bold text-[var(--txt-90)] py-2">目录</h2>
       <button
@@ -137,9 +137,9 @@ onUnmounted(() => window.removeEventListener('keydown', onKeydown))
       </div>
     </Transition>
     <div ref="fabRef" class="2xl:hidden fixed z-40 bottom-20 right-4 sm:right-8 sm:bottom-[5.25rem]">
-      <FabButton label="目录" :aria-expanded="isPanelOpen" aria-controls="toc-panel" @click="isPanelOpen = !isPanelOpen">
+      <FloatingButton label="目录" :aria-expanded="isPanelOpen" aria-controls="toc-panel" @click="isPanelOpen = !isPanelOpen">
         <Icon name="mdi:format-list-bulleted" class="w-5 h-5 sm:w-4 sm:h-4" aria-hidden="true" />
-      </FabButton>
+      </FloatingButton>
     </div>
   </template>
 </template>

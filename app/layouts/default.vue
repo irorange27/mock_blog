@@ -14,20 +14,20 @@ const hasSidebar = computed(() => route.path === '/')
       href="#main-content"
       class="sr-only focus:not-sr-only focus:fixed focus:top-2 focus:left-2 focus:z-[100] focus:px-4 focus:py-2 focus:rounded-lg focus:bg-[var(--btn-solid-bg)] focus:text-[var(--btn-solid-fg)]"
     >跳到主内容</a>
-    <NavBar />
+    <SiteNav />
     <!-- 首页跟随视口，但视口大于 1800px 时整体限宽 112.5rem 居中；其余页面保持 container 宽度 -->
     <main id="main-content" tabindex="-1" :class="hasSidebar
       ? 'mx-auto w-full max-w-[112.5rem] px-3 sm:px-6 py-6 sm:py-10'
       : 'container mx-auto max-w-7xl px-3 sm:px-6 py-6 sm:py-10'">
-      <!-- Mobile: compact profile above content；首页时动态卡片也在这里（文章列表上方，见 MomentsCard 内的条数限制） -->
+      <!-- 移动端：正文上方放紧凑版博主资料；首页时最近动态也在这里（文章列表上方，见 RecentMoments 内的条数限制） -->
       <div class="lg:hidden mb-5">
-        <ProfileCard
+        <AuthorProfile
           avatar="/avatar.png"
           github="https://github.com/irorange27"
           name="Niina"
           compact
         />
-        <MomentsCard v-if="hasSidebar" class="mt-6" />
+        <RecentMoments v-if="hasSidebar" class="mt-6" />
       </div>
 
       <!-- 只有首页是侧栏 + 正文双栏（1 : φ≈1.618 黄金分割，fr 弹性不写死像素）；其余页面单列居中 -->
@@ -37,16 +37,15 @@ const hasSidebar = computed(() => route.path === '/')
         <aside v-if="hasSidebar" aria-label="侧栏" class="order-2 lg:order-1">
           <div class="space-y-6 lg:sticky lg:top-20">
             <div class="hidden lg:block">
-              <ProfileCard
+              <AuthorProfile
                 avatar="/avatar.png"
                 github="https://github.com/irorange27"
                 name="Niina"
               />
             </div>
-            <!-- 分类/标签卡片已 deprecated（组件保留在 components/ 下，未删除） -->
-            <!-- 移动端的动态卡片在上面渲染过了，这里只在桌面端显示，避免重复 -->
+            <!-- 移动端的最近动态在上面渲染过了，这里只在桌面端显示，避免重复 -->
             <div class="hidden lg:block">
-              <MomentsCard />
+              <RecentMoments />
             </div>
           </div>
         </aside>

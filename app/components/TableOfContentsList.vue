@@ -18,7 +18,7 @@ defineEmits<{ navigate: [] }>()
 </script>
 
 <template>
-  <ul>
+  <ul class="table-of-contents-list">
     <li v-for="h in items" :key="h.id">
       <a
         :href="`#${h.id}`"

@@ -6,7 +6,7 @@ defineProps<{ label: string }>()
 
 <template>
   <button
-    class="z-40 w-11 h-11 sm:w-10 sm:h-10 rounded-full bg-[var(--card-bg-80)] backdrop-blur border border-[var(--line-color)] text-[var(--txt-30)] hover:text-[var(--primary)] hover:border-[var(--line-strong)] shadow-md transition-all flex items-center justify-center"
+    class="floating-button z-40 w-11 h-11 sm:w-10 sm:h-10 rounded-full bg-[var(--card-bg-80)] backdrop-blur border border-[var(--line-color)] text-[var(--txt-30)] hover:text-[var(--primary)] hover:border-[var(--line-strong)] shadow-md transition-all flex items-center justify-center"
     :aria-label="label"
   >
     <slot />

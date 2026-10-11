@@ -188,7 +188,7 @@ html {
 }
 
 /* ── TOC 侧栏：≥2xl 时固定在内容列右侧的留白里 ── */
-.toc-aside {
+.table-of-contents {
     position: fixed;
     top: 5.5rem;
     left: calc(50vw + 36rem + 0.75rem);
@@ -198,7 +198,7 @@ html {
     scrollbar-width: none;
 }
 
-.toc-aside::-webkit-scrollbar {
+.table-of-contents::-webkit-scrollbar {
     display: none;
 }
 
@@ -481,7 +481,7 @@ html.dark-mode.lightbox-dark-ink .vel-modal .vel-img {
    ══════════════════════════════════════════ */
 
 /* ── Admonition（::tip / ::note / ... 提示块） ── */
-.adm {
+.admonition {
     --adm-c: var(--adm-note);
     margin: 1.5em 0;
     padding: 0.875rem 1.125rem;
@@ -490,13 +490,13 @@ html.dark-mode.lightbox-dark-ink .vel-modal .vel-img {
     background: color-mix(in oklab, var(--adm-c) 9%, transparent);
 }
 
-.adm-tip { --adm-c: var(--adm-tip); }
-.adm-note { --adm-c: var(--adm-note); }
-.adm-important { --adm-c: var(--adm-important); }
-.adm-warning { --adm-c: var(--adm-warning); }
-.adm-caution { --adm-c: var(--adm-caution); }
+.admonition-tip { --adm-c: var(--adm-tip); }
+.admonition-note { --adm-c: var(--adm-note); }
+.admonition-important { --adm-c: var(--adm-important); }
+.admonition-warning { --adm-c: var(--adm-warning); }
+.admonition-caution { --adm-c: var(--adm-caution); }
 
-.adm-title {
+.admonition-title {
     display: flex;
     align-items: center;
     gap: 0.4rem;
@@ -505,15 +505,15 @@ html.dark-mode.lightbox-dark-ink .vel-modal .vel-img {
     font-size: 0.9em;
 }
 
-.adm-body {
+.admonition-body {
     margin-top: 0.35rem;
     font-size: 0.95em;
 }
 
 /* 放在 .prose 规则之后，覆盖其段落间距 */
-.adm-body p { margin: 0.4em 0; }
-.adm-body > :first-child { margin-top: 0 !important; }
-.adm-body > :last-child { margin-bottom: 0 !important; }
+.admonition-body p { margin: 0.4em 0; }
+.admonition-body > :first-child { margin-top: 0 !important; }
+.admonition-body > :last-child { margin-bottom: 0 !important; }
 
 /* ── Spoiler（:spoiler[...] 遮罩，点击/键盘聚焦揭示） ── */
 .spoiler {
@@ -539,7 +539,7 @@ html.dark-mode.lightbox-dark-ink .vel-modal .vel-img {
 }
 
 /* ── GitHub 仓库卡片（:github{repo="owner/name"}） ── */
-.gh-card {
+.github-card {
     display: flex;
     align-items: center;
     gap: 0.875rem;
@@ -551,14 +551,14 @@ html.dark-mode.lightbox-dark-ink .vel-modal .vel-img {
     transition: border-color 0.15s ease, background-color 0.15s ease;
 }
 
-.gh-card:hover {
+.github-card:hover {
     border-color: var(--line-strong);
     background: var(--panel-bg-hover);
 }
 
 /* 卡片本身是 .prose 里的 <a>，去掉链接下划线与主色 */
-.prose a.gh-card,
-.prose a.gh-card:hover {
+.prose a.github-card,
+.prose a.github-card:hover {
     text-decoration: none;
     color: inherit;
 }

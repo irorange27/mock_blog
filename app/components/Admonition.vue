@@ -16,12 +16,12 @@ const meta = computed(() => META[props.type] ?? META.note)
 </script>
 
 <template>
-  <div class="adm" :class="`adm-${type}`" role="note" :aria-label="title || meta.label">
-    <div class="adm-title">
+  <div class="admonition" :class="`admonition-${type}`" role="note" :aria-label="title || meta.label">
+    <div class="admonition-title">
       <Icon :name="meta.icon" class="w-4 h-4 shrink-0" aria-hidden="true" />
       <span>{{ title || meta.label }}</span>
     </div>
-    <div class="adm-body">
+    <div class="admonition-body">
       <slot />
     </div>
   </div>

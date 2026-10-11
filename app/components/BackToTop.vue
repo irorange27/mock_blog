@@ -20,9 +20,9 @@ const scrollToTop = () => {
 </script>
 
 <template>
-  <div v-show="visible" class="fixed bottom-6 sm:bottom-8 right-4 sm:right-8">
-    <FabButton label="返回顶部" @click="scrollToTop">
+  <div v-show="visible" class="back-to-top fixed bottom-6 sm:bottom-8 right-4 sm:right-8">
+    <FloatingButton label="返回顶部" @click="scrollToTop">
       <Icon name="mdi:chevron-up" class="w-5 h-5 sm:w-4 sm:h-4 mx-auto" />
-    </FabButton>
+    </FloatingButton>
   </div>
 </template>

@@ -69,6 +69,7 @@ onUnmounted(() => {
 
 <template>
   <VueEasyLightbox
+    class="image-lightbox"
     :visible="visible"
     :imgs="imgs"
     :index="index"

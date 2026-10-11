@@ -50,7 +50,7 @@ watch(() => route.path, () => {
 </script>
 
 <template>
-  <nav aria-label="主导航" class="sticky top-0 z-50 bg-[var(--nav-bg)] backdrop-blur-md">
+  <nav aria-label="主导航" class="site-nav sticky top-0 z-50 bg-[var(--nav-bg)] backdrop-blur-md">
     <div :class="isFullWidth ? 'mx-auto w-full max-w-[112.5rem] px-3 sm:px-6' : 'container mx-auto max-w-6xl px-4 sm:px-6'">
       <div class="flex items-center justify-between h-14">
         <!-- 品牌即返回首页入口：字号配色与导航项一致（text-sm + 同套颜色变量）。

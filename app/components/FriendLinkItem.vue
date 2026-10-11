@@ -10,7 +10,7 @@ const avatarError = ref(false)
 
 <template>
   <!-- article：DevTools / 读屏里这是一个独立的友链条目 -->
-  <article class="flex items-center p-4 border border-[var(--line-color)] rounded-lg shadow-sm hover:shadow-md transition-shadow">
+  <article class="friend-link-item flex items-center p-4 border border-[var(--line-color)] rounded-lg shadow-sm hover:shadow-md transition-shadow">
     <!-- 头像链接与下方名字链接指向同一 URL，对读屏是重复停顿点：
          aria-hidden + tabindex="-1" 让它只对鼠标/视觉有意义 -->
     <a :href="link.url" target="_blank" rel="noopener noreferrer" aria-hidden="true" tabindex="-1">

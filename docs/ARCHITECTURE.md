@@ -14,10 +14,9 @@
 app/                 # Application source (srcDir)
 ├── app.vue          # (optional — not present, uses pages/ only)
 ├── components/      # Auto-imported Vue components
-│   ├── NavBar.vue
-│   ├── ProfileCard.vue
-│   ├── CategoriesCard.vue
-│   ├── TagCard.vue
+│   ├── SiteNav.vue
+│   ├── AuthorProfile.vue
+│   ├── RecentMoments.vue
 │   ├── ColorModeSwitch.vue
 │   ├── FriendLinkItem.vue
 │   ├── TableOfContents.vue

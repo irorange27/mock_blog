@@ -42,7 +42,7 @@ const formatMomentTime = (date: string) => date.slice(11, 16)
 
 <template>
   <DataState :status="status" :error="error" @retry="refresh">
-    <ol v-if="moments.length > 0" class="space-y-5 ml-2 sm:ml-4">
+    <ol v-if="moments.length > 0" class="moments-timeline space-y-5 ml-2 sm:ml-4">
       <li
         v-for="moment in moments"
         :key="moment.path"

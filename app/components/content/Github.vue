@@ -34,7 +34,7 @@ onMounted(async () => {
 </script>
 
 <template>
-  <a :href="`https://github.com/${full}`" target="_blank" rel="noopener noreferrer" class="gh-card">
+  <a :href="`https://github.com/${full}`" target="_blank" rel="noopener noreferrer" class="github-card">
     <img
       :src="`https://github.com/${owner}.png?size=80`"
       :alt="owner"

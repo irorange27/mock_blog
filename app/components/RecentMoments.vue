@@ -6,7 +6,7 @@ const headingId = useId()
 
 <template>
   <!-- section + aria-labelledby：无障碍树里是一块有名字的「动态」区域，DevTools 里结构一目了然 -->
-  <section :aria-labelledby="headingId">
+  <section :aria-labelledby="headingId" class="recent-moments">
     <h2 :id="headingId" class="text-sm font-bold mb-3 text-[var(--txt-90)] border-l-4 border-[var(--line-strong)] pl-2">
       <NuxtLink to="/moments" class="hover:text-[var(--primary)] transition-colors">动态</NuxtLink>
     </h2>
