@@ -15,9 +15,9 @@ const hasSidebar = computed(() => route.path === '/')
       class="sr-only focus:not-sr-only focus:fixed focus:top-2 focus:left-2 focus:z-[100] focus:px-4 focus:py-2 focus:rounded-lg focus:bg-[var(--btn-solid-bg)] focus:text-[var(--btn-solid-fg)]"
     >跳到主内容</a>
     <NavBar />
-    <!-- 首页不设 max-w，内容铺满视口；其余页面保持 container 宽度 -->
+    <!-- 首页跟随视口，但视口大于 1800px 时整体限宽 112.5rem 居中；其余页面保持 container 宽度 -->
     <main id="main-content" tabindex="-1" :class="hasSidebar
-      ? 'mx-auto w-full px-3 sm:px-6 py-6 sm:py-10'
+      ? 'mx-auto w-full max-w-[112.5rem] px-3 sm:px-6 py-6 sm:py-10'
       : 'container mx-auto max-w-7xl px-3 sm:px-6 py-6 sm:py-10'">
       <!-- Mobile: compact profile above content；首页时动态卡片也在这里（文章列表上方，见 MomentsCard 内的条数限制） -->
       <div class="lg:hidden mb-5">
@@ -64,7 +64,7 @@ const hasSidebar = computed(() => route.path === '/')
 
     <footer class="py-8 mt-4">
       <div :class="hasSidebar
-        ? 'mx-auto w-full px-3 sm:px-6 text-center text-[var(--txt-30)] text-sm space-y-1'
+        ? 'mx-auto w-full max-w-[112.5rem] px-3 sm:px-6 text-center text-[var(--txt-30)] text-sm space-y-1'
         : 'container mx-auto max-w-7xl px-4 text-center text-[var(--txt-30)] text-sm space-y-1'">
         <p>&copy; 2024 - {{ currentYear }} Niina's Blog</p>
         <a href="/rss.xml" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-1 hover:text-[var(--txt-50)] transition-colors" aria-label="RSS 订阅（新窗口打开）">
