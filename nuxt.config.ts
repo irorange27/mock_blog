@@ -3,6 +3,10 @@
 const __pyGrammar = (await import('@shikijs/langs/python')).default
 const python3 = { ...(Array.isArray(__pyGrammar) ? __pyGrammar[0] : __pyGrammar), name: 'python3', displayName: 'Python 3' }
 
+// alphaTab 靠 Web Worker / AudioWorklet 渲染和发声，Vite 会拆散 worker 入口，
+// 官方插件负责接住。字体和 soundfont 不让它拷贝，走 public/ 自托管（见 public/fonts/alphatab、public/soundfont）
+import { alphaTab } from '@coderline/alphatab-vite'
+
 export default defineNuxtConfig({
   compatibilityDate: '2024-12-31',
   srcDir: 'app/',
@@ -66,6 +70,7 @@ export default defineNuxtConfig({
   },
   css: ['@/assets/css/main.css', 'katex/dist/katex.min.css'],
   vite: {
+    plugins: [alphaTab({ assetOutputDir: false })],
     optimizeDeps: {
       include: ['vue-easy-lightbox'],
     },

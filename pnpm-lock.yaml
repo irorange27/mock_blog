@@ -8,6 +8,12 @@ importers:
 
   .:
     dependencies:
+      '@coderline/alphatab':
+        specifier: ^1.8.4
+        version: 1.8.4
+      '@coderline/alphatab-vite':
+        specifier: ^1.8.4
+        version: 1.8.4(vite@7.3.3(@types/node@24.0.1)(jiti@2.7.0)(terser@5.42.0)(yaml@2.9.0))
       '@nuxt/content':
         specifier: ^3.16.1
         version: 3.16.1(better-sqlite3@13.0.3)(esbuild@0.28.1)(magic-string@0.30.21)(magicast@0.5.3)(oxc-parser@0.131.0)(rollup@4.60.4)(vite@7.3.3(@types/node@24.0.1)(jiti@2.7.0)(terser@5.42.0)(yaml@2.9.0))
@@ -359,6 +365,16 @@ packages:
     engines: {node: '>=16'}
     cpu: [x64]
     os: [win32]
+
+  '@coderline/alphatab-vite@1.8.4':
+    resolution: {integrity: sha512-kUABf0FNMXZrr7TvHLUBTqpQQLrHXs9bIrsQMHHZXE0uIlH70yNSgbiuvm0SK0L5D07On5RD5InteJZIX9dacg==}
+    engines: {node: '>=20.19.0'}
+    peerDependencies:
+      vite: ^7 || ^8
+
+  '@coderline/alphatab@1.8.4':
+    resolution: {integrity: sha512-VN5rfTZZWgA63Ny1aDKCp02k3Qm9CHhg4Q9AnK0kHm7G+fNDNZo36TeToPDFoJ6VpB9+AHcCrHwHFUP1tKqdsw==}
+    engines: {node: '>=6.0.0'}
 
   '@colordx/core@5.4.3':
     resolution: {integrity: sha512-kIxYSfA5T8HXjav55UaaH/o/cKivF6jCCGIb8eqtcsfI46wsvlSiT8jMDyrl779qLec3c2c2oHBZo4oAhvbjrQ==}
@@ -6664,6 +6680,13 @@ snapshots:
 
   '@cloudflare/workerd-windows-64@1.20260925.1':
     optional: true
+
+  '@coderline/alphatab-vite@1.8.4(vite@7.3.3(@types/node@24.0.1)(jiti@2.7.0)(terser@5.42.0)(yaml@2.9.0))':
+    dependencies:
+      magic-string: 0.30.21
+      vite: 7.3.3(@types/node@24.0.1)(jiti@2.7.0)(terser@5.42.0)(yaml@2.9.0)
+
+  '@coderline/alphatab@1.8.4': {}
 
   '@colordx/core@5.4.3': {}
 
