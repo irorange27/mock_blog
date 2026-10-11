@@ -4,7 +4,7 @@ date: 2026-09-01 15:30:00
 categories: '技术杂谈'
 tags:
   - 博客
-description: 本站 Markdown 支持的扩展语法演示与速查：admonition 提示块、GitHub 仓库卡片、spoiler 遮罩、ABC 乐谱、音频播放器、浏览器可运行代码块。
+description: 本站 Markdown 支持的扩展语法演示与速查：admonition 提示块、GitHub 仓库卡片、spoiler 遮罩、ABC 乐谱、GP 乐谱、音频播放器、浏览器可运行代码块。
 draft: true
 ---
 
@@ -134,6 +134,25 @@ C2 C2 G2 G2 | A2 A2 G4 |
 ::
 
 写谱速记（LilyPond 风格，时值数字后缀，八度用 `'` 升、`,` 降，默认中央 C 八度）：`c4` = 中央 C 四分音符；`d8` = 八分音符；`c1` = 全音符；`g4.` = 附点四分；`f#2` = 升 F 二分音符；`c'` = 高八度 do；`c,` = 低八度 do；`r4` = 四分休止。每行还可以用 `inst=名字` 指定合成音色：`click`（节拍声，脉冲行默认）、`tone`（三角波，逐音行默认）、`sine`、`square`、`saw`、`pluck`（拨弦）、`bell`（铃音）。播放时逐音行按音高合成旋律，脉冲行合成节拍，多声部用不同音色更好分辨。
+
+## GP 乐谱
+
+渲染 Guitar Pro 文件，alphaTab 解析成谱面，五线谱和 tab 都画。行内语法，`src` 指向 `public/scores/` 下的文件，`layout` 可选 `both`（默认，五线谱加 tab）、`tab`、`staff`，`audio` 可选挂 GP8 RSE 导出的整曲音频：
+
+```markdown
+:gp-score{src="/scores/xxx.gp"}
+```
+
+点「播放」用内置合成器回放曲谱，音色文件自托管，首次点击时加载（约 1.3 MB）。写长曲走文件，短 riff 可以不落文件，直接在组件内放无语言围栏代码块写 alphaTex：
+
+::gp-score
+```
+\title "五声练习"
+\tempo 92
+.
+:4 0.6 3.6 5.6 7.6 :2 10.6 | :4 7.6 5.6 3.6 0.6 :2 0.6
+```
+::
 
 ## 可运行代码块
 

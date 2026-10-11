@@ -1,5 +1,7 @@
 # 乐谱显示 + 音频播放 实现计划
 
+> **已被取代（2026-10-12）**：本计划未执行。包名有误（官方是 `@coderline/alphatab`，非 `alphatab`）、`StaveProfile.Mixed` 枚举不存在（实际为 `ScoreTab`/`Score`/`Tab`）、缺 Vite worker 插件、soundfont 应懒加载。实际实现按 2026-10-12 的对话计划完成，组件为 `app/components/content/GpScore.vue`。
+
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
 **Goal:** 让博客能在 Markdown 里用 `::score` 嵌入 Guitar Pro 乐谱(`.gp`),用 AlphaTab 渲染 tab/五线谱,并支持谱内 soundfont 回放 + RSE MP3 播放。

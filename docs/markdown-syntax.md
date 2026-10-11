@@ -109,6 +109,31 @@ C2 C2 G2 G2 | A2 A2 G4 |
 ::
 ```
 
+## GP 乐谱 gp-score
+
+渲染 Guitar Pro 文件（GP3–GP8 的 `.gp`、`.gp5`、`.gpx`），alphaTab 解析成 SVG 谱面，可合成回放。行内参数语法，`src` 指向 `public/scores/` 下的文件；`layout` 可选 `both`（默认，五线谱 + tab）/ `tab` / `staff`；`audio` 可选，挂 GP8 RSE 导出的整曲音频（原生播放器，和合成回放并存）：
+
+````markdown
+:gp-score{src="/scores/xxx.gp" layout="tab" audio="/audio/xxx.mp3"}
+````
+
+点「播放」用内置合成器回放曲谱。音色（sonivox，约 1.3 MB）自托管在 `/soundfont/`，首次点播放时才加载。
+
+短 riff 可以不落文件：块语法，组件内放**无语言标注**的围栏代码块，内容为 [alphaTex](https://www.alphatab.net/docs/alphatex/introduction) 记谱：
+
+````markdown
+::gp-score
+
+```
+\title "曲名"
+\tempo 92
+.
+:4 0.6 3.6 5.6 7.6 :2 10.6
+```
+
+::
+````
+
 ## 可运行代码块
 
 `js` / `ts` / `python` 三种语言的围栏代码块自动带「运行」按钮，浏览器本地执行：
