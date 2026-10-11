@@ -8,6 +8,9 @@ export function usePreEnhancer(
   hasTarget: (el: Element) => boolean = el =>
     el.tagName === 'PRE' || el.querySelector('pre') !== null,
 ) {
+  // 在 setup 同步段捕获 appContext，供 setButtonIcon 在应用上下文外渲染图标
+  setIconAppContext(getCurrentInstance()?.appContext ?? null)
+
   onMounted(() => {
     enhance()
 
