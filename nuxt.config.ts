@@ -73,6 +73,10 @@ export default defineNuxtConfig({
     plugins: [alphaTab({ assetOutputDir: false })],
     optimizeDeps: {
       include: ['vue-easy-lightbox'],
+      // alphatab 不走预打包：预打包会把它的 worker chunk 拆成裸文件名，
+      // alphatab-vite 插件在 dev 下按磁盘路径解析不到，会去找 server 环境的
+      // deps metadata（Nuxt 不生成）直接 500。直接吃 dist ESM 无此问题。
+      exclude: ['@coderline/alphatab'],
     },
   },
 })
