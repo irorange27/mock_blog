@@ -39,30 +39,30 @@ useSeoMeta({
       <div class="flex items-center text-[var(--txt-50)] text-sm">
         <span>{{ formatDate(data?.date) }}</span>
         <template v-if="views !== null">
-          <span class="mx-2">·</span>
+          <span class="mx-2" aria-hidden="true">·</span>
           <span class="inline-flex items-center gap-1">
-            <Icon name="mdi:eye-outline" class="w-4 h-4" />
+            <Icon name="mdi:eye-outline" class="w-4 h-4" aria-hidden="true" />
             {{ views }} 次浏览
           </span>
         </template>
-        <span class="mx-2">·</span>
+        <span class="mx-2" aria-hidden="true">·</span>
         <NuxtLink
           :to="`/categories/${data?.categories || '默认'}`"
           class="hover:text-[var(--primary)] transition-colors"
         >
           {{ data?.categories || '默认' }}
         </NuxtLink>
-        <span class="mx-2">·</span>
-        <div class="flex flex-wrap gap-2">
-          <NuxtLink
-            v-for="tag in data?.tags"
-            :key="tag"
-            :to="`/tags/${tag}`"
-            class="chip px-2.5 py-0.5 text-xs rounded-full"
-          >
-            {{ tag }}
-          </NuxtLink>
-        </div>
+        <span class="mx-2" aria-hidden="true">·</span>
+        <ul class="flex flex-wrap gap-2">
+          <li v-for="tag in data?.tags" :key="tag">
+            <NuxtLink
+              :to="`/tags/${tag}`"
+              class="chip px-2.5 py-0.5 text-xs rounded-full"
+            >
+              {{ tag }}
+            </NuxtLink>
+          </li>
+        </ul>
       </div>
     </header>
 
@@ -72,7 +72,7 @@ useSeoMeta({
       <ContentRenderer v-if="data" :value="data" />
     </div>
 
-    <nav v-if="adjacent.prev || adjacent.next" class="mt-10 pt-6 border-t border-[var(--line-color)] grid grid-cols-1 sm:grid-cols-2 gap-4">
+    <nav v-if="adjacent.prev || adjacent.next" aria-label="文章导航" class="mt-10 pt-6 border-t border-[var(--line-color)] grid grid-cols-1 sm:grid-cols-2 gap-4">
       <NuxtLink
         v-if="adjacent.prev"
         :to="adjacent.prev.path"

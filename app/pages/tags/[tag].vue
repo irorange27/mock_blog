@@ -21,32 +21,33 @@ useSeoMeta({
       </p>
     </header>
 
-    <div class="space-y-6">
-      <article v-for="post in taggedPosts" :key="post.path"
-        class="pb-6 border-b border-[var(--line-color)] last:border-0">
-        <NuxtLink :to="post.path">
-          <h2 class="text-lg font-bold text-[var(--txt-90)] mb-2 hover:text-[var(--primary)] transition-colors">
-            {{ post.title }}
-          </h2>
-        </NuxtLink>
+    <ul class="space-y-6">
+      <li v-for="post in taggedPosts" :key="post.path">
+        <article class="pb-6 border-b border-[var(--line-color)] last:border-0">
+          <NuxtLink :to="post.path">
+            <h2 class="text-lg font-bold text-[var(--txt-90)] mb-2 hover:text-[var(--primary)] transition-colors">
+              {{ post.title }}
+            </h2>
+          </NuxtLink>
 
-        <div class="flex items-center text-[var(--txt-50)] text-sm">
-          <span>{{ formatDate(post.date) }}</span>
-          <span class="mx-2">·</span>
-          <span>{{ post.categories || '默认' }}</span>
-          <span class="mx-2">·</span>
-          <div class="flex gap-2">
-            <NuxtLink
-              v-for="t in post.tags"
-              :key="t"
-              :to="`/tags/${t}`"
-              class="chip px-2 py-1 rounded-full"
-            >
-              {{ t }}
-            </NuxtLink>
+          <div class="flex items-center text-[var(--txt-50)] text-sm">
+            <span>{{ formatDate(post.date) }}</span>
+            <span class="mx-2" aria-hidden="true">·</span>
+            <span>{{ post.categories || '默认' }}</span>
+            <span class="mx-2" aria-hidden="true">·</span>
+            <ul class="flex gap-2">
+              <li v-for="t in post.tags" :key="t">
+                <NuxtLink
+                  :to="`/tags/${t}`"
+                  class="chip px-2 py-1 rounded-full"
+                >
+                  {{ t }}
+                </NuxtLink>
+              </li>
+            </ul>
           </div>
-        </div>
-      </article>
-    </div>
+        </article>
+      </li>
+    </ul>
   </div>
 </template>
