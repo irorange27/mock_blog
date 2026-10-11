@@ -4,6 +4,10 @@ links:
    url: 'https://blog.soulter.top'
    avatar: 'https://avatars.githubusercontent.com/u/37870767?v=4'
    description: 'We Need to Go Deeper!'
+ - name: '亂筆'
+   url: 'https://blog.l3zc.com/'
+   avatar: 'https://blog-img.l3zc.com/avatar.jpg'
+   description: '一个无趣者的自我放逐之地。'
 ---
 # 友情链接说明
 
