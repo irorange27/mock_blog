@@ -16,7 +16,7 @@ const hasSidebar = computed(() => route.path === '/')
     >跳到主内容</a>
     <NavBar />
     <!-- 首页不设 max-w，内容铺满视口；其余页面保持 container 宽度 -->
-    <main id="main-content" :class="hasSidebar
+    <main id="main-content" tabindex="-1" :class="hasSidebar
       ? 'mx-auto w-full px-3 sm:px-6 py-6 sm:py-10'
       : 'container mx-auto max-w-7xl px-3 sm:px-6 py-6 sm:py-10'">
       <!-- Mobile: compact profile above content；首页时动态卡片也在这里（文章列表上方，见 MomentsCard 内的条数限制） -->

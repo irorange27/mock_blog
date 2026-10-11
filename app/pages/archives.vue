@@ -4,9 +4,29 @@ useSeoMeta({
   description: '所有文章按时间归档。',
 })
 
+import type { Post } from '~/types/post'
+
 const { posts, status, error, refresh } = useBlogData()
 
-const groupedPosts = computed(() => groupPostsByYearAndMonth(posts.value))
+// 只按年分组，不单独强调月份；条目日期显示“M月D日”
+const groupedPosts = computed(() => {
+  const groups: { year: string; posts: Post[] }[] = []
+  for (const post of posts.value) {
+    const year = new Date(post.date).getFullYear().toString()
+    let g = groups.find(x => x.year === year)
+    if (!g) {
+      g = { year, posts: [] }
+      groups.push(g)
+    }
+    g.posts.push(post)
+  }
+  return groups
+})
+
+const formatMonthDay = (date: string | Date) => {
+  const d = typeof date === 'string' ? new Date(date) : date
+  return `${d.getMonth() + 1}月${d.getDate()}日`
+}
 </script>
 
 <template>
@@ -20,32 +40,25 @@ const groupedPosts = computed(() => groupPostsByYearAndMonth(posts.value))
           {{ yearGroup.year }}
         </h2>
 
-        <div class="space-y-4 sm:space-y-6 ml-2 sm:ml-4">
-          <div v-for="monthGroup in yearGroup.months" :key="monthGroup.month">
-            <h3 class="text-lg font-semibold mb-2 text-[var(--txt-75)]">
-              {{ monthGroup.month }} 月
-            </h3>
-            <ul class="space-y-2 ml-4">
-              <li
-                v-for="post in monthGroup.posts"
-                :key="post.path"
-                class="hover:bg-[var(--panel-bg-hover)] rounded-md transition"
-              >
-                <NuxtLink
-                  :to="post.path"
-                  class="flex items-center justify-between space-x-4 p-2"
-                >
-                  <span class="text-[var(--txt-50)] text-sm shrink-0">
-                    {{ formatDay(post.date) }}
-                  </span>
-                  <span class="font-medium font-bold text-[var(--txt-90)] hover:text-[var(--primary)] transition-colors truncate">
-                    {{ post.title }}
-                  </span>
-                </NuxtLink>
-              </li>
-            </ul>
-          </div>
-        </div>
+        <ul class="space-y-2 ml-2 sm:ml-4">
+          <li
+            v-for="post in yearGroup.posts"
+            :key="post.path"
+            class="hover:bg-[var(--panel-bg-hover)] rounded-md transition"
+          >
+            <NuxtLink
+              :to="post.path"
+              class="flex items-center justify-between space-x-4 p-2"
+            >
+              <span class="text-[var(--txt-50)] text-sm shrink-0">
+                {{ formatMonthDay(post.date) }}
+              </span>
+              <span class="font-medium font-bold text-[var(--txt-90)] hover:text-[var(--primary)] transition-colors truncate">
+                {{ post.title }}
+              </span>
+            </NuxtLink>
+          </li>
+        </ul>
       </div>
     </div>
 

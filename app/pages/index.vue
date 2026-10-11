@@ -39,15 +39,15 @@ const prefersReducedMotion = () =>
 </script>
 
 <template>
-  <div class="space-y-5">
+  <div class="space-y-3">
     <h1 class="sr-only">最新文章</h1>
-    <ul ref="postList" id="post-list" class="space-y-5 outline-none" tabindex="-1">
+    <ul ref="postList" id="post-list" class="space-y-3 outline-none" tabindex="-1">
       <li v-for="post in currentPosts" :key="post.path">
         <article
-          class="card-base p-4 sm:p-7 hover:border-[var(--line-strong)] hover:-translate-y-0.5 transition-all duration-200">
+          class="card-base px-4 pt-3 pb-4 sm:px-7 sm:pt-4 sm:pb-6 hover:border-[var(--line-strong)] hover:-translate-y-0.5 transition-all duration-200">
           <div>
-            <NuxtLink :to="post.path" class="block mb-3">
-              <h2 class="text-xl font-bold mb-2 text-[var(--txt-90)] hover:text-[var(--primary)] transition-colors">
+            <NuxtLink :to="post.path" class="block mb-2">
+              <h2 class="text-xl font-bold leading-snug text-[var(--txt-90)] hover:text-[var(--primary)] transition-colors">
                 {{ post.title }}
               </h2>
             </NuxtLink>

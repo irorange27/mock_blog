@@ -4,6 +4,7 @@
   "type": "module",
   "scripts": {
     "new-post": "node scripts/new-post.js",
+    "new-moment": "node scripts/new-moment.js",
     "media": "node scripts/media.mjs",
     "subset-font": "bash scripts/subset-font.sh",
     "build": "nuxt build",
