@@ -13,7 +13,7 @@ links:
    url: 'https://www.raptitude.com/'
    avatar: 'https://www.raptitude.com/wp-content/uploads/2022/02/goldenselfiedavid-e1645634079252.jpg'
    description: 'David Cain 的博客，关于正念与“如何把做人这件事做得更好”。'
- - name: '科学空间|Scientific Spaces'
+ - name: '科学空间'
    url: 'https://kexue.fm/'
    avatar: 'https://kexue.fm/usr/themes/geekg/images/avatar.png'
    description: '苏剑林的博客，数学与机器学习的纠缠之地。'
