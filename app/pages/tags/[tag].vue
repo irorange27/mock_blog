@@ -46,6 +46,10 @@ useSeoMeta({
               </li>
             </ul>
           </div>
+
+          <p class="text-[var(--txt-50)] text-sm leading-relaxed line-clamp-2 mt-2">
+            {{ post.description || post.title }}
+          </p>
         </article>
       </li>
     </ul>
