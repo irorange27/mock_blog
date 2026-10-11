@@ -55,14 +55,17 @@ describe('博客工具函数', () => {
   })
 
   describe('groupPostsByYearAndMonth', () => {
-    it('should group posts by year and month', () => {
+    it('should group posts by year and month in descending order', () => {
       const result = groupPostsByYearAndMonth(mockPosts)
-      
-      expect(result['2024']).toBeDefined()
-      expect(result['2024']['1']).toBeDefined()
-      expect(result['2024']['2']).toBeDefined()
-      expect(result['2024']['1']).toHaveLength(2)
-      expect(result['2024']['2']).toHaveLength(1)
+
+      expect(result).toHaveLength(1)
+      expect(result[0].year).toBe('2024')
+      expect(result[0].months.map(m => m.month)).toEqual(['2', '1'])
+      expect(result[0].months[0].posts).toHaveLength(1)
+      expect(result[0].months[1].posts).toHaveLength(2)
+      // 月内按日期倒序：2024-01-20 的文章排在 2024-01-15 之前
+      expect(result[0].months[1].posts[0].path).toBe('/posts/test-2')
+      expect(result[0].months[1].posts[1].path).toBe('/posts/test-1')
     })
   })
 })
