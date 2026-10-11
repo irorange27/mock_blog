@@ -17,7 +17,7 @@ const args = process.argv.slice(2)
 if (args.length === 0) {
   console.error(`Error: No filename argument provided
 Usage: pnpm new-moment <slug> [title]
-  <slug>   - English filename (required), saved as content/moments/YYYY-MM-DD-<slug>.md
+  <slug>   - Filename slug, Chinese supported (required), saved as content/moments/YYYY-MM-DD-<slug>.md
   [title]  - Display title (optional; pass "动态" to omit it from display)`)
   process.exit(1)
 }
@@ -35,9 +35,12 @@ if (fs.existsSync(fullPath)) {
 }
 
 const { date, time } = getDate()
+// 显式声明路由：Content v3 会把文件名 slug 化，中文会被剥掉，同日多条动态的 path 会撞车
+const routePath = `/moments/${date}-${slug.replace(/\.(md|mdx)$/i, "")}`
 const content = `---
 title: ${title}
 date: "${date} ${time}"
+path: ${routePath}
 ---
 
 `

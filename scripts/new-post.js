@@ -20,14 +20,17 @@ const args = process.argv.slice(2)
 if (args.length === 0) {
   console.error(`Error: No filename argument provided
 Usage: pnpm new-post <slug> [title]
-  <slug>   - English filename / URL slug (required)
-  [title]  - Display title, can be Chinese (optional, defaults to slug)`)
+  <slug>   - Filename / URL slug, Chinese supported (required)
+  [title]  - Display title (optional, defaults to slug)`)
   process.exit(1)
 }
 
 const slug = args[0]
 const title = args[1] || slug
 let fileName = slug
+// 显式声明路由：Content v3 会把文件名 slug 化，非 ASCII 字符（中文）会被剥掉，
+// 所以用 frontmatter 的 path 固定 URL（数据库与路由均按解码后的原文匹配）
+const routePath = "/posts/" + slug.replace(/\.(md|mdx)$/i, "")
 
 // Add .md extension if not present
 const fileExtensionRegex = /\.(md|mdx)$/i
@@ -52,6 +55,7 @@ if (!fs.existsSync(dirPath)) {
 const content = `---
 title: ${title}
 date: ${getDate()}
+path: ${routePath}
 categories: ''
 tags:
 description: ''

@@ -1,7 +1,9 @@
 <script setup lang="ts">
 const route = useRoute()
-const { data } = await useAsyncData(`content-${route.path}`, () =>
-  queryCollection('posts').path(route.path).first()
+// route.path 是百分号编码的（中文 slug 会变成 %E4%BD%A0…），Content 数据库里存的是解码后的原文
+const decodedPath = decodeURIComponent(route.path)
+const { data } = await useAsyncData(`content-${decodedPath}`, () =>
+  queryCollection('posts').path(decodedPath).first()
 )
 
 const slug = computed(() => {
@@ -13,7 +15,7 @@ const { views } = usePageViews(() => slug.value)
 
 const { posts } = useBlogData()
 const adjacent = computed(() => {
-  const idx = posts.value.findIndex(p => p.path === route.path)
+  const idx = posts.value.findIndex(p => p.path === decodedPath)
   if (idx === -1) return { prev: null, next: null }
   return {
     prev: idx < posts.value.length - 1 ? posts.value[idx + 1] : null,
