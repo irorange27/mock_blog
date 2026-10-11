@@ -26,11 +26,16 @@ const moments = computed(() => data.value || [])
 // 示例文件的占位标题不展示
 const showTitle = (m: MomentItem) => m.title && m.title !== '动态'
 
+// 星期按 slice 出的年月日用 Date.UTC 手动算：date 是无时区的本地时间字符串，
+// 经 new Date 解析再取星期会随构建机时区漂移，和展示的日期对不上
+const WEEKDAYS = ['周日', '周一', '周二', '周三', '周四', '周五', '周六']
+
 const formatMomentDate = (date: string) => {
   const [year, month, day] = date.slice(0, 10).split('-')
+  const weekday = WEEKDAYS[new Date(Date.UTC(+year, +month - 1, +day)).getUTCDay()]
   return year === String(new Date().getFullYear())
-    ? `${Number(month)}月${Number(day)}日`
-    : `${year}年${Number(month)}月${Number(day)}日`
+    ? `${Number(month)}月${Number(day)}日 ${weekday}`
+    : `${year}年${Number(month)}月${Number(day)}日 ${weekday}`
 }
 const formatMomentTime = (date: string) => date.slice(11, 16)
 </script>
