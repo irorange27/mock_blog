@@ -15,6 +15,15 @@ export default defineContentConfig({
         draft: z.boolean().default(false),
       }),
     }),
+    // 动态（moments）：content/moments/ 下每条一个 md，正文写在 frontmatter 之下的
+    // markdown body 里，date 定长字符串排序即时间序；侧栏只取最新几条
+    moments: defineCollection({
+      type: 'page',
+      source: 'moments/*.md',
+      schema: z.object({
+        date: z.string(),
+      }),
+    }),
     // content/draft/ 是 gitignore 的本地草稿：不建集合 = 不进列表、URL 也由根级
     // [...404].vue 兜住（v2 即如此），完全不收录
     about: defineCollection({

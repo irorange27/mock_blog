@@ -1,4 +1,5 @@
 ---
+title: Cyber
 links:
  - name: 'Soulter’s Blog'
    url: 'https://blog.soulter.top'

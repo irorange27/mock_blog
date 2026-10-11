@@ -167,6 +167,15 @@ html {
     border-radius: 0.5rem;
 }
 
+/* 纸面平铺（非首页的内容页，由 layout 挂 .paper）：
+   页面里已有的 card-base 只去外壳（底色/边框/圆角/内边距），不改内部排版 */
+.paper .card-base {
+    background-color: transparent;
+    border-color: transparent;
+    border-radius: 0;
+    padding: 0;
+}
+
 .widget-card {
     background-color: var(--card-bg-60);
     border-radius: 1rem;
