@@ -17,6 +17,28 @@
     font-display: swap;
 }
 
+/* 行内代码用 Light 字重：系统等宽字体（SF Mono/Consolas）笔画偏重，
+   和正文的文楷细体放在一起显得突兀 */
+@font-face {
+    font-family: 'JetBrainsMonoLight';
+    src: url('/fonts/JetBrainsMono-Light.woff2') format('woff2');
+    font-weight: 300;
+    font-style: normal;
+    font-display: swap;
+    unicode-range: U+0000-00FF, U+2000-206F, U+2190-21FF, U+2210-221F, U+2500-257F;
+}
+
+/* 拉丁正文：EB Garamond 可变字体（wght 400-700 一个文件），
+   人文衬线的书法感和楷体协调；中文继续走 LXGWWenKai 的 unicode-range */
+@font-face {
+    font-family: 'EBGaramond';
+    src: url('/fonts/EBGaramond-latin.woff2') format('woff2');
+    font-weight: 400 700;
+    font-style: normal;
+    font-display: swap;
+    unicode-range: U+0000-00FF, U+2000-206F, U+2070-209F, U+20A0-20CF, U+2190-21FF, U+2210-221F;
+}
+
 /* ══════════════════════════════════════════
    Design tokens — oklch + --hue
    全站颜色由此派生：改 --hue 即整站换主题色。
@@ -30,8 +52,8 @@
 
     /* 亮色文字/主色压到 WCAG AA（4.5:1）：primary 约 0.48L、txt-30 约 0.55L，见 DESIGN 对比度备注 */
     --primary: oklch(0.48 0.15 var(--hue));
-    --link-visited: oklch(0.50 0.17 290);
-    --danger: oklch(0.51 0.19 25);
+    --link-visited: oklch(0.50 0.17 calc(var(--hue) + 32));
+    --danger: oklch(0.51 0.19 calc(var(--hue) + 127));
 
     --page-bg: oklch(0.985 0.008 var(--hue));
     --nav-bg: oklch(0.985 0.008 var(--hue) / 0.8);
@@ -67,18 +89,19 @@
 
     --selection-bg: oklch(0.90 0.05 var(--hue));
 
-    /* admonition 语义色（固定色相，不随 --hue） */
-    --adm-tip: oklch(0.58 0.11 175);
-    --adm-note: oklch(0.54 0.12 255);
-    --adm-important: oklch(0.54 0.16 320);
-    --adm-warning: oklch(0.58 0.13 75);
-    --adm-caution: oklch(0.54 0.18 25);
+    /* admonition 语义色：相对 --hue 的角度偏移（tip/note/important/warning/caution
+       分别 -83/-3/+62/+177/+127，按初始主题 hue=258 反推），换主题色时整体旋转 */
+    --adm-tip: oklch(0.58 0.11 calc(var(--hue) - 83));
+    --adm-note: oklch(0.54 0.12 calc(var(--hue) - 3));
+    --adm-important: oklch(0.54 0.16 calc(var(--hue) + 62));
+    --adm-warning: oklch(0.58 0.13 calc(var(--hue) + 177));
+    --adm-caution: oklch(0.54 0.18 calc(var(--hue) + 127));
 }
 
 html.dark-mode {
     --primary: oklch(0.75 0.13 var(--hue));
-    --link-visited: oklch(0.70 0.13 290);
-    --danger: oklch(0.70 0.17 25);
+    --link-visited: oklch(0.70 0.13 calc(var(--hue) + 32));
+    --danger: oklch(0.70 0.17 calc(var(--hue) + 127));
 
     --page-bg: oklch(0.17 0.015 var(--hue));
     --nav-bg: oklch(0.17 0.015 var(--hue) / 0.8);
@@ -112,22 +135,22 @@ html.dark-mode {
 
     --selection-bg: oklch(0.40 0.08 var(--hue));
 
-    --adm-tip: oklch(0.72 0.11 175);
-    --adm-note: oklch(0.72 0.12 255);
-    --adm-important: oklch(0.72 0.15 320);
-    --adm-warning: oklch(0.75 0.13 75);
-    --adm-caution: oklch(0.70 0.16 25);
+    --adm-tip: oklch(0.72 0.11 calc(var(--hue) - 83));
+    --adm-note: oklch(0.72 0.12 calc(var(--hue) - 3));
+    --adm-important: oklch(0.72 0.15 calc(var(--hue) + 62));
+    --adm-warning: oklch(0.75 0.13 calc(var(--hue) + 177));
+    --adm-caution: oklch(0.70 0.16 calc(var(--hue) + 127));
 }
 
 /* overflow-x 只放在 html 上：body 上的 overflow-x:hidden 会让 body
    成为 sticky 后代的滚动容器，导致 position:sticky 全站失效 */
 html {
-    font-family: 'LXGWWenKai', sans-serif;
+    font-family: 'EBGaramond', 'LXGWWenKai', sans-serif;
     overflow-x: hidden;
 }
 
 body {
-    font-family: 'LXGWWenKai', sans-serif;
+    font-family: 'EBGaramond', 'LXGWWenKai', sans-serif;
 }
 
 /* 锚点跳转：平滑滚动，且标题不被 sticky 导航遮住 */
@@ -308,7 +331,7 @@ html:not(.dark-mode) .code-btn:hover {
 
 /* ── Font stack ── */
 .prose {
-  font-family: 'LXGWWenKai', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  font-family: 'EBGaramond', 'LXGWWenKai', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
 }
 
 /* ── Paragraphs ── */
@@ -392,11 +415,14 @@ html:not(.dark-mode) .code-btn:hover {
 }
 
 /* ── Inline code ── */
+/* 低调处理：无底色，仅靠淡下划线与等宽字体区分 */
 .prose code:not(pre code) {
-  background-color: var(--inline-code-bg);
+  background-color: transparent;
   color: var(--txt-90);
-  padding: 0.15em 0.45em;
-  border-radius: 0.3rem;
+  font-family: 'JetBrainsMonoLight', ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-weight: 300;
+  padding: 0 0.1em;
+  border-bottom: 1px solid var(--line-strong);
   font-size: 0.875em;
   word-break: break-all;
   max-width: 100%;
