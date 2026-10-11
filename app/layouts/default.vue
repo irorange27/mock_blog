@@ -55,8 +55,8 @@ const hasSidebar = computed(() => route.path === '/')
              不收缩就会把正文列整个顶宽、越过 max-w-6xl 撞上右侧固定目录。允许收缩后，
              列宽只由断点决定，超宽内容各自在列内滚动（见 main.css 的 .katex-display） -->
         <!-- paper：非首页的内容页不套卡片，纸面平铺（见 main.css 的 .paper）；
-             max-w-2xl 约束阅读宽度（接近纸质书版心） -->
-        <div :class="hasSidebar ? 'order-1 lg:order-2 min-w-0' : 'paper w-full max-w-2xl min-w-0'">
+             内容页宽度按黄金分割取容器（max-w-7xl=80rem）的 1/φ ≈ 49.4rem -->
+        <div :class="hasSidebar ? 'order-1 lg:order-2 min-w-0' : 'paper w-full max-w-[49.4rem] min-w-0'">
           <slot />
         </div>
       </div>
