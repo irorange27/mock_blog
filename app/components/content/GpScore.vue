@@ -6,7 +6,7 @@
 // alphaTab 体量大且依赖浏览器 API，动态 import 不进 SSR 包；其 Web Worker / AudioWorklet
 // 加载由 nuxt.config 里的 @coderline/alphatab-vite 插件接住。
 // 字体与 soundfont 自托管：public/fonts/alphatab、public/soundfont（路径见 app/utils/gpScore.ts）。
-import { FONT_DIRECTORY, SOUNDFONT_URL, normalizeLayout, type ScoreLayout } from '~/utils/gpScore'
+import { FONT_DIRECTORY, SCROLL_OFFSET_Y, SOUNDFONT_URL, normalizeLayout, type ScoreLayout } from '~/utils/gpScore'
 
 type AtApi = import('@coderline/alphatab').AlphaTabApi
 type AtSettingsJson = import('@coderline/alphatab').SettingsJson
@@ -87,7 +87,7 @@ function buildSettings(): AtSettingsJson {
   return {
     core: { engine: 'svg', useWorkers: true, fontDirectory: FONT_DIRECTORY },
     display,
-    player: { enablePlayer: true, enableCursor: true },
+    player: { enablePlayer: true, enableCursor: true, scrollOffsetY: SCROLL_OFFSET_Y },
   }
 }
 

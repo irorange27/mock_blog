@@ -13,3 +13,8 @@ export function normalizeLayout(layout: string | undefined): ScoreLayout {
   if (layout === 'both' || layout === 'tab' || layout === 'staff') return layout
   return DEFAULT_LAYOUT
 }
+
+// 播放自动滚动时视口顶部多留的距离：吸顶导航 56px + 约一个小节排面高度，
+// 避免当前小节贴顶被导航挡住（alphaTab 的 player.scrollOffsetY）。
+// 注意符号：offset 加在目标滚动位置上，负值才让小节停在视口顶部下方。
+export const SCROLL_OFFSET_Y = -220
