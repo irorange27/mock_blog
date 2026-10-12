@@ -9,7 +9,7 @@ import type { DurableObjectState } from './types'
 const NAME_MAX = 24
 const EMAIL_MAX = 254
 const LINK_MAX = 200
-const BODY_MAX = 2000
+const BODY_MAX = 1000
 const THREAD_MAX = 200
 
 // 同一 IP 10 分钟内最多 5 条，与 Twikoo 的默认口径一致。
@@ -212,9 +212,12 @@ function normalizeInput(payload: Record<string, unknown>): CommentInput | string
   if (!nick) return '昵称不能为空'
   if (nick.length > NAME_MAX) return `昵称不能超过 ${NAME_MAX} 个字符`
 
+  // 邮箱必填。它不参与展示（接口不回传这个字段），用途是日后的邮件通知，
+  // 比如有人回复了你的评论时提醒你——所以现在只做校验并入库。
   const email = str(payload.email).trim()
+  if (!email) return '邮箱不能为空'
   if (email.length > EMAIL_MAX) return `邮箱不能超过 ${EMAIL_MAX} 个字符`
-  if (email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return '邮箱格式不正确'
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return '邮箱格式不正确'
 
   const link = str(payload.link).trim()
   if (link.length > LINK_MAX) return `网址不能超过 ${LINK_MAX} 个字符`

@@ -105,8 +105,7 @@ export function useComments(slug: () => string) {
       }
 
       if (isCommentData(data.comment)) {
-        // 本地带上邮箱，让自己刚发的那条当场就有头像；服务端不会回传它。
-        comments.value = [...comments.value, { ...data.comment, email: identity.email }]
+        comments.value = [...comments.value, data.comment]
       } else {
         await refresh()
       }

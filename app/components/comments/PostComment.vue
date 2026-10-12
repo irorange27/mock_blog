@@ -15,16 +15,11 @@ const emit = defineEmits<{
   delete: [comment: CommentData]
 }>()
 
-// 头像用邮箱的 SHA-256 换 Gravatar。邮箱只在访客自己的浏览器里参与计算：
-// 接口不回传它，只有「我刚发的那条」在本地带着它。
-const avatar = ref('')
-
-onMounted(async () => {
-  if (!props.comment.email) return
-  const digest = await sha256(props.comment.email.trim().toLowerCase())
-  if (digest) avatar.value = `https://cn.gravatar.com/avatar/${digest}?d=mp&s=80`
-})
-
+// 头像用昵称首字。
+//
+// 曾经接过 Gravatar（邮箱 SHA-256 换图），但它要访客自己注册过才有图，
+// 没注册的邮箱会拿到一张默认灰色人像——看上去像加载失败，比没有头像更糟。
+// 这个站的读者基本不会注册过，所以统一退回首字。
 const initial = computed(() => props.comment.nick.trim().slice(0, 1).toUpperCase() || '?')
 
 const time = computed(() => formatDateTime(props.comment.created))
@@ -35,8 +30,7 @@ const iso = computed(() => new Date(props.comment.created).toISOString())
 <template>
   <li class="comment-item" :class="{ 'comment-item-reply': reply }">
     <div class="comment-avatar" aria-hidden="true">
-      <img v-if="avatar" :src="avatar" alt="" loading="lazy" decoding="async" width="36" height="36">
-      <span v-else>{{ initial }}</span>
+      <span>{{ initial }}</span>
     </div>
 
     <div class="comment-main">

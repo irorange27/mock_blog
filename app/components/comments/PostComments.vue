@@ -23,7 +23,48 @@ const notice = ref('')
 
 const textarea = ref<HTMLTextAreaElement | null>(null)
 const token = ref('')
+
+// 管理入口不在界面上露面：读者看不到任何「管理」按钮或提示，
+// 只有博主自己知道在地址后面加 ?admin=1（拼在文章 URL 上，如
+// /posts/foo/?admin=1）。参数在就展开令牌框，同时把令牌记进
+// sessionStorage，这样在文章之间跳转时不用每篇都加参数。
+// 与服务端 worker/comments.ts 保持同一条邮箱规则，避免「前端放行、服务端打回」
+const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+
+// 正文上限，与 worker/comments.ts 的 BODY_MAX 对应；改一处必须改两处。
+const BODY_MAX = 1000
+
+const ADMIN_QUERY = 'admin'
+const TOKEN_KEY = 'comment-admin-token'
+
 const showAdmin = ref(false)
+
+if (import.meta.client) {
+  const fromQuery = new URLSearchParams(window.location.search).has(ADMIN_QUERY)
+  let remembered = ''
+  try {
+    remembered = sessionStorage.getItem(TOKEN_KEY) ?? ''
+  } catch {
+    // 存储不可用：每次都要带 ?admin=1 重新填令牌
+  }
+  token.value = remembered
+  showAdmin.value = fromQuery || Boolean(remembered)
+}
+
+// 只要这个页面是「管理态」，就把令牌留给同一标签页里的后续文章。
+watch(token, (value) => {
+  if (!import.meta.client) return
+  try {
+    if (value) sessionStorage.setItem(TOKEN_KEY, value)
+    else sessionStorage.removeItem(TOKEN_KEY)
+  } catch {
+    // 同上，存不下就算了
+  }
+})
+
+// 表单左侧的头像预览：跟评论卡片同一个规则，用昵称首字。
+// 它要表达的是「发出去之后你会长这样」，所以不该跟卡片里的头像长得不一样。
+const previewInitial = computed(() => nick.value.trim().slice(0, 1).toUpperCase() || '?')
 
 // 输入框是身份的单一真相源，identity 只用于提交与持久化，所以只做单向同步。
 // 反向的 watch(identity) 曾经存在，但 identity 在组件存活期间只会被写、
@@ -42,6 +83,16 @@ async function onSubmit() {
 
   if (!nick.value.trim()) {
     error.value = '请填写昵称'
+    return
+  }
+  // 邮箱必填：原生 required 只保证非空，格式还得自己看一遍，
+  // 否则用户要等一次服务端往返才知道写错了。
+  if (!email.value.trim()) {
+    error.value = '请填写邮箱'
+    return
+  }
+  if (!EMAIL_PATTERN.test(email.value.trim())) {
+    error.value = '邮箱格式不正确'
     return
   }
   if (!body.value.trim()) {
@@ -84,14 +135,6 @@ async function onDelete(comment: CommentData) {
         评论
         <span v-if="count" class="comments-count">{{ count }}</span>
       </h2>
-      <button
-        type="button"
-        class="comments-admin-toggle"
-        :aria-expanded="showAdmin"
-        @click="showAdmin = !showAdmin"
-      >
-        {{ showAdmin ? '收起管理' : '管理' }}
-      </button>
     </header>
 
     <p v-if="showAdmin" class="comments-admin">
@@ -106,6 +149,52 @@ async function onDelete(comment: CommentData) {
       </label>
       <span class="comments-hint">令牌填对后，点评论右侧的「删除」即可移除（主楼连同回复）。</span>
     </p>
+
+    <form class="comments-form" @submit.prevent="onSubmit">
+      <p v-if="replyTo" class="comments-replying">
+        正在回复 <strong>{{ replyTo.nick }}</strong>
+        <button type="button" class="comments-action" @click="replyTo = null">取消</button>
+      </p>
+
+      <div class="comments-identity">
+        <!-- 头像预览：填了完整邮箱就换成 Gravatar，否则显示昵称首字 -->
+        <div class="comments-avatar-preview" aria-hidden="true">
+          <span>{{ previewInitial }}</span>
+        </div>
+
+        <label class="comments-field">
+          <span>昵称</span>
+          <input v-model="nick" type="text" maxlength="24" required placeholder="必填">
+        </label>
+        <label class="comments-field">
+          <span>邮箱</span>
+          <input v-model="email" type="email" maxlength="254" required placeholder="必填">
+        </label>
+        <label class="comments-field">
+          <span>网址</span>
+          <input v-model="link" type="url" maxlength="200" placeholder="选填">
+        </label>
+      </div>
+
+      <textarea
+        ref="textarea"
+        v-model="body"
+        class="comments-body"
+        rows="4"
+        :maxlength="BODY_MAX"
+        required
+        placeholder="写下你的想法…"
+      />
+
+      <div class="comments-actions">
+        <span v-if="error" class="comments-error" role="alert">{{ error }}</span>
+        <span v-else-if="notice" class="comments-notice" role="status">{{ notice }}</span>
+        <span class="comments-counter">{{ body.length }} / {{ BODY_MAX }}</span>
+        <button type="submit" class="comments-submit" :disabled="submitting">
+          {{ submitting ? '发送中…' : '发表评论' }}
+        </button>
+      </div>
+    </form>
 
     <p v-if="loadFailed" class="comments-empty">
       暂时读不到评论。本地开发（pnpm dev）没有 Worker 后端，属预期行为。
@@ -128,45 +217,5 @@ async function onDelete(comment: CommentData) {
       </template>
     </ul>
 
-    <form class="comments-form" @submit.prevent="onSubmit">
-      <p v-if="replyTo" class="comments-replying">
-        正在回复 <strong>{{ replyTo.nick }}</strong>
-        <button type="button" class="comments-action" @click="replyTo = null">取消</button>
-      </p>
-
-      <div class="comments-identity">
-        <label class="comments-field">
-          <span>昵称</span>
-          <input v-model="nick" type="text" maxlength="24" required placeholder="必填">
-        </label>
-        <label class="comments-field">
-          <span>邮箱</span>
-          <input v-model="email" type="email" maxlength="254" placeholder="选填，用于头像">
-        </label>
-        <label class="comments-field">
-          <span>网址</span>
-          <input v-model="link" type="url" maxlength="200" placeholder="选填">
-        </label>
-      </div>
-
-      <textarea
-        ref="textarea"
-        v-model="body"
-        class="comments-body"
-        rows="4"
-        maxlength="2000"
-        required
-        placeholder="写下你的想法…"
-      />
-
-      <div class="comments-actions">
-        <span v-if="error" class="comments-error" role="alert">{{ error }}</span>
-        <span v-else-if="notice" class="comments-notice" role="status">{{ notice }}</span>
-        <span class="comments-counter">{{ body.length }} / 2000</span>
-        <button type="submit" class="comments-submit" :disabled="submitting">
-          {{ submitting ? '发送中…' : '发表评论' }}
-        </button>
-      </div>
-    </form>
   </section>
 </template>

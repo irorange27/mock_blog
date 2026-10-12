@@ -28,23 +28,4 @@ export const formatDateTime = (timestamp: number): string => {
   return `${date.getFullYear()} 年 ${date.getMonth() + 1} 月 ${date.getDate()} 日`
 }
 
-/**
- * 邮箱 → Gravatar 哈希（SHA-256 十六进制）。
- *
- * 只用 Web Crypto（浏览器与 Node 18+ 都自带），不引 md5 依赖。
- * 非安全上下文（http 的局域网访问）下 crypto.subtle 不可用，此时返回空串，
- * 调用方回退到昵称首字头像，不影响正文与提交。
- */
-export const sha256 = async (text: string): Promise<string> => {
-  try {
-    const data = new TextEncoder().encode(text)
-    const digest = await crypto.subtle.digest('SHA-256', data)
-    return Array.from(new Uint8Array(digest))
-      .map(byte => byte.toString(16).padStart(2, '0'))
-      .join('')
-  } catch {
-    return ''
-  }
-}
-
 const pad = (value: number): string => value.toString().padStart(2, '0')

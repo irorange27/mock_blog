@@ -860,20 +860,14 @@ html.dark-mode.lightbox-dark-ink .vel-modal .vel-img {
     color: var(--txt-50);
 }
 
-.comments-admin-toggle,
 .comments-action {
     font-size: 0.75rem;
     color: var(--txt-30);
     transition: color 0.15s ease;
 }
 
-.comments-admin-toggle:hover,
 .comments-action:hover {
     color: var(--primary);
-}
-
-.comment-action-danger:hover {
-    color: var(--danger);
 }
 
 .comments-admin {
@@ -934,12 +928,6 @@ html.dark-mode.lightbox-dark-ink .vel-modal .vel-img {
     font-weight: 600;
 }
 
-.comment-avatar img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-}
-
 .comment-main {
     flex: 1;
     min-width: 0;
@@ -994,6 +982,8 @@ html.dark-mode.lightbox-dark-ink .vel-modal .vel-img {
     padding: 1rem;
     border: 1px solid var(--line-color);
     border-radius: 0.75rem;
+    /* 表单在列表上方，紧挨着第一条评论时两块的边界会糊在一起 */
+    margin-bottom: 1.5rem;
 }
 
 .comments-replying {
@@ -1001,27 +991,78 @@ html.dark-mode.lightbox-dark-ink .vel-modal .vel-img {
     color: var(--txt-50);
 }
 
+/* 头像预览与三个字段同一行：头像固定宽度，字段各占一列。
+   窄屏换成两行（头像与昵称一行，邮箱与网址一行）。 */
 .comments-identity {
     display: grid;
-    grid-template-columns: repeat(1, minmax(0, 1fr));
+    grid-template-columns: auto minmax(0, 1fr);
+    align-items: center;
     gap: 0.5rem;
+}
+
+.comments-avatar-preview {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    width: 2.25rem;
+    height: 2.25rem;
+    border-radius: 9999px;
+    background: var(--chip-bg);
+    color: var(--primary);
+    font-size: 0.9rem;
+    font-weight: 600;
 }
 
 @media (min-width: 640px) {
     .comments-identity {
-        grid-template-columns: repeat(3, minmax(0, 1fr));
+        grid-template-columns: auto repeat(3, minmax(0, 1fr));
     }
 }
 
+/* 一个字段是一个整体框：标签在框内左侧（带分隔线），输入框占剩下的部分。
+   标签单独占一行会把表单撑得很高，而把标签放到框外又会被误认成输入框的一部分。 */
 .comments-field {
     display: flex;
-    flex-direction: column;
-    gap: 0.25rem;
-    font-size: 0.75rem;
-    color: var(--txt-30);
+    align-items: stretch;
+    min-width: 0;
+    font-size: 0.8125rem;
+    color: var(--txt-50);
+    background: var(--card-bg);
+    border: 1px solid var(--line-color);
+    border-radius: 0.5rem;
+    transition: border-color 0.15s ease;
 }
 
-.comments-field input,
+.comments-field:focus-within {
+    border-color: var(--primary);
+}
+
+.comments-field > span {
+    display: flex;
+    align-items: center;
+    flex: none;
+    padding: 0 0.6rem;
+    white-space: nowrap;
+    border-right: 1px solid var(--line-color);
+}
+
+/* 输入框自己不再画边框：它跟标签共用一个。 */
+.comments-field input {
+    flex: 1;
+    min-width: 0;
+    padding: 0.5rem 0.6rem;
+    font-size: 0.875rem;
+    color: var(--txt-90);
+    background: transparent;
+    border: 0;
+    border-radius: 0 0.5rem 0.5rem 0;
+}
+
+.comments-field input:focus-visible {
+    outline: none;
+}
+
 .comments-body {
     width: 100%;
     padding: 0.5rem 0.65rem;
@@ -1033,7 +1074,6 @@ html.dark-mode.lightbox-dark-ink .vel-modal .vel-img {
     transition: border-color 0.15s ease;
 }
 
-.comments-field input:focus-visible,
 .comments-body:focus-visible {
     outline: 2px solid var(--primary);
     outline-offset: 1px;
@@ -1090,3 +1130,22 @@ html.dark-mode.lightbox-dark-ink .vel-modal .vel-img {
     opacity: 0.55;
     cursor: default;
 }
+
+/* 评论卡片里的「回复 / 删除」。
+   它们之前没有专属字号规则，一路继承正文，看起来跟评论内容一样重。
+   单独调小并压暗一档，让视线先落在正文上。 */
+.comment-action {
+    font-size: 0.6875rem;
+    line-height: 1.5;
+    color: var(--txt-30);
+    transition: color 0.15s ease;
+}
+
+.comment-action:hover {
+    color: var(--primary);
+}
+
+.comment-action-danger:hover {
+    color: var(--danger);
+}
+

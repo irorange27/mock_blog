@@ -9,9 +9,4 @@ export interface CommentData {
   parent: string
   /** 毫秒时间戳 */
   created: number
-  /**
-   * 访客自己刚发的那一条在本地带上的邮箱，仅用于当场算头像。
-   * 服务端从不回传它，所以从接口读到的评论上永远是 undefined。
-   */
-  email?: string
 }

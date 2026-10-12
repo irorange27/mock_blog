@@ -153,11 +153,14 @@ describe('CommentStore — 发表', () => {
     expect(listed.comments).toHaveLength(1)
   })
 
-  it('拒绝空昵称、空正文、错误邮箱与非法网址', async () => {
+  it('拒绝空昵称、空邮箱、空正文、错误邮箱与非法网址', async () => {
     const cases: Array<[Record<string, unknown>, string]> = [
       [{ ...valid, nick: '   ' }, '昵称不能为空'],
-      [{ ...valid, body: '  ' }, '评论内容不能为空'],
+      // 邮箱必填：留空与格式错误是两条不同的提示，分别对应「没填」和「填错」
+      [{ ...valid, email: '' }, '邮箱不能为空'],
+      [{ ...valid, email: '   ' }, '邮箱不能为空'],
       [{ ...valid, email: 'not-an-email' }, '邮箱格式不正确'],
+      [{ ...valid, body: '  ' }, '评论内容不能为空'],
       [{ ...valid, link: 'example.com' }, '网址需以 http:// 或 https:// 开头'],
     ]
 
@@ -168,9 +171,10 @@ describe('CommentStore — 发表', () => {
     }
   })
 
-  it('昵称与正文超长被拒绝', async () => {
+  it('昵称、邮箱与正文超长被拒绝', async () => {
     expect((await post(store, { ...valid, nick: 'a'.repeat(25) })).status).toBe(400)
-    expect((await post(store, { ...valid, body: 'a'.repeat(2001) })).status).toBe(400)
+    expect((await post(store, { ...valid, email: `${'a'.repeat(250)}@b.com` })).status).toBe(400)
+    expect((await post(store, { ...valid, body: 'a'.repeat(1001) })).status).toBe(400)
   })
 
   it('拒绝不存在的回复目标', async () => {
