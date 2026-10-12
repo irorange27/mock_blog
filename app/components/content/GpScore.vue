@@ -488,9 +488,8 @@ onBeforeUnmount(() => {
     <div ref="texSrc" aria-hidden="true" class="hidden"><slot /></div>
     <div v-if="errored" class="my-2 flex flex-wrap items-center gap-3 text-sm" role="alert">
       <p class="text-[var(--danger)]">谱面加载失败。</p>
-      <button class="abc-score-play" @click="retryLoad">
+      <button class="abc-score-play" title="重试加载" aria-label="重试加载" @click="retryLoad">
         <Icon name="mdi:reload" class="w-3.5 h-3.5" />
-        <span>重试</span>
       </button>
       <a v-if="src" :href="src" download class="underline">点此下载原始乐谱文件</a>
     </div>
@@ -514,6 +513,7 @@ onBeforeUnmount(() => {
           class="abc-score-play"
           :aria-pressed="trackMode === 'all'"
           :title="trackMode === 'all' ? '切换为单轨显示' : '切换为多轨同屏'"
+          :aria-label="trackMode === 'all' ? '切换为单轨显示' : '切换为多轨同屏'"
           @click="switchTrackMode(trackMode === 'all' ? 'single' : 'all')"
         >
           <!-- 括号+谱线：单轨一横，多轨三横（mdi 无现成图标，内联画） -->
@@ -525,21 +525,20 @@ onBeforeUnmount(() => {
               <rect v-if="trackMode === 'all'" x="10.5" y="15.5" width="9" height="2.2" rx="1.1" />
             </g>
           </svg>
-          <span>{{ trackMode === 'all' ? '单轨' : '多轨' }}</span>
         </button>
       </template>
       <button
         class="abc-score-play"
         :class="{ 'abc-score-play-err': state === 'error' }"
         :disabled="state === 'loading'"
+        :title="state === 'playing' ? '停止' : state === 'loading' ? '加载音色…' : state === 'error' ? '音色加载失败，点击重试' : '播放'"
+        :aria-label="state === 'playing' ? '停止' : state === 'loading' ? '加载音色…' : state === 'error' ? '音色加载失败，点击重试' : '播放'"
         @click="togglePlay"
       >
         <Icon
           :name="state === 'playing' ? 'mdi:stop' : state === 'error' ? 'mdi:alert-outline' : 'mdi:play'"
           class="w-3.5 h-3.5"
-          :class="{ 'ml-0.5': state !== 'playing' && state !== 'error' }"
         />
-        <span>{{ state === 'playing' ? '停止' : state === 'loading' ? '加载音色…' : state === 'error' ? '音色加载失败，点击重试' : '播放' }}</span>
       </button>
       <span v-if="position" class="px-2 py-1 text-xs tabular-nums text-[var(--txt-50)]">{{ position }}</span>
       <span class="flex-1" />
@@ -551,7 +550,6 @@ onBeforeUnmount(() => {
         @click="openFullscreen"
       >
         <Icon name="mdi:fullscreen" class="w-3.5 h-3.5" />
-        <span>放大</span>
       </button>
     </div>
     <audio v-if="audio" ref="audioEl" controls :src="audio" class="mt-3 w-full" @play="onAudioPlay" />
@@ -570,14 +568,14 @@ onBeforeUnmount(() => {
           class="abc-score-play"
           :class="{ 'abc-score-play-err': state === 'error' }"
           :disabled="state === 'loading'"
+          :title="state === 'playing' ? '停止' : state === 'loading' ? '加载音色…' : state === 'error' ? '音色加载失败，点击重试' : '播放'"
+          :aria-label="state === 'playing' ? '停止' : state === 'loading' ? '加载音色…' : state === 'error' ? '音色加载失败，点击重试' : '播放'"
           @click="togglePlay"
         >
           <Icon
             :name="state === 'playing' ? 'mdi:stop' : state === 'error' ? 'mdi:alert-outline' : 'mdi:play'"
             class="w-3.5 h-3.5"
-            :class="{ 'ml-0.5': state !== 'playing' && state !== 'error' }"
           />
-          <span>{{ state === 'playing' ? '停止' : state === 'loading' ? '加载音色…' : state === 'error' ? '音色加载失败，点击重试' : '播放' }}</span>
         </button>
         <span v-if="position" class="px-1 text-xs tabular-nums text-[var(--txt-50)]">{{ position }}</span>
         <label class="flex items-center gap-1 px-1 text-xs text-[var(--txt-50)]">
@@ -604,19 +602,18 @@ onBeforeUnmount(() => {
             <option v-for="s in SPEEDS" :key="s" :value="s">{{ s }}x</option>
           </select>
         </label>
-        <button class="abc-score-play" :aria-pressed="loop" title="整曲循环" @click="loop = !loop; applyLoop()">
+        <button class="abc-score-play" :aria-pressed="loop" title="整曲循环" aria-label="整曲循环" @click="loop = !loop; applyLoop()">
           <Icon name="mdi:repeat" class="w-3.5 h-3.5" />
-          <span>循环</span>
         </button>
         <div class="relative">
           <button
             class="abc-score-play"
             :aria-pressed="metronome > 0"
             :title="metronome > 0 ? `节拍器音量 ${Math.round(metronome * 100)}%，点击调节` : '节拍器已关，点击调节音量'"
+            :aria-label="metronome > 0 ? `节拍器音量 ${Math.round(metronome * 100)}%，点击调节` : '节拍器已关，点击调节音量'"
             @click="showMetroPanel = !showMetroPanel; showCountInPanel = false"
           >
             <Icon name="mdi:metronome" class="w-3.5 h-3.5" />
-            <span>节拍器</span>
           </button>
           <div
             v-if="showMetroPanel"
@@ -640,10 +637,10 @@ onBeforeUnmount(() => {
             class="abc-score-play"
             :aria-pressed="countIn > 0"
             :title="countIn > 0 ? `预备拍音量 ${Math.round(countIn * 100)}%，点击调节` : '预备拍已关，点击调节音量'"
+            :aria-label="countIn > 0 ? `预备拍音量 ${Math.round(countIn * 100)}%，点击调节` : '预备拍已关，点击调节音量'"
             @click="showCountInPanel = !showCountInPanel; showMetroPanel = false"
           >
             <Icon name="mdi:timer-play-outline" class="w-3.5 h-3.5" />
-            <span>预备拍</span>
           </button>
           <div
             v-if="showCountInPanel"
@@ -685,7 +682,6 @@ onBeforeUnmount(() => {
         <span class="flex-1" />
         <button class="abc-score-play" title="关闭（Esc）" aria-label="关闭全屏播放器" @click="closeFullscreen">
           <Icon name="mdi:fullscreen-exit" class="w-3.5 h-3.5" />
-          <span>关闭</span>
         </button>
       </div>
       <div v-if="trackList.length > 1" class="flex flex-wrap items-center gap-x-4 gap-y-1 border-b border-[var(--line-color)] px-4 py-2">
@@ -703,17 +699,19 @@ onBeforeUnmount(() => {
             class="abc-score-play"
             :aria-pressed="muted.has(t.index)"
             :title="`静音 ${t.name}`"
+            :aria-label="`静音 ${t.name}`"
             @click="toggleMute(t.index)"
           >
-            <span>M</span>
+            <Icon name="mdi:volume-off" class="w-3.5 h-3.5" />
           </button>
           <button
             class="abc-score-play"
             :aria-pressed="soloed.has(t.index)"
             :title="`独奏 ${t.name}`"
+            :aria-label="`独奏 ${t.name}`"
             @click="toggleSolo(t.index)"
           >
-            <span>S</span>
+            <Icon name="mdi:headphones" class="w-3.5 h-3.5" />
           </button>
         </div>
       </div>
