@@ -503,7 +503,16 @@ onBeforeUnmount(() => {
           :title="trackMode === 'all' ? '切换为单轨显示' : '切换为多轨同屏'"
           @click="switchTrackMode(trackMode === 'all' ? 'single' : 'all')"
         >
-          <Icon name="mdi:layers-triple" class="w-3.5 h-3.5" />
+          <!-- 括号+谱线：单轨一横，多轨三横（mdi 无现成图标，内联画） -->
+          <svg viewBox="0 0 24 24" class="w-3.5 h-3.5" aria-hidden="true">
+            <path d="M8 4 C5.5 4 5.5 4 5.5 7 L5.5 10 C5.5 12 5.5 12 3.5 12 C5.5 12 5.5 12 5.5 14 L5.5 17 C5.5 20 5.5 20 8 20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" />
+            <g v-if="trackMode === 'all'" fill="currentColor">
+              <rect x="10" y="6.5" width="10" height="2.2" />
+              <rect x="10" y="10.9" width="10" height="2.2" />
+              <rect x="10" y="15.3" width="10" height="2.2" />
+            </g>
+            <rect v-else x="10" y="10.9" width="10" height="2.2" fill="currentColor" />
+          </svg>
           <span>{{ trackMode === 'all' ? '单轨' : '多轨' }}</span>
         </button>
       </template>
