@@ -14,13 +14,8 @@ export function normalizeLayout(layout: string | undefined): ScoreLayout {
   return DEFAULT_LAYOUT
 }
 
-// 播放自动滚动时视口顶部多留的距离：吸顶导航 56px + 约一个小节排面高度，
-// 避免当前小节贴顶被导航挡住（alphaTab 的 player.scrollOffsetY）。
-// 注意符号：offset 加在目标滚动位置上，负值才让小节停在视口顶部下方。
-export const SCROLL_OFFSET_Y = -220
-
-// 全屏浮层里的滚动偏移：没有吸顶导航挡，只留浮层工具条的高度
-export const SCROLL_OFFSET_Y_FULLSCREEN = -80
+// 横向版式跟随滚动时小节左侧多留的距离，负值让小节停在视口左边缘右侧
+export const SCROLL_OFFSET_X = -100
 
 // 全屏浮层默认缩放：地方大，谱面可以比卡片大一档
 export const FULLSCREEN_SCALE = 1.2

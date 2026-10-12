@@ -6,7 +6,7 @@
 // alphaTab 体量大且依赖浏览器 API，动态 import 不进 SSR 包；其 Web Worker / AudioWorklet
 // 加载由 nuxt.config 里的 @coderline/alphatab-vite 插件接住。
 // 字体与 soundfont 自托管：public/fonts/alphatab、public/soundfont（路径见 app/utils/gpScore.ts）。
-import { FONT_DIRECTORY, FULLSCREEN_SCALE, SCROLL_OFFSET_Y, SCROLL_OFFSET_Y_FULLSCREEN, SOUNDFONT_URL, clampScale, clampSpeed, clampVolume, formatTime, normalizeLayout, normalizeTrackMode, type GpTrackInfo, type ScoreLayout, type TrackMode } from '~/utils/gpScore'
+import { FONT_DIRECTORY, FULLSCREEN_SCALE, SCROLL_OFFSET_X, SOUNDFONT_URL, clampScale, clampSpeed, clampVolume, formatTime, normalizeLayout, normalizeTrackMode, type GpTrackInfo, type ScoreLayout, type TrackMode } from '~/utils/gpScore'
 
 type AtApi = import('@coderline/alphatab').AlphaTabApi
 type AtSettingsJson = import('@coderline/alphatab').SettingsJson
@@ -124,7 +124,30 @@ function buildSettings(): AtSettingsJson {
   return {
     core: { engine: 'svg', useWorkers: true, fontDirectory: FONT_DIRECTORY },
     display,
-    player: { enablePlayer: true, enableCursor: true, scrollOffsetY: SCROLL_OFFSET_Y },
+    player: {
+      enablePlayer: true,
+      enableCursor: true,
+      // 内置自动滚动关掉自己跟随：alphaTab 的滚动容器有缓存，运行时换 scrollElement
+      // 不生效（BrowserUiFacade._scrollContainer 无失效）。自己订阅位置事件滚，可靠。
+      scrollMode: 'off',
+    },
+  }
+}
+
+// 播放跟随滚动：位置事件触发时把游标带回视口。
+// 横向滚谱面自身的横向滚动条，竖排把游标滚到视口中央（最近的滚动祖先：页面或浮层滚动区）。
+function followCursor() {
+  const bar = host.value?.querySelector('.at-cursor-bar') as HTMLElement | null
+  const scroller = host.value
+  if (!bar || !scroller) return
+  if (liveLayout.value === 'horizontal') {
+    const r = bar.getBoundingClientRect()
+    const sr = scroller.getBoundingClientRect()
+    const margin = Math.abs(SCROLL_OFFSET_X)
+    if (r.right > sr.right - margin) scroller.scrollLeft += (r.right - sr.right) + margin
+    else if (r.left < sr.left) scroller.scrollLeft -= (sr.left - r.left) + margin
+  } else {
+    bar.scrollIntoView({ block: 'center', behavior: 'auto' })
   }
 }
 
@@ -204,8 +227,7 @@ function currentTrackObjects(): AtTrack[] {
 function renderCurrentTracks() {
   const tracks = currentTrackObjects()
   if (!api || tracks.length === 0) return
-  // 切轨先停播：stop 后游标停在原处不清，切完 render 会重画，避免旧游标盖住新谱
-  if (state.value === 'playing') api.stop()
+  // 切轨不断播：renderTracks 重画后游标按新谱重算继续走
   api.renderTracks(tracks)
 }
 
@@ -332,8 +354,6 @@ async function openFullscreen() {
   await nextTick()
   if (!fsScrollWrap.value || !host.value || !api) return
   fsScrollWrap.value.appendChild(host.value)
-  api.settings.player.scrollElement = fsScrollWrap.value
-  api.settings.player.scrollOffsetY = SCROLL_OFFSET_Y_FULLSCREEN
   scale.value = FULLSCREEN_SCALE
   api.settings.display.scale = FULLSCREEN_SCALE
   api.updateSettings()
@@ -344,13 +364,11 @@ async function openFullscreen() {
 function closeFullscreen() {
   if (!api || !host.value || !cardScrollWrap.value || !fullscreen.value) return
   cardScrollWrap.value.appendChild(host.value)
-  api.settings.player.scrollElement = 'html,body'
-  api.settings.player.scrollOffsetY = SCROLL_OFFSET_Y
   scale.value = cardScale
   api.settings.display.scale = cardScale
+  fullscreen.value = false
   api.updateSettings()
   api.render()
-  fullscreen.value = false
   document.removeEventListener('keydown', onFsKeydown)
   // 焦点回放大键（WCAG 2.4.3，抄 ImageLightbox 的做法）
   ;(lastTrigger as HTMLElement | null)?.focus?.()
@@ -375,14 +393,21 @@ onMounted(async () => {
         api.scoreLoaded.on((score) => {
           host.value!.setAttribute('role', 'img')
           host.value!.setAttribute('aria-label', score.title ? `乐谱：${score.title}` : '乐谱（Guitar Pro）')
+          // 不同乐器的轨不连谱线：按相同 MIDI program 分组括号（默认 GroupStaves 会连起来）。
+          // BracketExtendMode 只有类型导出，运行时按数值（GroupSimilarInstruments = 2）
+          score.stylesheet.bracketExtendMode = 0
           extractTracks(score)
           // renderTracks 会再触发 scoreLoaded，提取幂等。
           // single 模式默认就是首轨，不用调；只有 all 模式需要主动铺全轨
           if (trackMode.value === 'all') renderCurrentTracks()
+          else api.render()
         })
         api.renderStarted.on(() => { rendering.value = true })
         api.renderFinished.on(() => { rendering.value = false })
-        api.playerPositionChanged.on(e => { position.value = `${formatTime(e.currentTime)} / ${formatTime(e.endTime)}` })
+        api.playerPositionChanged.on(e => {
+          position.value = `${formatTime(e.currentTime)} / ${formatTime(e.endTime)}`
+          followCursor()
+        })
         api.error.on((e) => showError(e))
       }
 

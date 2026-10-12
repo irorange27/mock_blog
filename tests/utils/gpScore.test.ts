@@ -4,14 +4,13 @@ import {
   DEFAULT_LAYOUT,
   SOUNDFONT_URL,
   FONT_DIRECTORY,
-  SCROLL_OFFSET_Y,
   normalizeTrackMode,
   DEFAULT_TRACK_MODE,
   clampVolume,
   clampSpeed,
   clampScale,
   formatTime,
-  SCROLL_OFFSET_Y_FULLSCREEN,
+  SCROLL_OFFSET_X,
   FULLSCREEN_SCALE,
 } from '~/utils/gpScore'
 
@@ -41,19 +40,9 @@ describe('自托管资源路径', () => {
 })
 
 describe('播放滚动偏移', () => {
-  it('SCROLL_OFFSET_Y 为负：offset 加在滚动目标上，负值才让小节停在视口顶部下方', () => {
-    expect(SCROLL_OFFSET_Y).toBeLessThan(0)
-  })
-
-  it('偏移绝对值留出吸顶导航加一个小节排面的高度', () => {
-    // 吸顶导航 h-14（56px），绝对值必须明显大于它，否则当前小节贴顶被挡
-    expect(Math.abs(SCROLL_OFFSET_Y)).toBeGreaterThan(56)
-    expect(Number.isInteger(SCROLL_OFFSET_Y)).toBe(true)
-  })
-
-  it('浮层偏移同样为负，绝对值只留工具条高度', () => {
-    expect(SCROLL_OFFSET_Y_FULLSCREEN).toBeLessThan(0)
-    expect(Math.abs(SCROLL_OFFSET_Y_FULLSCREEN)).toBeLessThan(Math.abs(SCROLL_OFFSET_Y))
+  it('横向偏移为负，让小节停在视口左边缘右侧', () => {
+    expect(SCROLL_OFFSET_X).toBeLessThan(0)
+    expect(Number.isInteger(SCROLL_OFFSET_X)).toBe(true)
   })
 })
 
