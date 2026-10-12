@@ -6,7 +6,7 @@
 // alphaTab 体量大且依赖浏览器 API，动态 import 不进 SSR 包；其 Web Worker / AudioWorklet
 // 加载由 nuxt.config 里的 @coderline/alphatab-vite 插件接住。
 // 字体与 soundfont 自托管：public/fonts/alphatab、public/soundfont（路径见 app/utils/gpScore.ts）。
-import { FONT_DIRECTORY, FULLSCREEN_SCALE, SCROLL_OFFSET_X, SOUNDFONT_URL, clampScale, clampSpeed, clampVolume, createPlayerId, formatTime, normalizeLayout, normalizeTrackMode, registerPlayer, requestPlay, unregisterPlayer, type GpTrackInfo, type ScoreLayout, type TrackMode } from '~/utils/gpScore'
+import { FONT_DIRECTORY, FULLSCREEN_SCALE, MAX_PLAYBACK_SPEED, MIN_PLAYBACK_SPEED, SCROLL_OFFSET_X, SOUNDFONT_URL, clampScale, clampSpeed, clampVolume, createPlayerId, formatTime, normalizeLayout, normalizeTrackMode, registerPlayer, requestPlay, unregisterPlayer, type GpTrackInfo, type ScoreLayout, type TrackMode } from '~/utils/gpScore'
 
 type AtApi = import('@coderline/alphatab').AlphaTabApi
 type AtSettingsJson = import('@coderline/alphatab').SettingsJson
@@ -32,6 +32,8 @@ const trackList = ref<GpTrackInfo[]>([])
 const trackMode = ref<TrackMode>('single')
 // active 集合：实际渲染哪些轨。single 模式保证只有一条，all 模式可多条
 const activeTracks = ref<Set<number>>(new Set([0]))
+// 单轨/多轨各自记住上次的 active 集合，toggle 切回去时恢复
+const remembered: { single: Set<number>; all: Set<number> } = { single: new Set([0]), all: new Set() }
 const activeTrack = computed(() => activeTracks.value.values().next().value ?? 0)
 
 let alphatab: typeof import('@coderline/alphatab') | null = null
@@ -55,16 +57,24 @@ const fsScrollWrap = ref<HTMLElement | null>(null) // 浮层里的谱面滚动�
 const expandBtn = ref<HTMLElement | null>(null)
 let lastTrigger: HTMLElement | null = null
 let cardScale = 1
+// 浮层缩放跨开关记忆：每次进浮层恢复上次的倍率，不再固定重置
+let fsScale = FULLSCREEN_SCALE
 
 // 浮层工具条状态（与 alphaTab 运行时属性双向绑定）
 const muted = ref<Set<number>>(new Set())
 const soloed = ref<Set<number>>(new Set())
 const volume = ref(0.8)
-const speed = ref(1)
+// speed: 预设档位数字，或 'custom'（此时用 customSpeed 的自由输入值）
+const speed = ref<number | 'custom'>(1)
+const customSpeed = ref(1)
+// 常用档位 + 自定义入口（范围 0.125–8，alphaTab 自己的钳制）
+const SPEEDS = [0.25, 0.5, 0.75, 1, 1.25, 1.5, 2, 4]
 const loop = ref(false)
 // 节拍器/预备拍走音量（0 关，alphaTab 没有音高调节）：滑杆直接绑运行时属性
-const metronome = ref(0)
-const countIn = ref(0)
+// 节拍器/预备拍走音量（0 关，alphaTab 没有音高调节）：滑杆直接绑运行时属性。
+// 默认 0.5：点开面板不用先拖滑杆就能出声
+const metronome = ref(0.5)
+const countIn = ref(0.5)
 // 音量面板显隐：点按钮展开，再点收起（同时只开一个）
 const showMetroPanel = ref(false)
 const showCountInPanel = ref(false)
@@ -72,7 +82,6 @@ const scale = ref(1)
 const position = ref('')
 const audioEl = ref<HTMLAudioElement | null>(null)
 
-const SPEEDS = [0.5, 0.75, 1, 1.25, 1.5]
 
 // alphaTab 把颜色烘进 SVG，只认 hex/rgb()/raw 数值，而主题色是 oklch + var()。
 // 用 1×1 canvas 让浏览器代解主题变量并取像素值，不硬编码颜色。
@@ -231,6 +240,7 @@ function extractTracks(score: { tracks: AtTrack[] }) {
   // tracks="all" 首屏直接全选同屏
   if (trackMode.value === 'all') {
     activeTracks.value = new Set(trackList.value.map(t => t.index))
+    remembered.all = new Set(activeTracks.value)
   }
 }
 
@@ -247,23 +257,26 @@ function renderCurrentTracks() {
 
 function switchTrack(index: number) {
   activeTracks.value = new Set([index])
+  remembered.single = new Set([index])
   trackMode.value = 'single'
   renderCurrentTracks()
 }
 
 function switchTrackMode(mode: TrackMode) {
+  if (mode === trackMode.value) return
   trackMode.value = mode
+  // 单轨/多轨各自记住 active 集合，切回去时恢复上次的选择
   if (mode === 'all') {
-    activeTracks.value = new Set(trackList.value.map(t => t.index))
+    remembered.all = new Set(activeTracks.value)
+    activeTracks.value = remembered.single.size > 1 ? new Set(remembered.single) : new Set(remembered.all)
   } else {
-    // 回单轨：保留当前 active 集合的第一条
-    const first = [...activeTracks.value].sort((a, b) => a - b)[0] ?? 0
-    activeTracks.value = new Set([first])
+    remembered.single = new Set(activeTracks.value)
+    activeTracks.value = new Set([[...remembered.all].sort((a, b) => a - b)[0] ?? 0])
   }
   renderCurrentTracks()
 }
 
-// 浮层每轨行的 A 键：增减 active 集合，至少保留一条
+// 浮层每轨行的轨名按钮：增减 active 集合，至少保留一条；改动同步进当前模式的记忆
 function toggleActiveTrack(index: number) {
   const next = new Set(activeTracks.value)
   if (next.has(index)) {
@@ -273,6 +286,8 @@ function toggleActiveTrack(index: number) {
     next.add(index)
   }
   activeTracks.value = next
+  if (trackMode.value === 'all') remembered.all = new Set(next)
+  else remembered.single = new Set(next)
   trackMode.value = next.size > 1 ? 'all' : 'single'
   renderCurrentTracks()
 }
@@ -323,9 +338,17 @@ function applyVolume() {
 }
 
 function applySpeed() {
-  if (!api) return
+  if (!api || speed.value === 'custom') return
   speed.value = clampSpeed(speed.value)
+  customSpeed.value = speed.value
   api.playbackSpeed = speed.value
+}
+
+// 自定义变速：number 输入，钳到 alphaTab 范围（0.125–8）
+function applyCustomSpeed() {
+  if (!api) return
+  customSpeed.value = clampSpeed(customSpeed.value)
+  api.playbackSpeed = customSpeed.value
 }
 
 function applyLoop() {
@@ -348,6 +371,8 @@ function applyScale() {
   if (!api) return
   scale.value = clampScale(scale.value)
   api.settings.display.scale = scale.value
+  // 浮层里调的倍率记住，下次进浮层恢复（关闭时 scale 会切回卡片值）
+  if (fullscreen.value) fsScale = scale.value
   api.updateSettings()
   api.render()
 }
@@ -368,8 +393,8 @@ async function openFullscreen() {
   await nextTick()
   if (!fsScrollWrap.value || !host.value || !api) return
   fsScrollWrap.value.appendChild(host.value)
-  scale.value = FULLSCREEN_SCALE
-  api.settings.display.scale = FULLSCREEN_SCALE
+  scale.value = fsScale
+  api.settings.display.scale = fsScale
   api.updateSettings()
   api.render()
   document.addEventListener('keydown', onFsKeydown)
@@ -488,7 +513,7 @@ onBeforeUnmount(() => {
     <div ref="texSrc" aria-hidden="true" class="hidden"><slot /></div>
     <div v-if="errored" class="my-2 flex flex-wrap items-center gap-3 text-sm" role="alert">
       <p class="text-[var(--danger)]">谱面加载失败。</p>
-      <button class="abc-score-play" title="重试加载" aria-label="重试加载" @click="retryLoad">
+      <button class="abc-score-play" title="重试加载" data-tip="重试加载" aria-label="重试加载" @click="retryLoad">
         <Icon name="mdi:reload" class="w-3.5 h-3.5" />
       </button>
       <a v-if="src" :href="src" download class="underline">点此下载原始乐谱文件</a>
@@ -513,6 +538,7 @@ onBeforeUnmount(() => {
           class="abc-score-play"
           :aria-pressed="trackMode === 'all'"
           :title="trackMode === 'all' ? '切换为单轨显示' : '切换为多轨同屏'"
+          :data-tip="trackMode === 'all' ? '切换为单轨显示' : '切换为多轨同屏'"
           :aria-label="trackMode === 'all' ? '切换为单轨显示' : '切换为多轨同屏'"
           @click="switchTrackMode(trackMode === 'all' ? 'single' : 'all')"
         >
@@ -526,7 +552,7 @@ onBeforeUnmount(() => {
             <path d="M11.8 3.6 Q13.2 2.8 13.6 1.6" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round" />
             <path d="M11.8 20.4 Q13.2 21.2 13.6 22.4" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round" />
             <!-- 小节线：随谱表行数伸缩 -->
-            <rect x="12.6" :y="trackMode === 'all' ? 5 : 8.6" width="2.2" :height="trackMode === 'all' ? 14 : 6.8" fill="currentColor" />
+            <rect x="12.6" :y="trackMode === 'all' ? 5 : 8.6" width="6.2" :height="trackMode === 'all' ? 14 : 6.8" fill="currentColor" />
             <!-- 谱表：单轨一行居中，多轨两行 -->
             <rect x="15.6" :y="trackMode === 'all' ? 6 : 9.2" width="6.2" height="3.6" fill="currentColor" />
             <rect v-if="trackMode === 'all'" x="15.6" y="14.2" width="6.2" height="3.6" fill="currentColor" />
@@ -538,6 +564,7 @@ onBeforeUnmount(() => {
         :class="{ 'abc-score-play-err': state === 'error' }"
         :disabled="state === 'loading'"
         :title="state === 'playing' ? '停止' : state === 'loading' ? '加载音色…' : state === 'error' ? '音色加载失败，点击重试' : '播放'"
+        :data-tip="state === 'playing' ? '停止' : state === 'loading' ? '加载音色…' : state === 'error' ? '音色加载失败，点击重试' : '播放'"
         :aria-label="state === 'playing' ? '停止' : state === 'loading' ? '加载音色…' : state === 'error' ? '音色加载失败，点击重试' : '播放'"
         @click="togglePlay"
       >
@@ -551,7 +578,7 @@ onBeforeUnmount(() => {
       <button
         ref="expandBtn"
         class="abc-score-play"
-        title="全屏播放器"
+        title="全屏播放器" data-tip="全屏播放器"
         aria-label="打开全屏播放器"
         @click="openFullscreen"
       >
@@ -596,6 +623,7 @@ onBeforeUnmount(() => {
             aria-label="总音量"
             @input="applyVolume"
           >
+          <span class="w-8 text-right tabular-nums">{{ Math.round(volume * 100) }}%</span>
         </label>
         <label class="flex items-center gap-1 px-1 text-xs text-[var(--txt-50)]">
           速度
@@ -606,9 +634,22 @@ onBeforeUnmount(() => {
             @change="applySpeed"
           >
             <option v-for="s in SPEEDS" :key="s" :value="s">{{ s }}x</option>
+            <option value="custom">自定义…</option>
           </select>
+          <input
+            v-if="speed === 'custom'"
+            ref="speedInput"
+            v-model.number="customSpeed"
+            type="number"
+            :min="MIN_PLAYBACK_SPEED"
+            :max="MAX_PLAYBACK_SPEED"
+            step="0.05"
+            class="w-16 rounded-full bg-[var(--chip-bg)] px-2 py-1 text-xs text-[var(--txt-75)]"
+            aria-label="自定义播放速度倍率"
+            @change="applyCustomSpeed"
+          >
         </label>
-        <button class="abc-score-play" :aria-pressed="loop" title="整曲循环" aria-label="整曲循环" @click="loop = !loop; applyLoop()">
+        <button class="abc-score-play" :aria-pressed="loop" title="整曲循环" data-tip="整曲循环" aria-label="整曲循环" @click="loop = !loop; applyLoop()">
           <Icon name="mdi:repeat" class="w-3.5 h-3.5" />
         </button>
         <div class="relative">
@@ -616,6 +657,7 @@ onBeforeUnmount(() => {
             class="abc-score-play"
             :aria-pressed="metronome > 0"
             :title="metronome > 0 ? `节拍器音量 ${Math.round(metronome * 100)}%，点击调节` : '节拍器已关，点击调节音量'"
+            :data-tip="metronome > 0 ? `节拍器音量 ${Math.round(metronome * 100)}%，点击调节` : '节拍器已关，点击调节音量'"
             :aria-label="metronome > 0 ? `节拍器音量 ${Math.round(metronome * 100)}%，点击调节` : '节拍器已关，点击调节音量'"
             @click="showMetroPanel = !showMetroPanel; showCountInPanel = false"
           >
@@ -643,6 +685,7 @@ onBeforeUnmount(() => {
             class="abc-score-play"
             :aria-pressed="countIn > 0"
             :title="countIn > 0 ? `预备拍音量 ${Math.round(countIn * 100)}%，点击调节` : '预备拍已关，点击调节音量'"
+            :data-tip="countIn > 0 ? `预备拍音量 ${Math.round(countIn * 100)}%，点击调节` : '预备拍已关，点击调节音量'"
             :aria-label="countIn > 0 ? `预备拍音量 ${Math.round(countIn * 100)}%，点击调节` : '预备拍已关，点击调节音量'"
             @click="showCountInPanel = !showCountInPanel; showMetroPanel = false"
           >
@@ -666,11 +709,11 @@ onBeforeUnmount(() => {
           </div>
         </div>
         <div class="flex items-center gap-1 px-1" role="group" aria-label="谱面缩放">
-          <button class="abc-score-play" title="缩小" aria-label="缩小谱面" @click="stepScale(-0.1)">
+          <button class="abc-score-play" title="缩小" data-tip="缩小谱面" aria-label="缩小谱面" @click="stepScale(-0.1)">
             <Icon name="mdi:minus" class="w-3.5 h-3.5" />
           </button>
           <span class="w-10 text-center text-xs tabular-nums text-[var(--txt-50)]">{{ Math.round(scale * 100) }}%</span>
-          <button class="abc-score-play" title="放大" aria-label="放大谱面" @click="stepScale(0.1)">
+          <button class="abc-score-play" title="放大" data-tip="放大谱面" aria-label="放大谱面" @click="stepScale(0.1)">
             <Icon name="mdi:plus" class="w-3.5 h-3.5" />
           </button>
         </div>
@@ -706,7 +749,7 @@ onBeforeUnmount(() => {
           </select>
         </label>
         <span class="flex-1" />
-        <button class="abc-score-play" title="关闭（Esc）" aria-label="关闭全屏播放器" @click="closeFullscreen">
+        <button class="abc-score-play" title="关闭（Esc）" data-tip="关闭全屏播放器" aria-label="关闭全屏播放器" @click="closeFullscreen">
           <Icon name="mdi:fullscreen-exit" class="w-3.5 h-3.5" />
         </button>
       </div>
@@ -717,6 +760,7 @@ onBeforeUnmount(() => {
             :class="activeTracks.has(t.index) ? 'bg-[var(--primary)] font-bold text-[var(--btn-solid-fg)]' : 'text-[var(--txt-30)]'"
             :aria-pressed="activeTracks.has(t.index)"
             :title="activeTracks.has(t.index) ? `隐藏 ${t.name}` : `显示 ${t.name}`"
+            :data-tip="activeTracks.has(t.index) ? `隐藏 ${t.name}` : `显示 ${t.name}`"
             @click="toggleActiveTrack(t.index)"
           >
             {{ t.name }}
@@ -725,6 +769,7 @@ onBeforeUnmount(() => {
             class="abc-score-play"
             :aria-pressed="muted.has(t.index)"
             :title="`静音 ${t.name}`"
+            :data-tip="`静音 ${t.name}`"
             :aria-label="`静音 ${t.name}`"
             @click="toggleMute(t.index)"
           >
@@ -734,6 +779,7 @@ onBeforeUnmount(() => {
             class="abc-score-play"
             :aria-pressed="soloed.has(t.index)"
             :title="`独奏 ${t.name}`"
+            :data-tip="`独奏 ${t.name}`"
             :aria-label="`独奏 ${t.name}`"
             @click="toggleSolo(t.index)"
           >
@@ -769,5 +815,31 @@ onBeforeUnmount(() => {
 .abc-score-play[aria-pressed="true"] {
   background: var(--primary);
   color: var(--btn-solid-fg);
+}
+/* 图标按钮的快速提示：浏览器原生 title 要悬停 1 秒以上才显示，这里用 CSS
+   tooltip 0.3s 就出。文字仍写 title/aria-label（读屏用），这里只加速视觉提示 */
+.abc-score-play[data-tip] {
+  position: relative;
+}
+.abc-score-play[data-tip]::after {
+  content: attr(data-tip);
+  position: absolute;
+  top: calc(100% + 6px);
+  left: 50%;
+  transform: translateX(-50%);
+  padding: 0.25rem 0.5rem;
+  border-radius: 0.375rem;
+  background: var(--txt-90);
+  color: var(--page-bg);
+  font-size: 0.7rem;
+  line-height: 1.2;
+  white-space: nowrap;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.15s ease 0.15s;
+  z-index: 120;
+}
+.abc-score-play[data-tip]:hover::after {
+  opacity: 1;
 }
 </style>

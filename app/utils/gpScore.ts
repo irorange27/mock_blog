@@ -45,8 +45,12 @@ export function clampVolume(v: number): number {
   return clamp(v, 0, 1)
 }
 
+// alphaTab 自己的钳制范围（SynthConstants.MinPlaybackSpeed/MaxPlaybackSpeed）
+export const MIN_PLAYBACK_SPEED = 0.125
+export const MAX_PLAYBACK_SPEED = 8
+
 export function clampSpeed(v: number): number {
-  return clamp(v, 0.25, 2)
+  return clamp(v, MIN_PLAYBACK_SPEED, MAX_PLAYBACK_SPEED)
 }
 
 export function clampScale(v: number): number {

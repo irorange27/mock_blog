@@ -73,12 +73,13 @@ describe('钳制函数', () => {
     expect(clampVolume(3)).toBe(1)
   })
 
-  it('clampSpeed 把变速钳在 0.25–2', () => {
-    expect(clampSpeed(0)).toBe(0.25)
-    expect(clampSpeed(0.25)).toBe(0.25)
+  it('clampSpeed 把变速钳在 alphaTab 范围 0.125–8', () => {
+    expect(clampSpeed(0)).toBe(0.125)
+    expect(clampSpeed(0.125)).toBe(0.125)
     expect(clampSpeed(1)).toBe(1)
     expect(clampSpeed(2)).toBe(2)
-    expect(clampSpeed(4)).toBe(2)
+    expect(clampSpeed(8)).toBe(8)
+    expect(clampSpeed(16)).toBe(8)
   })
 
   it('clampScale 把缩放钳在 0.5–2', () => {
