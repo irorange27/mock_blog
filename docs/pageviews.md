@@ -75,6 +75,6 @@ pnpm deploy    # = nuxt generate && wrangler deploy
 
 - 若之前是 SSR 模式，本次起改为静态 + API：页面走边缘预渲染产物，更快更省；副作用是仅靠直链访问的草稿（如 `when-machines-come-alive`）从按需渲染变为 404，与 draft 语义一致。
 - 非 main 分支的 push 会生成 preview 版本，绑定相同，读写同一个 DO 的计数。
-- 若构建日志中 Node 版本低于 22，在 Settings → Variables 设 `NODE_VERSION=22`。
+- Node 版本由仓库根的 `.node-version`（24）钉住；若构建日志里版本过低，也在 Settings → Variables 设 `NODE_VERSION`。
 - 部署无需配置任何 secret（Workers Builds 自带授权），DO 里的计数数据跨部署保留。
-- `.github/workflows/build.yml` 仍在并行部署 GitHub Pages（无 `/api`，阅读量自动隐藏，无副作用），确认 Cloudflare 侧稳定后可删掉它的 deploy job。
+- `.github/workflows/build.yml` 现只做检查、不发部署。它此前并行往 GitHub Pages 发一份（无 `/api`，阅读量自动隐藏），已随评论功能一起退场——评论在那份产物上同样会静默降级，两份产出还多一个不一致源。CI 的检查清单见 [comments.md](comments.md#ci-与部署的关系)。

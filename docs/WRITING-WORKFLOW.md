@@ -90,11 +90,17 @@ git commit -m "add: 新文章标题"
 git push origin main
 ```
 
-推送至 `main` 分支后，GitHub Actions 自动执行以下流水线：
+推送至 `main` 分支后，GitHub Actions 跑一遍检查（类型 / 测试 / 静态产物 / Worker 打包），
+再由 Cloudflare 侧的 Workers Builds 发布：
 
 ```plaintext
-Test → Build (nuxt generate) → Deploy to GitHub Pages
+typecheck → test → nuxt generate → 产物校验 → wrangler 预检
+                                              ↓
+                              Cloudflare Workers Builds 发布
 ```
+
+CI 不再往 GitHub Pages 发一份（那份产物没有 `/api`，阅读量与评论都会静默降级）。
+细节见 [comments.md](comments.md#开发与部署) 与 [pageviews.md](pageviews.md)。
 
 RSS (`/rss.xml`) 和 sitemap (`/sitemap.xml`) 随构建自动更新。
 

@@ -8,8 +8,8 @@ const { data } = await useAsyncData(`content-${decodedPath}`, () =>
 
 const slug = computed(() => {
   if (!data.value) return ''
-  const p = route.params.slug
-  return (Array.isArray(p) ? p.join('/') : p) ?? ''
+  // normalizeSlug 负责去掉 catch-all 参数的收尾斜杠（见 utils/blog.ts）
+  return normalizeSlug(route.params.slug)
 })
 const { views } = usePageViews(() => slug.value)
 
@@ -96,5 +96,11 @@ useSeoMeta({
         </p>
       </NuxtLink>
     </nav>
+
+    <!-- 评论区只在客户端渲染：评论要按需从 Worker 拉取，预渲染 HTML 里没有它，
+         静态产物不必为它留占位，SEO 也不受影响 -->
+    <ClientOnly>
+      <PostComments v-if="slug" :slug="slug" class="comments-section" />
+    </ClientOnly>
   </article>
 </template>
