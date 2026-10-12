@@ -57,6 +57,9 @@ const loop = ref(false)
 // 节拍器/预备拍走音量（0 关，alphaTab 没有音高调节）：滑杆直接绑运行时属性
 const metronome = ref(0)
 const countIn = ref(0)
+// 音量面板显隐：点按钮展开，再点收起（同时只开一个）
+const showMetroPanel = ref(false)
+const showCountInPanel = ref(false)
 const scale = ref(1)
 const position = ref('')
 const audioEl = ref<HTMLAudioElement | null>(null)
@@ -266,7 +269,7 @@ function toggleActiveTrack(index: number) {
 // 运行时版式切换：Page 竖排分页 / Horizontal 横向长条（SettingsJson 接受小写字符串）
 export type PageLayout = 'page' | 'horizontal'
 const PAGE_LAYOUTS: PageLayout[] = ['page', 'horizontal']
-const pageLayoutLabel: Record<PageLayout, string> = { page: '竖排', horizontal: '横向' }
+const pageLayoutLabel: Record<PageLayout, string> = { page: '垂直于屏幕', horizontal: '水平于屏幕' }
 const liveLayout = ref<PageLayout>('horizontal')
 
 function applyLayout(layout: PageLayout) {
@@ -584,32 +587,60 @@ onBeforeUnmount(() => {
           <Icon name="mdi:repeat" class="w-3.5 h-3.5" />
           <span>循环</span>
         </button>
-        <label class="flex items-center gap-1 px-1 text-xs text-[var(--txt-50)]">
-          节拍器
-          <input
-            v-model.number="metronome"
-            type="range"
-            min="0"
-            max="1"
-            step="0.05"
-            class="w-16"
-            aria-label="节拍器音量，0 为关闭"
-            @input="applyMetronome"
+        <div class="relative">
+          <button
+            class="abc-score-play"
+            :aria-pressed="metronome > 0"
+            :title="metronome > 0 ? `节拍器音量 ${Math.round(metronome * 100)}%，点击调节` : '节拍器已关，点击调节音量'"
+            @click="showMetroPanel = !showMetroPanel; showCountInPanel = false"
           >
-        </label>
-        <label class="flex items-center gap-1 px-1 text-xs text-[var(--txt-50)]">
-          预备拍
-          <input
-            v-model.number="countIn"
-            type="range"
-            min="0"
-            max="1"
-            step="0.05"
-            class="w-16"
-            aria-label="预备拍音量，0 为关闭"
-            @input="applyCountIn"
+            <Icon name="mdi:metronome" class="w-3.5 h-3.5" />
+            <span>节拍器</span>
+          </button>
+          <div
+            v-if="showMetroPanel"
+            class="absolute left-0 top-full z-10 mt-1 flex items-center gap-2 rounded-lg border border-[var(--line-color)] bg-[var(--card-bg)] px-3 py-2 shadow-md"
           >
-        </label>
+            <input
+              v-model.number="metronome"
+              type="range"
+              min="0"
+              max="1"
+              step="0.05"
+              class="w-24"
+              aria-label="节拍器音量，0 为关闭"
+              @input="applyMetronome"
+            >
+            <span class="w-9 text-right text-xs tabular-nums text-[var(--txt-50)]">{{ Math.round(metronome * 100) }}%</span>
+          </div>
+        </div>
+        <div class="relative">
+          <button
+            class="abc-score-play"
+            :aria-pressed="countIn > 0"
+            :title="countIn > 0 ? `预备拍音量 ${Math.round(countIn * 100)}%，点击调节` : '预备拍已关，点击调节音量'"
+            @click="showCountInPanel = !showCountInPanel; showMetroPanel = false"
+          >
+            <Icon name="mdi:timer-play-outline" class="w-3.5 h-3.5" />
+            <span>预备拍</span>
+          </button>
+          <div
+            v-if="showCountInPanel"
+            class="absolute left-0 top-full z-10 mt-1 flex items-center gap-2 rounded-lg border border-[var(--line-color)] bg-[var(--card-bg)] px-3 py-2 shadow-md"
+          >
+            <input
+              v-model.number="countIn"
+              type="range"
+              min="0"
+              max="1"
+              step="0.05"
+              class="w-24"
+              aria-label="预备拍音量，0 为关闭"
+              @input="applyCountIn"
+            >
+            <span class="w-9 text-right text-xs tabular-nums text-[var(--txt-50)]">{{ Math.round(countIn * 100) }}%</span>
+          </div>
+        </div>
         <div class="flex items-center gap-1 px-1" role="group" aria-label="谱面缩放">
           <button class="abc-score-play" title="缩小" aria-label="缩小谱面" @click="stepScale(-0.1)">
             <Icon name="mdi:minus" class="w-3.5 h-3.5" />
