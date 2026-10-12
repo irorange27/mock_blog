@@ -30,7 +30,9 @@ const rendering = ref(false) // 切轨/缩放重绘中，谱面区盖遮罩
 // 音轨：scoreLoaded 后提取，UI 只消费 GpTrackInfo
 const trackList = ref<GpTrackInfo[]>([])
 const trackMode = ref<TrackMode>('single')
-const activeTrack = ref(0)
+// active 集合：实际渲染哪些轨。single 模式保证只有一条，all 模式可多条
+const activeTracks = ref<Set<number>>(new Set([0]))
+const activeTrack = computed(() => activeTracks.value.values().next().value ?? 0)
 
 let alphatab: typeof import('@coderline/alphatab') | null = null
 let api: AtApi | null = null
@@ -52,8 +54,9 @@ const soloed = ref<Set<number>>(new Set())
 const volume = ref(0.8)
 const speed = ref(1)
 const loop = ref(false)
-const metronome = ref(false)
-const countIn = ref(false)
+// 节拍器/预备拍走音量（0 关，alphaTab 没有音高调节）：滑杆直接绑运行时属性
+const metronome = ref(0)
+const countIn = ref(0)
 const scale = ref(1)
 const position = ref('')
 const audioEl = ref<HTMLAudioElement | null>(null)
@@ -186,12 +189,14 @@ function extractTracks(score: { tracks: AtTrack[] }) {
     name: t.name || `音轨 ${i + 1}`,
     shortName: t.shortName || `T${i + 1}`,
   }))
+  // tracks="all" 首屏直接全选同屏
+  if (trackMode.value === 'all') {
+    activeTracks.value = new Set(trackList.value.map(t => t.index))
+  }
 }
 
 function currentTrackObjects(): AtTrack[] {
-  if (!api?.score) return []
-  if (trackMode.value === 'all') return [...api.score.tracks]
-  return [api.score.tracks[activeTrack.value]].filter(Boolean) as AtTrack[]
+  return trackObjects([...activeTracks.value].sort((a, b) => a - b))
 }
 
 function renderCurrentTracks() {
@@ -203,14 +208,49 @@ function renderCurrentTracks() {
 }
 
 function switchTrack(index: number) {
-  activeTrack.value = index
+  activeTracks.value = new Set([index])
   trackMode.value = 'single'
   renderCurrentTracks()
 }
 
 function switchTrackMode(mode: TrackMode) {
   trackMode.value = mode
+  if (mode === 'all') {
+    activeTracks.value = new Set(trackList.value.map(t => t.index))
+  } else {
+    // 回单轨：保留当前 active 集合的第一条
+    const first = [...activeTracks.value].sort((a, b) => a - b)[0] ?? 0
+    activeTracks.value = new Set([first])
+  }
   renderCurrentTracks()
+}
+
+// 浮层每轨行的 A 键：增减 active 集合，至少保留一条
+function toggleActiveTrack(index: number) {
+  const next = new Set(activeTracks.value)
+  if (next.has(index)) {
+    if (next.size <= 1) return
+    next.delete(index)
+  } else {
+    next.add(index)
+  }
+  activeTracks.value = next
+  trackMode.value = next.size > 1 ? 'all' : 'single'
+  renderCurrentTracks()
+}
+
+// 运行时版式切换：Page 竖排分页 / Horizontal 横向长条（SettingsJson 接受小写字符串）
+export type PageLayout = 'page' | 'horizontal'
+const PAGE_LAYOUTS: PageLayout[] = ['page', 'horizontal']
+const pageLayoutLabel: Record<PageLayout, string> = { page: '竖排', horizontal: '横向' }
+const liveLayout = ref<PageLayout>('page')
+
+function applyLayout(layout: PageLayout) {
+  if (!api) return
+  liveLayout.value = layout
+  api.settings.display.layoutMode = layout
+  api.updateSettings()
+  api.render()
 }
 
 // —— 浮层工具条：每轨 mute/solo、音量、变速、循环、节拍器、预备拍、缩放 ——
@@ -255,11 +295,15 @@ function applyLoop() {
 }
 
 function applyMetronome() {
-  if (api) api.metronomeVolume = metronome.value ? 1 : 0
+  if (!api) return
+  metronome.value = clampVolume(metronome.value)
+  api.metronomeVolume = metronome.value
 }
 
 function applyCountIn() {
-  if (api) api.countInVolume = countIn.value ? 1 : 0
+  if (!api) return
+  countIn.value = clampVolume(countIn.value)
+  api.countInVolume = countIn.value
 }
 
 function applyScale() {
@@ -330,10 +374,9 @@ onMounted(async () => {
           host.value!.setAttribute('role', 'img')
           host.value!.setAttribute('aria-label', score.title ? `乐谱：${score.title}` : '乐谱（Guitar Pro）')
           extractTracks(score)
-          // tracks="all" 时首屏直接多轨同屏；renderTracks 会再触发 scoreLoaded，提取幂等
-          if (trackMode.value === 'all' && api?.score) {
-            api.renderTracks([...api.score.tracks])
-          }
+          // renderTracks 会再触发 scoreLoaded，提取幂等。
+          // single 模式默认就是首轨，不用调；只有 all 模式需要主动铺全轨
+          if (trackMode.value === 'all') renderCurrentTracks()
         })
         api.renderStarted.on(() => { rendering.value = true })
         api.renderFinished.on(() => { rendering.value = false })
@@ -411,7 +454,7 @@ onBeforeUnmount(() => {
     <div v-if="ready && !errored" class="abc-score-bar flex-wrap gap-2">
       <template v-if="trackList.length > 1">
         <select
-          v-if="trackMode === 'single'"
+          v-if="activeTracks.size <= 1"
           :value="activeTrack"
           class="rounded-full bg-[var(--chip-bg)] px-3 py-1 text-xs text-[var(--txt-75)]"
           aria-label="选择音轨"
@@ -422,7 +465,7 @@ onBeforeUnmount(() => {
           </option>
         </select>
         <span v-else class="px-2 py-1 text-xs text-[var(--txt-50)]">
-          全部 {{ trackList.length }} 轨
+          {{ activeTracks.size }} 轨同屏
         </span>
         <button
           class="abc-score-play"
@@ -514,14 +557,32 @@ onBeforeUnmount(() => {
           <Icon name="mdi:repeat" class="w-3.5 h-3.5" />
           <span>循环</span>
         </button>
-        <button class="abc-score-play" :aria-pressed="metronome" title="节拍器开关" @click="metronome = !metronome; applyMetronome()">
-          <Icon name="mdi:metronome" class="w-3.5 h-3.5" />
-          <span>节拍器</span>
-        </button>
-        <button class="abc-score-play" :aria-pressed="countIn" title="预备拍开关" @click="countIn = !countIn; applyCountIn()">
-          <Icon name="mdi:timer-play-outline" class="w-3.5 h-3.5" />
-          <span>预备拍</span>
-        </button>
+        <label class="flex items-center gap-1 px-1 text-xs text-[var(--txt-50)]">
+          节拍器
+          <input
+            v-model.number="metronome"
+            type="range"
+            min="0"
+            max="1"
+            step="0.05"
+            class="w-16"
+            aria-label="节拍器音量，0 为关闭"
+            @input="applyMetronome"
+          >
+        </label>
+        <label class="flex items-center gap-1 px-1 text-xs text-[var(--txt-50)]">
+          预备拍
+          <input
+            v-model.number="countIn"
+            type="range"
+            min="0"
+            max="1"
+            step="0.05"
+            class="w-16"
+            aria-label="预备拍音量，0 为关闭"
+            @input="applyCountIn"
+          >
+        </label>
         <div class="flex items-center gap-1 px-1" role="group" aria-label="谱面缩放">
           <button class="abc-score-play" title="缩小" aria-label="缩小谱面" @click="stepScale(-0.1)">
             <Icon name="mdi:minus" class="w-3.5 h-3.5" />
@@ -529,6 +590,18 @@ onBeforeUnmount(() => {
           <span class="w-10 text-center text-xs tabular-nums text-[var(--txt-50)]">{{ Math.round(scale * 100) }}%</span>
           <button class="abc-score-play" title="放大" aria-label="放大谱面" @click="stepScale(0.1)">
             <Icon name="mdi:plus" class="w-3.5 h-3.5" />
+          </button>
+        </div>
+        <div class="flex items-center gap-1 px-1" role="group" aria-label="谱面版式">
+          <button
+            v-for="l in PAGE_LAYOUTS"
+            :key="l"
+            class="abc-score-play"
+            :aria-pressed="liveLayout === l"
+            :title="`切换为${pageLayoutLabel[l]}版式`"
+            @click="applyLayout(l)"
+          >
+            <span>{{ pageLayoutLabel[l] }}</span>
           </button>
         </div>
         <span class="flex-1" />
@@ -539,6 +612,14 @@ onBeforeUnmount(() => {
       </div>
       <div v-if="trackList.length > 1" class="flex flex-wrap items-center gap-x-4 gap-y-1 border-b border-[var(--line-color)] px-4 py-2">
         <div v-for="t in trackList" :key="t.index" class="flex items-center gap-1 text-xs">
+          <button
+            class="abc-score-play"
+            :aria-pressed="activeTracks.has(t.index)"
+            :title="activeTracks.has(t.index) ? `隐藏 ${t.name}` : `显示 ${t.name}`"
+            @click="toggleActiveTrack(t.index)"
+          >
+            <span>A</span>
+          </button>
           <span class="max-w-32 truncate text-[var(--txt-75)]" :title="t.name">{{ t.name }}</span>
           <button
             class="abc-score-play"
@@ -565,18 +646,19 @@ onBeforeUnmount(() => {
 
 <style>
 /* 播放游标：alphaTab 只创建透明 div，颜色由网站定（https://www.alphatab.net/docs/tutorial-web/player）。
-   作用域限 .gp-score，避免污染站内其他内容。小节底色淡、拍线用主题主色。 */
-.gp-score .at-cursor-bar {
+   不限 .gp-score 作用域：全屏时谱面 DOM 搬进 body 下的浮层，限了作用域游标就没颜色。
+   scoped 样式自带组件属性，不会漏到站内其他内容。小节底色淡、拍线用主题主色。 */
+.at-cursor-bar {
   background: color-mix(in srgb, var(--primary) 18%, transparent);
 }
-.gp-score .at-cursor-beat {
+.at-cursor-beat {
   background: var(--primary);
   width: 3px;
 }
-.gp-score .at-selection div {
+.at-selection div {
   background: color-mix(in srgb, var(--primary) 12%, transparent);
 }
-.gp-score .at-highlight * {
+.at-highlight * {
   fill: var(--primary);
   stroke: var(--primary);
 }
