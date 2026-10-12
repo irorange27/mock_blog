@@ -116,6 +116,8 @@ function staveProfileOf(layout: ScoreLayout) {
 function buildSettings(): AtSettingsJson {
   const display: NonNullable<AtSettingsJson['display']> = {
     staveProfile: staveProfileOf(normalizeLayout(props.layout)),
+    // 内容页默认横向版式：小节横向排，不挤竖向空间
+    layoutMode: 'horizontal',
   }
   // 回放：soundfont 不在初始化时给，首次点播放再 loadSoundFont，避免访客白下几 MB
   applyColors(display.resources = {})
@@ -243,7 +245,7 @@ function toggleActiveTrack(index: number) {
 export type PageLayout = 'page' | 'horizontal'
 const PAGE_LAYOUTS: PageLayout[] = ['page', 'horizontal']
 const pageLayoutLabel: Record<PageLayout, string> = { page: '竖排', horizontal: '横向' }
-const liveLayout = ref<PageLayout>('page')
+const liveLayout = ref<PageLayout>('horizontal')
 
 function applyLayout(layout: PageLayout) {
   if (!api) return
@@ -592,18 +594,17 @@ onBeforeUnmount(() => {
             <Icon name="mdi:plus" class="w-3.5 h-3.5" />
           </button>
         </div>
-        <div class="flex items-center gap-1 px-1" role="group" aria-label="谱面版式">
-          <button
-            v-for="l in PAGE_LAYOUTS"
-            :key="l"
-            class="abc-score-play"
-            :aria-pressed="liveLayout === l"
-            :title="`切换为${pageLayoutLabel[l]}版式`"
-            @click="applyLayout(l)"
+        <label class="flex items-center gap-1 px-1 text-xs text-[var(--txt-50)]">
+          版式
+          <select
+            v-model="liveLayout"
+            class="rounded-full bg-[var(--chip-bg)] px-2 py-1 text-xs text-[var(--txt-75)]"
+            aria-label="谱面版式"
+            @change="applyLayout(liveLayout)"
           >
-            <span>{{ pageLayoutLabel[l] }}</span>
-          </button>
-        </div>
+            <option v-for="l in PAGE_LAYOUTS" :key="l" :value="l">{{ pageLayoutLabel[l] }}</option>
+          </select>
+        </label>
         <span class="flex-1" />
         <button class="abc-score-play" title="关闭（Esc）" aria-label="关闭全屏播放器" @click="closeFullscreen">
           <Icon name="mdi:fullscreen-exit" class="w-3.5 h-3.5" />
@@ -613,14 +614,14 @@ onBeforeUnmount(() => {
       <div v-if="trackList.length > 1" class="flex flex-wrap items-center gap-x-4 gap-y-1 border-b border-[var(--line-color)] px-4 py-2">
         <div v-for="t in trackList" :key="t.index" class="flex items-center gap-1 text-xs">
           <button
-            class="abc-score-play"
+            class="max-w-32 truncate rounded-full px-2 py-1"
+            :class="activeTracks.has(t.index) ? 'bg-[var(--primary)] font-bold text-[var(--btn-solid-fg)]' : 'text-[var(--txt-30)]'"
             :aria-pressed="activeTracks.has(t.index)"
             :title="activeTracks.has(t.index) ? `隐藏 ${t.name}` : `显示 ${t.name}`"
             @click="toggleActiveTrack(t.index)"
           >
-            <span>A</span>
+            {{ t.name }}
           </button>
-          <span class="max-w-32 truncate text-[var(--txt-75)]" :title="t.name">{{ t.name }}</span>
           <button
             class="abc-score-play"
             :aria-pressed="muted.has(t.index)"
