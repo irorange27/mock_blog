@@ -26,3 +26,8 @@ Next.
 
 ::gp-score{src="/scores/初音ミク - From Y To Y[总谱].gp"}
 ::
+
+带内嵌音频的：
+
+::gp-score{src="/scores/后续.gp"}
+::
