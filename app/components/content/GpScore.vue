@@ -6,7 +6,7 @@
 // alphaTab 体量大且依赖浏览器 API，动态 import 不进 SSR 包；其 Web Worker / AudioWorklet
 // 加载由 nuxt.config 里的 @coderline/alphatab-vite 插件接住。
 // 字体与 soundfont 自托管：public/fonts/alphatab、public/soundfont（路径见 app/utils/gpScore.ts）。
-import { FONT_DIRECTORY, SCROLL_OFFSET_Y, SOUNDFONT_URL, normalizeLayout, normalizeTrackMode, type GpTrackInfo, type ScoreLayout, type TrackMode } from '~/utils/gpScore'
+import { FONT_DIRECTORY, FULLSCREEN_SCALE, SCROLL_OFFSET_Y, SCROLL_OFFSET_Y_FULLSCREEN, SOUNDFONT_URL, clampScale, clampSpeed, clampVolume, formatTime, normalizeLayout, normalizeTrackMode, type GpTrackInfo, type ScoreLayout, type TrackMode } from '~/utils/gpScore'
 
 type AtApi = import('@coderline/alphatab').AlphaTabApi
 type AtSettingsJson = import('@coderline/alphatab').SettingsJson
@@ -37,6 +37,28 @@ let api: AtApi | null = null
 let soundfontRequested = false
 // renderTracks 后 scoreLoaded 会再触发，提取音轨列表必须幂等
 let tracksExtracted = false
+
+// 全屏浮层：实例不重建，谱面 DOM 在卡片和浮层容器之间搬运
+const fullscreen = ref(false)
+const cardScrollWrap = ref<HTMLElement | null>(null) // 卡片里的谱面滚动区
+const fsScrollWrap = ref<HTMLElement | null>(null) // 浮层里的谱面滚动区
+const expandBtn = ref<HTMLElement | null>(null)
+let lastTrigger: HTMLElement | null = null
+let cardScale = 1
+
+// 浮层工具条状态（与 alphaTab 运行时属性双向绑定）
+const muted = ref<Set<number>>(new Set())
+const soloed = ref<Set<number>>(new Set())
+const volume = ref(0.8)
+const speed = ref(1)
+const loop = ref(false)
+const metronome = ref(false)
+const countIn = ref(false)
+const scale = ref(1)
+const position = ref('')
+const audioEl = ref<HTMLAudioElement | null>(null)
+
+const SPEEDS = [0.5, 0.75, 1, 1.25, 1.5]
 
 // alphaTab 把颜色烘进 SVG，只认 hex/rgb()/raw 数值，而主题色是 oklch + var()。
 // 用 1×1 canvas 让浏览器代解主题变量并取像素值，不硬编码颜色。
@@ -128,6 +150,8 @@ async function togglePlay() {
       api.loadSoundFont(SOUNDFONT_URL, false)
       await waitForSoundfont()
     }
+    // 合成播放与 RSE 音频互斥：播一边先停另一边
+    if (audioEl.value && !audioEl.value.paused) audioEl.value.pause()
     api.play()
     // 成功后的 playing 态由 playerStateChanged 置位；失败落 catch
   } catch {
@@ -137,9 +161,21 @@ async function togglePlay() {
   }
 }
 
+// RSE 音频开始播时，若合成在播就停掉它
+function onAudioPlay() {
+  if (api && state.value === 'playing') api.stop()
+}
+
 function showError(e: unknown) {
   console.error('[gp-score]', e)
   errored.value = true
+}
+
+// 谱面加载失败重试：重置后重走 onMounted 的加载分支
+let loadFn: (() => Promise<void>) | null = null
+async function retryLoad() {
+  errored.value = false
+  await loadFn?.()
 }
 
 function extractTracks(score: { tracks: AtTrack[] }) {
@@ -177,39 +213,147 @@ function switchTrackMode(mode: TrackMode) {
   renderCurrentTracks()
 }
 
-onMounted(async () => {
-  const tex = texSrc.value?.textContent?.trim() ?? ''
-  if (!props.src && !tex) return
-  try {
-    alphatab = await import('@coderline/alphatab')
-    api = new alphatab.AlphaTabApi(host.value!, buildSettings())
-    trackMode.value = normalizeTrackMode(props.tracks)
-    api.playerStateChanged.on(markPlaying)
-    // SVG 图形对读屏零信息（WCAG 1.1.1）：解析出曲名后当文本替代
-    api.scoreLoaded.on((score) => {
-      host.value!.setAttribute('role', 'img')
-      host.value!.setAttribute('aria-label', score.title ? `乐谱：${score.title}` : '乐谱（Guitar Pro）')
-      extractTracks(score)
-      // tracks="all" 时首屏直接多轨同屏；renderTracks 会再触发 scoreLoaded，提取幂等
-      if (trackMode.value === 'all' && api?.score) {
-        api.renderTracks([...api.score.tracks])
-      }
-    })
-    api.renderStarted.on(() => { rendering.value = true })
-    api.renderFinished.on(() => { rendering.value = false })
-    api.error.on((e) => showError(e))
+// —— 浮层工具条：每轨 mute/solo、音量、变速、循环、节拍器、预备拍、缩放 ——
 
-    if (props.src) {
-      const res = await fetch(props.src)
-      if (!res.ok) throw new Error(`HTTP ${res.status} ${props.src}`)
-      api.load(new Uint8Array(await res.arrayBuffer()))
-    } else {
-      api.tex(tex)
+function trackObjects(indexes: number[]): AtTrack[] {
+  if (!api?.score) return []
+  return indexes.map(i => api!.score!.tracks[i]).filter(Boolean) as AtTrack[]
+}
+
+function toggleMute(index: number) {
+  if (!api) return
+  const next = new Set(muted.value)
+  if (next.has(index)) next.delete(index)
+  else next.add(index)
+  muted.value = next
+  api.changeTrackMute(trackObjects([index]), next.has(index))
+}
+
+function toggleSolo(index: number) {
+  if (!api) return
+  const next = new Set(soloed.value)
+  if (next.has(index)) next.delete(index)
+  else next.add(index)
+  soloed.value = next
+  api.changeTrackSolo(trackObjects([index]), next.has(index))
+}
+
+function applyVolume() {
+  if (!api) return
+  volume.value = clampVolume(volume.value)
+  api.masterVolume = volume.value
+}
+
+function applySpeed() {
+  if (!api) return
+  speed.value = clampSpeed(speed.value)
+  api.playbackSpeed = speed.value
+}
+
+function applyLoop() {
+  if (api) api.isLooping = loop.value
+}
+
+function applyMetronome() {
+  if (api) api.metronomeVolume = metronome.value ? 1 : 0
+}
+
+function applyCountIn() {
+  if (api) api.countInVolume = countIn.value ? 1 : 0
+}
+
+function applyScale() {
+  if (!api) return
+  scale.value = clampScale(scale.value)
+  api.settings.display.scale = scale.value
+  api.updateSettings()
+  api.render()
+}
+
+function stepScale(delta: number) {
+  scale.value = clampScale(Math.round((scale.value + delta) * 10) / 10)
+  applyScale()
+}
+
+// —— 全屏浮层：搬运谱面 DOM，实例不重建 ——
+
+async function openFullscreen() {
+  if (!api || !host.value || fullscreen.value) return
+  lastTrigger = (expandBtn.value as HTMLElement | null) ?? (document.activeElement as HTMLElement | null)
+  cardScale = scale.value
+  // 浮层容器由 v-if 控制，先开浮层等 DOM 落定再搬运（否则 ref 全是 null）
+  fullscreen.value = true
+  await nextTick()
+  if (!fsScrollWrap.value || !host.value || !api) return
+  fsScrollWrap.value.appendChild(host.value)
+  api.settings.player.scrollElement = fsScrollWrap.value
+  api.settings.player.scrollOffsetY = SCROLL_OFFSET_Y_FULLSCREEN
+  scale.value = FULLSCREEN_SCALE
+  api.settings.display.scale = FULLSCREEN_SCALE
+  api.updateSettings()
+  api.render()
+  document.addEventListener('keydown', onFsKeydown)
+}
+
+function closeFullscreen() {
+  if (!api || !host.value || !cardScrollWrap.value || !fullscreen.value) return
+  cardScrollWrap.value.appendChild(host.value)
+  api.settings.player.scrollElement = 'html,body'
+  api.settings.player.scrollOffsetY = SCROLL_OFFSET_Y
+  scale.value = cardScale
+  api.settings.display.scale = cardScale
+  api.updateSettings()
+  api.render()
+  fullscreen.value = false
+  document.removeEventListener('keydown', onFsKeydown)
+  // 焦点回放大键（WCAG 2.4.3，抄 ImageLightbox 的做法）
+  ;(lastTrigger as HTMLElement | null)?.focus?.()
+  lastTrigger = null
+}
+
+function onFsKeydown(e: KeyboardEvent) {
+  if (e.key === 'Escape') closeFullscreen()
+}
+
+onMounted(async () => {
+  loadFn = async () => {
+    const tex = texSrc.value?.textContent?.trim() ?? ''
+    if (!props.src && !tex) return
+    try {
+      alphatab ??= await import('@coderline/alphatab')
+      if (!api) {
+        api = new alphatab.AlphaTabApi(host.value!, buildSettings())
+        trackMode.value = normalizeTrackMode(props.tracks)
+        api.playerStateChanged.on(markPlaying)
+        // SVG 图形对读屏零信息（WCAG 1.1.1）：解析出曲名后当文本替代
+        api.scoreLoaded.on((score) => {
+          host.value!.setAttribute('role', 'img')
+          host.value!.setAttribute('aria-label', score.title ? `乐谱：${score.title}` : '乐谱（Guitar Pro）')
+          extractTracks(score)
+          // tracks="all" 时首屏直接多轨同屏；renderTracks 会再触发 scoreLoaded，提取幂等
+          if (trackMode.value === 'all' && api?.score) {
+            api.renderTracks([...api.score.tracks])
+          }
+        })
+        api.renderStarted.on(() => { rendering.value = true })
+        api.renderFinished.on(() => { rendering.value = false })
+        api.playerPositionChanged.on(e => { position.value = `${formatTime(e.currentTime)} / ${formatTime(e.endTime)}` })
+        api.error.on((e) => showError(e))
+      }
+
+      if (props.src) {
+        const res = await fetch(props.src)
+        if (!res.ok) throw new Error(`HTTP ${res.status} ${props.src}`)
+        api.load(new Uint8Array(await res.arrayBuffer()))
+      } else {
+        api.tex(tex)
+      }
+      ready.value = true
+    } catch (e) {
+      showError(e)
     }
-    ready.value = true
-  } catch (e) {
-    showError(e)
   }
+  await loadFn()
 })
 
 // 乐谱颜色是渲染时烘进 SVG 的，主题切换需要改配色后整体重绘
@@ -235,6 +379,7 @@ watch(colorMode, () => {
 })
 
 onBeforeUnmount(() => {
+  document.removeEventListener('keydown', onFsKeydown)
   api?.destroy()
   api = null
   probe?.remove()
@@ -244,7 +389,7 @@ onBeforeUnmount(() => {
 
 <template>
   <div class="gp-score my-6 rounded-xl border border-[var(--line-color)] bg-[var(--panel-bg)] px-5 pt-4 pb-3">
-    <div class="relative">
+    <div ref="cardScrollWrap" class="relative">
       <div ref="host" v-show="!errored" class="overflow-x-auto" />
       <div
         v-if="rendering && !errored"
@@ -255,8 +400,12 @@ onBeforeUnmount(() => {
     </div>
     <!-- 记谱原文：仅供解析，不展示 -->
     <div ref="texSrc" aria-hidden="true" class="hidden"><slot /></div>
-    <div v-if="errored" class="my-2 text-sm" role="alert">
+    <div v-if="errored" class="my-2 flex flex-wrap items-center gap-3 text-sm" role="alert">
       <p class="text-[var(--danger)]">谱面加载失败。</p>
+      <button class="abc-score-play" @click="retryLoad">
+        <Icon name="mdi:reload" class="w-3.5 h-3.5" />
+        <span>重试</span>
+      </button>
       <a v-if="src" :href="src" download class="underline">点此下载原始乐谱文件</a>
     </div>
     <div v-if="ready && !errored" class="abc-score-bar flex-wrap gap-2">
@@ -298,9 +447,120 @@ onBeforeUnmount(() => {
         />
         <span>{{ state === 'playing' ? '停止' : state === 'loading' ? '加载音色…' : state === 'error' ? '音色加载失败，点击重试' : '播放' }}</span>
       </button>
+      <span v-if="position" class="px-2 py-1 text-xs tabular-nums text-[var(--txt-50)]">{{ position }}</span>
+      <span class="flex-1" />
+      <button
+        ref="expandBtn"
+        class="abc-score-play"
+        title="全屏播放器"
+        aria-label="打开全屏播放器"
+        @click="openFullscreen"
+      >
+        <Icon name="mdi:fullscreen" class="w-3.5 h-3.5" />
+        <span>放大</span>
+      </button>
     </div>
-    <audio v-if="audio" controls :src="audio" class="mt-3 w-full" />
+    <audio v-if="audio" ref="audioEl" controls :src="audio" class="mt-3 w-full" @play="onAudioPlay" />
   </div>
+
+  <Teleport to="body">
+    <div
+      v-if="fullscreen"
+      class="fixed inset-0 z-[100] flex flex-col bg-[var(--page-bg)]"
+      role="dialog"
+      aria-modal="true"
+      aria-label="乐谱全屏播放器"
+    >
+      <div class="flex flex-wrap items-center gap-2 border-b border-[var(--line-color)] px-4 py-2">
+        <button
+          class="abc-score-play"
+          :class="{ 'abc-score-play-err': state === 'error' }"
+          :disabled="state === 'loading'"
+          @click="togglePlay"
+        >
+          <Icon
+            :name="state === 'playing' ? 'mdi:stop' : state === 'error' ? 'mdi:alert-outline' : 'mdi:play'"
+            class="w-3.5 h-3.5"
+            :class="{ 'ml-0.5': state !== 'playing' && state !== 'error' }"
+          />
+          <span>{{ state === 'playing' ? '停止' : state === 'loading' ? '加载音色…' : state === 'error' ? '音色加载失败，点击重试' : '播放' }}</span>
+        </button>
+        <span v-if="position" class="px-1 text-xs tabular-nums text-[var(--txt-50)]">{{ position }}</span>
+        <label class="flex items-center gap-1 px-1 text-xs text-[var(--txt-50)]">
+          音量
+          <input
+            v-model.number="volume"
+            type="range"
+            min="0"
+            max="1"
+            step="0.05"
+            class="w-20"
+            aria-label="总音量"
+            @input="applyVolume"
+          >
+        </label>
+        <label class="flex items-center gap-1 px-1 text-xs text-[var(--txt-50)]">
+          速度
+          <select
+            v-model.number="speed"
+            class="rounded-full bg-[var(--chip-bg)] px-2 py-1 text-xs text-[var(--txt-75)]"
+            aria-label="播放速度"
+            @change="applySpeed"
+          >
+            <option v-for="s in SPEEDS" :key="s" :value="s">{{ s }}x</option>
+          </select>
+        </label>
+        <button class="abc-score-play" :aria-pressed="loop" title="整曲循环" @click="loop = !loop; applyLoop()">
+          <Icon name="mdi:repeat" class="w-3.5 h-3.5" />
+          <span>循环</span>
+        </button>
+        <button class="abc-score-play" :aria-pressed="metronome" title="节拍器开关" @click="metronome = !metronome; applyMetronome()">
+          <Icon name="mdi:metronome" class="w-3.5 h-3.5" />
+          <span>节拍器</span>
+        </button>
+        <button class="abc-score-play" :aria-pressed="countIn" title="预备拍开关" @click="countIn = !countIn; applyCountIn()">
+          <Icon name="mdi:timer-play-outline" class="w-3.5 h-3.5" />
+          <span>预备拍</span>
+        </button>
+        <div class="flex items-center gap-1 px-1" role="group" aria-label="谱面缩放">
+          <button class="abc-score-play" title="缩小" aria-label="缩小谱面" @click="stepScale(-0.1)">
+            <Icon name="mdi:minus" class="w-3.5 h-3.5" />
+          </button>
+          <span class="w-10 text-center text-xs tabular-nums text-[var(--txt-50)]">{{ Math.round(scale * 100) }}%</span>
+          <button class="abc-score-play" title="放大" aria-label="放大谱面" @click="stepScale(0.1)">
+            <Icon name="mdi:plus" class="w-3.5 h-3.5" />
+          </button>
+        </div>
+        <span class="flex-1" />
+        <button class="abc-score-play" title="关闭（Esc）" aria-label="关闭全屏播放器" @click="closeFullscreen">
+          <Icon name="mdi:fullscreen-exit" class="w-3.5 h-3.5" />
+          <span>关闭</span>
+        </button>
+      </div>
+      <div v-if="trackList.length > 1" class="flex flex-wrap items-center gap-x-4 gap-y-1 border-b border-[var(--line-color)] px-4 py-2">
+        <div v-for="t in trackList" :key="t.index" class="flex items-center gap-1 text-xs">
+          <span class="max-w-32 truncate text-[var(--txt-75)]" :title="t.name">{{ t.name }}</span>
+          <button
+            class="abc-score-play"
+            :aria-pressed="muted.has(t.index)"
+            :title="`静音 ${t.name}`"
+            @click="toggleMute(t.index)"
+          >
+            <span>M</span>
+          </button>
+          <button
+            class="abc-score-play"
+            :aria-pressed="soloed.has(t.index)"
+            :title="`独奏 ${t.name}`"
+            @click="toggleSolo(t.index)"
+          >
+            <span>S</span>
+          </button>
+        </div>
+      </div>
+      <div ref="fsScrollWrap" class="min-h-0 flex-1 overflow-y-auto px-4 py-3" />
+    </div>
+  </Teleport>
 </template>
 
 <style>
@@ -319,5 +579,11 @@ onBeforeUnmount(() => {
 .gp-score .at-highlight * {
   fill: var(--primary);
   stroke: var(--primary);
+}
+/* 开关类按键（循环/节拍器/预备拍/M/S）：按下态用主色底。
+   Teleport 到 body 的浮层同样带本组件作用域属性，直接匹配即可 */
+.abc-score-play[aria-pressed="true"] {
+  background: var(--primary);
+  color: var(--btn-solid-fg);
 }
 </style>
