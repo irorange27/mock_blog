@@ -519,17 +519,17 @@ onBeforeUnmount(() => {
           <!-- 连谱号 + 小节线 + 谱表：单轨一行谱表，多轨两行（用户提供的形状，内联画） -->
           <svg viewBox="0 0 24 24" class="w-3.5 h-3.5" aria-hidden="true">
             <!-- 连谱号主干 -->
-            <rect x="8" y="4" width="2.4" height="16" fill="currentColor" />
+            <rect x="7.2" y="4" width="3.6" height="16" fill="currentColor" />
             <!-- 连谱号上下臂与卷边 -->
-            <polygon points="8,3 12,3.4 11,5.4 8,5.4" fill="currentColor" />
-            <polygon points="8,21 12,20.6 11,18.6 8,18.6" fill="currentColor" />
-            <path d="M11.6 3.6 Q13 2.8 13.4 1.6" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round" />
-            <path d="M11.6 20.4 Q13 21.2 13.4 22.4" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round" />
+            <polygon points="7.2,3 12.2,3.4 11.4,5.4 7.2,5.4" fill="currentColor" />
+            <polygon points="7.2,21 12.2,20.6 11.4,18.6 7.2,18.6" fill="currentColor" />
+            <path d="M11.8 3.6 Q13.2 2.8 13.6 1.6" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round" />
+            <path d="M11.8 20.4 Q13.2 21.2 13.6 22.4" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round" />
             <!-- 小节线：随谱表行数伸缩 -->
-            <rect x="12.8" :y="trackMode === 'all' ? 6 : 9.2" width="1.4" :height="trackMode === 'all' ? 12 : 5.6" fill="currentColor" />
+            <rect x="12.6" :y="trackMode === 'all' ? 5 : 8.6" width="2.2" :height="trackMode === 'all' ? 14 : 6.8" fill="currentColor" />
             <!-- 谱表：单轨一行居中，多轨两行 -->
-            <rect x="15" :y="trackMode === 'all' ? 6 : 9.2" width="6.6" height="3.6" fill="currentColor" />
-            <rect v-if="trackMode === 'all'" x="15" y="14.2" width="6.6" height="3.6" fill="currentColor" />
+            <rect x="15.6" :y="trackMode === 'all' ? 6 : 9.2" width="6.2" height="3.6" fill="currentColor" />
+            <rect v-if="trackMode === 'all'" x="15.6" y="14.2" width="6.2" height="3.6" fill="currentColor" />
           </svg>
         </button>
       </template>
@@ -684,14 +684,14 @@ onBeforeUnmount(() => {
         >
           <!-- 连谱号 + 小节线 + 谱表：单轨一行居中，多轨两行（与常态条同形） -->
           <svg viewBox="0 0 24 24" class="w-3.5 h-3.5" aria-hidden="true">
-            <rect x="8" y="4" width="2.4" height="16" fill="currentColor" />
-            <polygon points="8,3 12,3.4 11,5.4 8,5.4" fill="currentColor" />
-            <polygon points="8,21 12,20.6 11,18.6 8,18.6" fill="currentColor" />
-            <path d="M11.6 3.6 Q13 2.8 13.4 1.6" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round" />
-            <path d="M11.6 20.4 Q13 21.2 13.4 22.4" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round" />
-            <rect x="12.8" :y="trackMode === 'all' ? 6 : 9.2" width="1.4" :height="trackMode === 'all' ? 12 : 5.6" fill="currentColor" />
-            <rect x="15" :y="trackMode === 'all' ? 6 : 9.2" width="6.6" height="3.6" fill="currentColor" />
-            <rect v-if="trackMode === 'all'" x="15" y="14.2" width="6.6" height="3.6" fill="currentColor" />
+            <rect x="7.2" y="4" width="3.6" height="16" fill="currentColor" />
+            <polygon points="7.2,3 12.2,3.4 11.4,5.4 7.2,5.4" fill="currentColor" />
+            <polygon points="7.2,21 12.2,20.6 11.4,18.6 7.2,18.6" fill="currentColor" />
+            <path d="M11.8 3.6 Q13.2 2.8 13.6 1.6" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round" />
+            <path d="M11.8 20.4 Q13.2 21.2 13.6 22.4" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round" />
+            <rect x="12.6" :y="trackMode === 'all' ? 5 : 8.6" width="2.2" :height="trackMode === 'all' ? 14 : 6.8" fill="currentColor" />
+            <rect x="15.6" :y="trackMode === 'all' ? 6 : 9.2" width="6.2" height="3.6" fill="currentColor" />
+            <rect v-if="trackMode === 'all'" x="15.6" y="14.2" width="6.2" height="3.6" fill="currentColor" />
           </svg>
         </button>
         <label class="flex items-center gap-1 px-1 text-xs text-[var(--txt-50)]">
