@@ -412,13 +412,6 @@ onMounted(async () => {
           // BracketExtendMode 只有类型导出，运行时按数值（GroupSimilarInstruments = 2）
           score.stylesheet.bracketExtendMode = 0
           extractTracks(score)
-          // 带内嵌 RSE 音频的谱默认走 backing track（混好的一条流，没有分轨 API）。
-          // 首次播放前切合成器：那时 score 已加载、MIDI 已生成，切走只是换个播放后端，
-          // 分轨 M/S/单轨音量才可用。原声由 audio prop 挂 GP8 导出的 mp3 补齐。
-          if (api.actualPlayerMode === 3) {
-            api.settings.player.playerMode = 'synthesizer'
-            api.updateSettings()
-          }
           // renderTracks 会再触发 scoreLoaded，提取幂等。
           // single 模式默认就是首轨，不用调；只有 all 模式需要主动铺全轨
           if (trackMode.value === 'all') renderCurrentTracks()
