@@ -516,14 +516,20 @@ onBeforeUnmount(() => {
           :aria-label="trackMode === 'all' ? '切换为单轨显示' : '切换为多轨同屏'"
           @click="switchTrackMode(trackMode === 'all' ? 'single' : 'all')"
         >
-          <!-- 括号+谱线：单轨一横，多轨三横（mdi 无现成图标，内联画） -->
+          <!-- 连谱号 + 小节线 + 谱表：单轨一行谱表，多轨两行（用户提供的形状，内联画） -->
           <svg viewBox="0 0 24 24" class="w-3.5 h-3.5" aria-hidden="true">
-            <path d="M9 4 C7 4 6.2 5 6.2 7.2 L6.2 9.4 C6.2 11.2 5.4 11.7 3.6 12 C5.4 12.3 6.2 12.8 6.2 14.6 L6.2 16.8 C6.2 19 7 20 9 20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
-            <g fill="currentColor">
-              <rect x="10.5" y="10.9" width="9" height="2.2" rx="1.1" />
-              <rect v-if="trackMode === 'all'" x="10.5" y="6.3" width="9" height="2.2" rx="1.1" />
-              <rect v-if="trackMode === 'all'" x="10.5" y="15.5" width="9" height="2.2" rx="1.1" />
-            </g>
+            <!-- 连谱号主干 -->
+            <rect x="8" y="4" width="1.6" height="16" fill="currentColor" />
+            <!-- 连谱号上下臂与卷边 -->
+            <polygon points="8.4,3.4 11.3,3.6 10.7,5 8.4,5" fill="currentColor" />
+            <polygon points="8.4,20.6 11.3,20.4 10.7,19 8.4,19" fill="currentColor" />
+            <path d="M10.9 3.7 Q11.7 3.3 11.9 2.2" stroke="currentColor" stroke-width="0.9" fill="none" stroke-linecap="round" />
+            <path d="M10.9 20.3 Q11.7 20.7 11.9 21.8" stroke="currentColor" stroke-width="0.9" fill="none" stroke-linecap="round" />
+            <!-- 小节线 -->
+            <rect x="12" y="6.5" width="0.9" height="11" fill="currentColor" />
+            <!-- 谱表：单轨一行，多轨两行 -->
+            <rect x="13.6" y="6.5" width="7.6" height="2.6" fill="currentColor" />
+            <rect v-if="trackMode === 'all'" x="13.6" y="14.9" width="7.6" height="2.6" fill="currentColor" />
           </svg>
         </button>
       </template>
