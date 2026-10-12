@@ -16,13 +16,13 @@
   },
   {
     "file": "app/utils/blog.ts",
-    "line": 101,
-    "code": "TS2532"
+    "line": 110,
+    "code": "TS2769"
   },
   {
     "file": "app/utils/blog.ts",
-    "line": 97,
-    "code": "TS2769"
+    "line": 114,
+    "code": "TS2532"
   },
   {
     "file": "server/routes/rss.xml.ts",

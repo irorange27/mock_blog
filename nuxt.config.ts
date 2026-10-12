@@ -21,6 +21,13 @@ export default defineNuxtConfig({
   icon: {
     collections: ['mdi'],
   },
+  // comments/ 只是组织方式，不是命名空间：默认 Nuxt 会把目录名拼进组件名
+  // （components/comments/PostComments.vue → <CommentsPostComments>），
+  // 模板里写 <PostComments> 就只会渲染成一个空的自定义元素。
+  components: [
+    { path: '~/components', pathPrefix: true },
+    { path: '~/components/comments', pathPrefix: false },
+  ],
   content: {
     build: {
       markdown: {

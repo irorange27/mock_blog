@@ -25,19 +25,16 @@ const textarea = ref<HTMLTextAreaElement | null>(null)
 const token = ref('')
 const showAdmin = ref(false)
 
-// useComments 里的 identity 是响应式的，把本地输入同步回去（提交时用的是它）
+// 输入框是身份的单一真相源，identity 只用于提交与持久化，所以只做单向同步。
+// 反向的 watch(identity) 曾经存在，但 identity 在组件存活期间只会被写、
+// 不会被外部改（loadIdentity 只在 useComments 的 setup 里跑一次），
+// 所以那条反向 watch 永远不会触发，是死代码。回到本页时恢复身份靠 loadIdentity，
+// 上面几个 ref 的初值已经拿到了。
 watch([nick, email, link], () => {
   identity.nick = nick.value
   identity.email = email.value
   identity.link = link.value
 }, { immediate: true })
-
-// 从别的文章回本站时能把输入框里残留的身份补上
-watch(identity, () => {
-  if (!nick.value) nick.value = identity.nick
-  if (!email.value) email.value = identity.email
-  if (!link.value) link.value = identity.link
-})
 
 async function onSubmit() {
   error.value = ''

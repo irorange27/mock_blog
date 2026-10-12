@@ -8,8 +8,8 @@ const { data } = await useAsyncData(`content-${decodedPath}`, () =>
 
 const slug = computed(() => {
   if (!data.value) return ''
-  const p = route.params.slug
-  return (Array.isArray(p) ? p.join('/') : p) ?? ''
+  // normalizeSlug 负责去掉 catch-all 参数的收尾斜杠（见 utils/blog.ts）
+  return normalizeSlug(route.params.slug)
 })
 const { views } = usePageViews(() => slug.value)
 

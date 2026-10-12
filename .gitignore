@@ -35,6 +35,9 @@ logs
 .env.*
 !.env.example
 
+# Wrangler 本地开发密钥（COMMENT_ADMIN_TOKEN 等）
+.dev.vars
+
 .vercel
 
 # Full font source files (only the subset woff2 is committed)

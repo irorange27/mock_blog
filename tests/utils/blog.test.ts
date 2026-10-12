@@ -3,6 +3,7 @@ import {
   formatDate, 
   formatDay, 
   groupPostsByYearAndMonth,
+  normalizeSlug,
 } from '~/utils/blog'
 
 describe('博客工具函数', () => {
@@ -67,5 +68,35 @@ describe('博客工具函数', () => {
       expect(result[0].months[1].posts[0].path).toBe('/posts/test-2')
       expect(result[0].months[1].posts[1].path).toBe('/posts/test-1')
     })
+  })
+})
+
+describe('normalizeSlug', () => {
+  // 这条规则修的是一个真实 bug：route.params.slug 带收尾斜杠时，
+  // 阅读量与评论都会打到 /api/.../foo%2F 上被 Worker 判 400。
+  it('去掉收尾斜杠', () => {
+    expect(normalizeSlug('2024summary/')).toBe('2024summary')
+    expect(normalizeSlug('2024summary//')).toBe('2024summary')
+  })
+
+  it('不带斜杠时原样返回', () => {
+    expect(normalizeSlug('2024summary')).toBe('2024summary')
+  })
+
+  it('保留多段路径中的斜杠', () => {
+    expect(normalizeSlug('2024/notes/foo')).toBe('2024/notes/foo')
+    expect(normalizeSlug('2024/notes/foo/')).toBe('2024/notes/foo')
+  })
+
+  it('catch-all 参数是数组时先拼起来', () => {
+    expect(normalizeSlug(['2024', 'notes'])).toBe('2024/notes')
+    // 数组尾元素为空 → join 出收尾斜杠 → 归一后仍应干净
+    expect(normalizeSlug(['2024', 'notes', ''])).toBe('2024/notes')
+  })
+
+  it('空值返回空串', () => {
+    expect(normalizeSlug(undefined)).toBe('')
+    expect(normalizeSlug(null)).toBe('')
+    expect(normalizeSlug('')).toBe('')
   })
 })
