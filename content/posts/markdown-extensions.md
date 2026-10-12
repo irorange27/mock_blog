@@ -137,13 +137,13 @@ C2 C2 G2 G2 | A2 A2 G4 |
 
 ## GP 乐谱
 
-渲染 Guitar Pro 文件，alphaTab 解析成谱面，五线谱和 tab 都画。行内语法，`src` 指向 `public/scores/` 下的文件，`layout` 可选 `both`（默认，五线谱加 tab）、`tab`、`staff`，`audio` 可选挂 GP8 RSE 导出的整曲音频：
+渲染 Guitar Pro 文件，alphaTab 解析成谱面，五线谱和 tab 都画。行内语法，`src` 指向 `public/scores/` 下的文件，`layout` 可选 `both`（默认，五线谱加 tab）、`tab`、`staff`，`tracks="all"` 多轨同屏（默认单轨下拉切换），`audio` 可选挂 GP8 RSE 导出的整曲音频：
 
 ```markdown
 :gp-score{src="/scores/xxx.gp"}
 ```
 
-点「播放」用内置合成器回放曲谱，音色文件自托管，首次点击时加载（约 1.3 MB）。写长曲走文件，短 riff 可以不落文件，直接在组件内放无语言围栏代码块写 alphaTex：
+点「播放」用内置合成器回放曲谱，音色文件自托管，首次点击时加载（约 1.3 MB）。点「放大」进全屏播放器：谱面更大，带每轨静音/独奏、音量、变速、循环、节拍器、预备拍和缩放。写长曲走文件，短 riff 可以不落文件，直接在组件内放无语言围栏代码块写 alphaTex：
 
 ::gp-score
 ```
