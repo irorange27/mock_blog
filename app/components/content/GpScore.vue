@@ -216,3 +216,22 @@ onBeforeUnmount(() => {
     <audio v-if="audio" controls :src="audio" class="mt-3 w-full" />
   </div>
 </template>
+
+<style>
+/* 播放游标：alphaTab 只创建透明 div，颜色由网站定（https://www.alphatab.net/docs/tutorial-web/player）。
+   作用域限 .gp-score，避免污染站内其他内容。小节底色淡、拍线用主题主色。 */
+.gp-score .at-cursor-bar {
+  background: color-mix(in srgb, var(--primary) 18%, transparent);
+}
+.gp-score .at-cursor-beat {
+  background: var(--primary);
+  width: 3px;
+}
+.gp-score .at-selection div {
+  background: color-mix(in srgb, var(--primary) 12%, transparent);
+}
+.gp-score .at-highlight * {
+  fill: var(--primary);
+  stroke: var(--primary);
+}
+</style>
