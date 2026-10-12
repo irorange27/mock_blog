@@ -1,4 +1,12 @@
-name: pnpm ci
+name: CI
+
+# CI 只做「提交能不能过」的检查：类型、测试、静态产物、Worker 打包。
+# 部署不在这里 —— 线上是 Cloudflare Workers（wrangler.jsonc + `pnpm deploy`），
+# 由 Cloudflare 侧的 Workers Builds 从同一个仓库构建发布。
+# 这里的 dry-run 步骤与那条构建共享同一份配置，所以能当预检用。
+#
+# 历史上这里还并行部署 GitHub Pages，但那份产物没有 /api（阅读量、评论都静默降级），
+# 于 2026-10 随评论功能一起退场（见 docs/comments.md）。
 
 env:
   CI: true
@@ -10,87 +18,73 @@ on:
   push:
     branches: [main]
 
-# Sets permissions of the GITHUB_TOKEN to allow deployment to GitHub Pages
 permissions:
   contents: read
-  pages: write
-  id-token: write
+
+concurrency:
+  # 同一分支的重复推送取消上一轮，省额度也省等待
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
-  test:
+  check:
     runs-on: ubuntu-latest
+    timeout-minutes: 20
+
     steps:
       - name: checkout code
         uses: actions/checkout@v7
 
-      - uses: pnpm/action-setup@v6
+      - name: setup pnpm
+        uses: pnpm/action-setup@v6
 
       - name: setup node.js
         uses: actions/setup-node@v7
         with:
-          node-version: '24'
-
-      - name: restore node_modules
-        uses: actions/cache@v6
-        with:
-          path: |
-            node_modules
-          key: ${{ runner.os }}-modules-${{ hashFiles('pnpm-lock.yaml') }}
-          restore-keys: |
-            ${{ runner.os }}-modules-
+          # 与 engines（>=22）和本地上游一致；.node-version 也钉了同一个值
+          node-version-file: .node-version
+          cache: pnpm
 
       - name: install dependencies
-        run: pnpm install
+        run: pnpm install --frozen-lockfile
 
-      - name: typecheck Worker
+      - name: typecheck worker
         run: pnpm typecheck:worker
 
+      - name: typecheck app（基线之外零错误）
+        run: pnpm typecheck:ci
+
       - name: test
-        run: pnpm test -- --run
+        run: pnpm test:run
 
-  build:
-    needs: test
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: checkout code
-        uses: actions/checkout@v7
-
-      - uses: pnpm/action-setup@v6
-
-      - name: setup node.js
-        uses: actions/setup-node@v7
-        with:
-          node-version: '24'
-
-      - name: restore node_modules
-        uses: actions/cache@v6
-        with:
-          path: |
-            node_modules
-          key: ${{ runner.os }}-modules-${{ hashFiles('pnpm-lock.yaml') }}
-          restore-keys: |
-            ${{ runner.os }}-modules-
-
-      - name: install dependencies
-        run: pnpm install
-
-      - name: generate
+      - name: generate static site
         run: pnpm generate
 
-      - name: Upload artifact
-        uses: actions/upload-pages-artifact@v5
-        with:
-          path: .output/public
+      - name: verify static output
+        # 防的是「构建绿了但没产出内容」：首页、RSS、sitemap 缺一个就说明渲染挂了
+        run: |
+          set -e
+          for file in .output/public/index.html .output/public/rss.xml .output/public/sitemap.xml; do
+            if [ ! -s "$file" ]; then
+              echo "::error::$file 缺失或为空，静态产物不完整"
+              exit 1
+            fi
+          done
+          test -d .output/public/_nuxt || { echo "::error::_nuxt 资源目录缺失"; exit 1; }
+          if [ -d .output/public/api ]; then
+            echo "::error::静态产物里出现了 /api，它应该由 Worker 处理而不是被预渲染"
+            exit 1
+          fi
+          echo "静态产物检查通过：$(find .output/public -name '*.html' | wc -l) 个页面"
 
-  deploy:
-    if: github.event_name == 'push'
-    needs: build
-    runs-on: ubuntu-latest
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
-    steps:
-      - name: Deploy to GitHub Pages
-        id: deployment
-        uses: actions/deploy-pages@v5
+      - name: verify worker bundles
+        # wrangler 在 main 出问题时才报错（绑定名、DO 类、迁移），提前在这里拦住
+        run: pnpm cf:dry-run
+
+      - name: upload build artifact
+        if: github.event_name == 'push'
+        uses: actions/upload-artifact@v6
+        with:
+          name: static-site
+          path: .output/public
+          retention-days: 7

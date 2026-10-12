@@ -657,12 +657,43 @@ html.dark-mode.lightbox-dark-ink .vel-modal .vel-img {
 
 .poly-score-strong {
     fill: var(--primary);
+    opacity: 0.55;
 }
 
 .poly-score-weak {
     fill: none;
     stroke: var(--line-strong);
-    stroke-width: 1.5;
+    stroke-width: 1.1;
+    opacity: 0.8;
+}
+
+/* 共享时间标尺与竖向网格：刻度贯穿全部声部行，供混速错拍读时间 */
+.poly-score-ruler {
+    display: block;
+    width: 100%;
+    min-width: 560px;
+    height: 16px;
+}
+
+.poly-score-rulenum {
+    font-size: 12px;
+    fill: var(--txt-25);
+}
+
+.poly-score-rtick {
+    stroke: var(--txt-25);
+    stroke-width: 1;
+}
+
+.poly-score-gridline {
+    stroke: var(--line-color);
+    stroke-width: 1;
+    stroke-dasharray: 2 4;
+}
+
+.poly-score-rulerspace {
+    flex: 0 0 auto;
+    height: 16px;
 }
 
 .poly-score-barline {
@@ -789,4 +820,273 @@ html.dark-mode.lightbox-dark-ink .vel-modal .vel-img {
     font-size: 0.75rem;
     color: var(--txt-30);
     white-space: nowrap;
+}
+
+/* ══════════════════════════════════════════
+   评论（PostComments / PostComment）
+   颜色一律走 token；正文按纯文本渲染，靠 white-space 保留换行。
+   见 docs/comments.md。
+   ══════════════════════════════════════════ */
+
+.comments-section {
+    margin-top: 2.5rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid var(--line-color);
+}
+
+.comments-header {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 1rem;
+    margin-bottom: 1.25rem;
+}
+
+.comments-title {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 1.05rem;
+    font-weight: 700;
+    color: var(--txt-90);
+}
+
+.comments-count {
+    font-size: 0.75rem;
+    font-weight: 400;
+    padding: 0.05rem 0.45rem;
+    border-radius: 9999px;
+    background: var(--chip-bg);
+    color: var(--txt-50);
+}
+
+.comments-admin-toggle,
+.comments-action {
+    font-size: 0.75rem;
+    color: var(--txt-30);
+    transition: color 0.15s ease;
+}
+
+.comments-admin-toggle:hover,
+.comments-action:hover {
+    color: var(--primary);
+}
+
+.comment-action-danger:hover {
+    color: var(--danger);
+}
+
+.comments-admin {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    margin-bottom: 1.25rem;
+    padding: 0.75rem 1rem;
+    border-radius: 0.75rem;
+    background: var(--panel-bg);
+}
+
+.comments-hint,
+.comments-counter {
+    font-size: 0.75rem;
+    color: var(--txt-30);
+}
+
+.comments-empty {
+    padding: 1.5rem 0;
+    font-size: 0.9rem;
+    color: var(--txt-30);
+    text-align: center;
+}
+
+.comments-list {
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+    margin-bottom: 2rem;
+}
+
+.comment-item {
+    display: flex;
+    gap: 0.75rem;
+}
+
+/* 回复缩进：用左侧竖线标出层级，比再套一层卡片轻 */
+.comment-item-reply {
+    margin-top: 1rem;
+    margin-left: 2.25rem;
+    padding-left: 0.875rem;
+    border-left: 2px solid var(--line-color);
+}
+
+.comment-avatar {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    width: 2.25rem;
+    height: 2.25rem;
+    border-radius: 9999px;
+    overflow: hidden;
+    background: var(--chip-bg);
+    color: var(--primary);
+    font-size: 0.9rem;
+    font-weight: 600;
+}
+
+.comment-avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.comment-main {
+    flex: 1;
+    min-width: 0;
+}
+
+.comment-meta {
+    display: flex;
+    align-items: baseline;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+}
+
+.comment-nick {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--txt-90);
+}
+
+.comment-nick-link {
+    transition: color 0.15s ease;
+}
+
+.comment-nick-link:hover {
+    color: var(--primary);
+}
+
+.comment-time {
+    font-size: 0.75rem;
+    color: var(--txt-30);
+}
+
+/* 访客输入的换行要保住，但不能出现 HTML —— 见 PostComment.vue 的注释 */
+.comment-body {
+    margin-top: 0.35rem;
+    font-size: 0.9rem;
+    line-height: 1.7;
+    color: var(--txt-75);
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+}
+
+.comment-tools {
+    display: flex;
+    gap: 0.75rem;
+    margin-top: 0.35rem;
+}
+
+.comments-form {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    padding: 1rem;
+    border: 1px solid var(--line-color);
+    border-radius: 0.75rem;
+}
+
+.comments-replying {
+    font-size: 0.8rem;
+    color: var(--txt-50);
+}
+
+.comments-identity {
+    display: grid;
+    grid-template-columns: repeat(1, minmax(0, 1fr));
+    gap: 0.5rem;
+}
+
+@media (min-width: 640px) {
+    .comments-identity {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+}
+
+.comments-field {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+    font-size: 0.75rem;
+    color: var(--txt-30);
+}
+
+.comments-field input,
+.comments-body {
+    width: 100%;
+    padding: 0.5rem 0.65rem;
+    font-size: 0.875rem;
+    color: var(--txt-90);
+    background: var(--card-bg);
+    border: 1px solid var(--line-color);
+    border-radius: 0.5rem;
+    transition: border-color 0.15s ease;
+}
+
+.comments-field input:focus-visible,
+.comments-body:focus-visible {
+    outline: 2px solid var(--primary);
+    outline-offset: 1px;
+    border-color: var(--primary);
+}
+
+.comments-body {
+    resize: vertical;
+    min-height: 5rem;
+    line-height: 1.7;
+    font-family: inherit;
+}
+
+.comments-body::placeholder,
+.comments-field input::placeholder {
+    color: var(--txt-25);
+}
+
+.comments-actions {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+}
+
+.comments-error {
+    font-size: 0.8rem;
+    color: var(--danger);
+}
+
+.comments-notice {
+    font-size: 0.8rem;
+    color: var(--primary);
+}
+
+.comments-counter {
+    margin-left: auto;
+}
+
+.comments-submit {
+    padding: 0.45rem 1.1rem;
+    font-size: 0.875rem;
+    border-radius: 0.5rem;
+    background: var(--btn-solid-bg);
+    color: var(--btn-solid-fg);
+    transition: background-color 0.15s ease, opacity 0.15s ease;
+}
+
+.comments-submit:hover:not(:disabled) {
+    background: var(--btn-solid-bg-hover);
+}
+
+.comments-submit:disabled {
+    opacity: 0.55;
+    cursor: default;
 }

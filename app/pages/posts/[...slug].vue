@@ -96,5 +96,11 @@ useSeoMeta({
         </p>
       </NuxtLink>
     </nav>
+
+    <!-- 评论区只在客户端渲染：评论要按需从 Worker 拉取，预渲染 HTML 里没有它，
+         静态产物不必为它留占位，SEO 也不受影响 -->
+    <ClientOnly>
+      <PostComments v-if="slug" :slug="slug" class="comments-section" />
+    </ClientOnly>
   </article>
 </template>
