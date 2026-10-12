@@ -52,14 +52,14 @@ describe('播放滚动偏移', () => {
 
 describe('normalizeTrackMode', () => {
   it('应原样接受合法值', () => {
-    expect(normalizeTrackMode('single')).toBe('single')
-    expect(normalizeTrackMode('all')).toBe('all')
+    expect(normalizeTrackMode('singleTrack')).toBe('singleTrack')
+    expect(normalizeTrackMode('multiTrack')).toBe('multiTrack')
   })
 
   it('对非法/空值回落到默认', () => {
     expect(normalizeTrackMode(undefined)).toBe(DEFAULT_TRACK_MODE)
     expect(normalizeTrackMode('')).toBe(DEFAULT_TRACK_MODE)
-    expect(normalizeTrackMode('All')).toBe(DEFAULT_TRACK_MODE) // 大小写敏感
+    expect(normalizeTrackMode('MultiTrack')).toBe(DEFAULT_TRACK_MODE) // 大小写敏感
     expect(normalizeTrackMode('0,2')).toBe(DEFAULT_TRACK_MODE)
   })
 })

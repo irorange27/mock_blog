@@ -20,12 +20,12 @@ export const SCROLL_OFFSET_X = -100
 // 全屏浮层默认缩放：地方大，谱面可以比卡片大一档
 export const FULLSCREEN_SCALE = 1.2
 
-export type TrackMode = 'single' | 'all'
+export type TrackMode = 'singleTrack' | 'multiTrack'
 
-export const DEFAULT_TRACK_MODE: TrackMode = 'single'
+export const DEFAULT_TRACK_MODE: TrackMode = 'singleTrack'
 
 export function normalizeTrackMode(mode: string | undefined): TrackMode {
-  if (mode === 'single' || mode === 'all') return mode
+  if (mode === 'singleTrack' || mode === 'multiTrack') return mode
   return DEFAULT_TRACK_MODE
 }
 

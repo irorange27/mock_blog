@@ -29,7 +29,7 @@ const rendering = ref(false) // 切轨/缩放重绘中，谱面区盖遮罩
 
 // 音轨：scoreLoaded 后提取，UI 只消费 GpTrackInfo
 const trackList = ref<GpTrackInfo[]>([])
-const trackMode = ref<TrackMode>('single')
+const trackMode = ref<TrackMode>('singleTrack')
 // active 集合：实际渲染哪些轨。single 模式保证只有一条，all 模式可多条
 const activeTracks = ref<Set<number>>(new Set([0]))
 // 单轨/多轨各自记住上次的 active 集合，toggle 切回去时恢复
@@ -238,7 +238,7 @@ function extractTracks(score: { tracks: AtTrack[] }) {
     shortName: t.shortName || `T${i + 1}`,
   }))
   // tracks="all" 首屏直接全选同屏
-  if (trackMode.value === 'all') {
+  if (trackMode.value === 'multiTrack') {
     activeTracks.value = new Set(trackList.value.map(t => t.index))
     remembered.all = new Set(activeTracks.value)
   }
@@ -258,7 +258,7 @@ function renderCurrentTracks() {
 function switchTrack(index: number) {
   activeTracks.value = new Set([index])
   remembered.single = new Set([index])
-  trackMode.value = 'single'
+  trackMode.value = 'singleTrack'
   renderCurrentTracks()
 }
 
@@ -266,7 +266,7 @@ function switchTrackMode(mode: TrackMode) {
   if (mode === trackMode.value) return
   trackMode.value = mode
   // 单轨/多轨各自记住 active 集合，切回去时恢复上次的选择
-  if (mode === 'all') {
+  if (mode === 'multiTrack') {
     remembered.all = new Set(activeTracks.value)
     activeTracks.value = remembered.single.size > 1 ? new Set(remembered.single) : new Set(remembered.all)
   } else {
@@ -286,9 +286,9 @@ function toggleActiveTrack(index: number) {
     next.add(index)
   }
   activeTracks.value = next
-  if (trackMode.value === 'all') remembered.all = new Set(next)
+  if (trackMode.value === 'multiTrack') remembered.all = new Set(next)
   else remembered.single = new Set(next)
-  trackMode.value = next.size > 1 ? 'all' : 'single'
+  trackMode.value = next.size > 1 ? 'multiTrack' : 'singleTrack'
   renderCurrentTracks()
 }
 
@@ -439,7 +439,7 @@ onMounted(async () => {
           extractTracks(score)
           // renderTracks 会再触发 scoreLoaded，提取幂等。
           // single 模式默认就是首轨，不用调；只有 all 模式需要主动铺全轨
-          if (trackMode.value === 'all') renderCurrentTracks()
+          if (trackMode.value === 'multiTrack') renderCurrentTracks()
           else api.render()
         })
         api.renderStarted.on(() => { rendering.value = true })
@@ -536,11 +536,11 @@ onBeforeUnmount(() => {
         </span>
         <button
           class="abc-score-play"
-          :aria-pressed="trackMode === 'all'"
-          :title="trackMode === 'all' ? '切换为单轨显示' : '切换为多轨同屏'"
-          :data-tip="trackMode === 'all' ? '切换为单轨显示' : '切换为多轨同屏'"
-          :aria-label="trackMode === 'all' ? '切换为单轨显示' : '切换为多轨同屏'"
-          @click="switchTrackMode(trackMode === 'all' ? 'single' : 'all')"
+          :aria-pressed="trackMode === 'multiTrack'"
+          :title="trackMode === 'multiTrack' ? '切换为单轨显示' : '切换为多轨同屏'"
+          :data-tip="trackMode === 'multiTrack' ? '切换为单轨显示' : '切换为多轨同屏'"
+          :aria-label="trackMode === 'multiTrack' ? '切换为单轨显示' : '切换为多轨同屏'"
+          @click="switchTrackMode(trackMode === 'multiTrack' ? 'singleTrack' : 'multiTrack')"
         >
           <!-- 连谱号 + 小节线 + 谱表：单轨一行谱表，多轨两行（用户提供的形状，内联画） -->
           <svg viewBox="0 0 24 24" class="w-3.5 h-3.5" aria-hidden="true">
@@ -552,10 +552,10 @@ onBeforeUnmount(() => {
             <path d="M11.8 3.6 Q13.2 2.8 13.6 1.6" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round" />
             <path d="M11.8 20.4 Q13.2 21.2 13.6 22.4" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round" />
             <!-- 小节线：随谱表行数伸缩 -->
-            <rect x="12.6" :y="trackMode === 'all' ? 5 : 8.6" width="6.2" :height="trackMode === 'all' ? 14 : 6.8" fill="currentColor" />
+            <rect x="12.6" :y="trackMode === 'multiTrack' ? 5 : 8.6" width="2.2" :height="trackMode === 'multiTrack' ? 14 : 6.8" fill="currentColor" />
             <!-- 谱表：单轨一行居中，多轨两行 -->
-            <rect x="15.6" :y="trackMode === 'all' ? 6 : 9.2" width="6.2" height="3.6" fill="currentColor" />
-            <rect v-if="trackMode === 'all'" x="15.6" y="14.2" width="6.2" height="3.6" fill="currentColor" />
+            <rect x="15.6" :y="trackMode === 'multiTrack' ? 6 : 9.2" width="6.2" height="3.6" fill="currentColor" />
+            <rect v-if="trackMode === 'multiTrack'" x="15.6" y="14.2" width="6.2" height="3.6" fill="currentColor" />
           </svg>
         </button>
       </template>
@@ -720,10 +720,10 @@ onBeforeUnmount(() => {
         <button
           v-if="trackList.length > 1"
           class="abc-score-play"
-          :aria-pressed="trackMode === 'all'"
-          :title="trackMode === 'all' ? '切换为单轨显示' : '切换为多轨同屏'"
-          :aria-label="trackMode === 'all' ? '切换为单轨显示' : '切换为多轨同屏'"
-          @click="switchTrackMode(trackMode === 'all' ? 'single' : 'all')"
+          :aria-pressed="trackMode === 'multiTrack'"
+          :title="trackMode === 'multiTrack' ? '切换为单轨显示' : '切换为多轨同屏'"
+          :aria-label="trackMode === 'multiTrack' ? '切换为单轨显示' : '切换为多轨同屏'"
+          @click="switchTrackMode(trackMode === 'multiTrack' ? 'singleTrack' : 'multiTrack')"
         >
           <!-- 连谱号 + 小节线 + 谱表：单轨一行居中，多轨两行（与常态条同形） -->
           <svg viewBox="0 0 24 24" class="w-3.5 h-3.5" aria-hidden="true">
@@ -732,9 +732,9 @@ onBeforeUnmount(() => {
             <polygon points="7.2,21 12.2,20.6 11.4,18.6 7.2,18.6" fill="currentColor" />
             <path d="M11.8 3.6 Q13.2 2.8 13.6 1.6" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round" />
             <path d="M11.8 20.4 Q13.2 21.2 13.6 22.4" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round" />
-            <rect x="12.6" :y="trackMode === 'all' ? 5 : 8.6" width="2.2" :height="trackMode === 'all' ? 14 : 6.8" fill="currentColor" />
-            <rect x="15.6" :y="trackMode === 'all' ? 6 : 9.2" width="6.2" height="3.6" fill="currentColor" />
-            <rect v-if="trackMode === 'all'" x="15.6" y="14.2" width="6.2" height="3.6" fill="currentColor" />
+            <rect x="12.6" :y="trackMode === 'multiTrack' ? 5 : 8.6" width="2.2" :height="trackMode === 'multiTrack' ? 14 : 6.8" fill="currentColor" />
+            <rect x="15.6" :y="trackMode === 'multiTrack' ? 6 : 9.2" width="6.2" height="3.6" fill="currentColor" />
+            <rect v-if="trackMode === 'multiTrack'" x="15.6" y="14.2" width="6.2" height="3.6" fill="currentColor" />
           </svg>
         </button>
         <label class="flex items-center gap-1 px-1 text-xs text-[var(--txt-50)]">

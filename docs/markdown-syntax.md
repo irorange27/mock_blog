@@ -114,7 +114,7 @@ C2 C2 G2 G2 | A2 A2 G4 |
 渲染 Guitar Pro 文件（GP3–GP8 的 `.gp`、`.gp5`、`.gpx`），alphaTab 解析成 SVG 谱面，可合成回放。行内参数语法，`src` 指向 `public/scores/` 下的文件；`layout` 可选 `both`（默认，五线谱 + tab）/ `tab` / `staff`；`tracks` 可选 `single`（默认，下拉切轨）/ `all`（多轨同屏）；`audio` 可选，挂 GP8 RSE 导出的整曲音频（点合成播放时会自动暂停它，反之亦然）：
 
 ````markdown
-:gp-score{src="/scores/xxx.gp" layout="tab" tracks="all" audio="/audio/xxx.mp3"}
+:gp-score{src="/scores/xxx.gp" layout="tab" tracks="multiTrack" audio="/audio/xxx.mp3"}
 ````
 
 点「播放」用内置合成器回放曲谱。音色（sonivox，约 1.3 MB）自托管在 `/soundfont/`，首次点播放时才加载。

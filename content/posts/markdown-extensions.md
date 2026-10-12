@@ -137,7 +137,7 @@ C2 C2 G2 G2 | A2 A2 G4 |
 
 ## GP 乐谱
 
-渲染 Guitar Pro 文件，alphaTab 解析成谱面，五线谱和 tab 都画。行内语法，`src` 指向 `public/scores/` 下的文件，`layout` 可选 `both`（默认，五线谱加 tab）、`tab`、`staff`，`tracks="all"` 多轨同屏（默认单轨下拉切换），`audio` 可选挂 GP8 RSE 导出的整曲音频：
+渲染 Guitar Pro 文件，alphaTab 解析成谱面，五线谱和 tab 都画。行内语法，`src` 指向 `public/scores/` 下的文件，`layout` 可选 `both`（默认，五线谱加 tab）、`tab`、`staff`，`tracks="multiTrack"` 多轨同屏（默认单轨下拉切换），`audio` 可选挂 GP8 RSE 导出的整曲音频：
 
 ```markdown
 :gp-score{src="/scores/xxx.gp"}
