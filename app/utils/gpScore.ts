@@ -59,3 +59,28 @@ export function formatTime(ms: number): string {
   const seconds = String(totalSeconds % 60).padStart(2, '0')
   return `${minutes}:${seconds}`
 }
+
+// 同一页面多个 gp 卡片的播放互斥：谁要播，先停掉其他已注册的实例。
+// 模块级单例，组件 onMounted 注册、onBeforeUnmount 注销。
+// stop 回调里调 api.stop() / audio.pause()，对方靠自己的事件驱动回 idle，UI 自动跟。
+let nextPlayerId = 0
+const playerStops = new Map<number, () => void>()
+
+export function createPlayerId(): number {
+  nextPlayerId += 1
+  return nextPlayerId
+}
+
+export function registerPlayer(id: number, stop: () => void): void {
+  playerStops.set(id, stop)
+}
+
+export function unregisterPlayer(id: number): void {
+  playerStops.delete(id)
+}
+
+export function requestPlay(id: number): void {
+  for (const [otherId, stop] of playerStops) {
+    if (otherId !== id) stop()
+  }
+}

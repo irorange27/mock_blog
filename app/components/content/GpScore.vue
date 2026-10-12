@@ -6,7 +6,7 @@
 // alphaTab 体量大且依赖浏览器 API，动态 import 不进 SSR 包；其 Web Worker / AudioWorklet
 // 加载由 nuxt.config 里的 @coderline/alphatab-vite 插件接住。
 // 字体与 soundfont 自托管：public/fonts/alphatab、public/soundfont（路径见 app/utils/gpScore.ts）。
-import { FONT_DIRECTORY, FULLSCREEN_SCALE, SCROLL_OFFSET_X, SOUNDFONT_URL, clampScale, clampSpeed, clampVolume, formatTime, normalizeLayout, normalizeTrackMode, type GpTrackInfo, type ScoreLayout, type TrackMode } from '~/utils/gpScore'
+import { FONT_DIRECTORY, FULLSCREEN_SCALE, SCROLL_OFFSET_X, SOUNDFONT_URL, clampScale, clampSpeed, clampVolume, createPlayerId, formatTime, normalizeLayout, normalizeTrackMode, registerPlayer, requestPlay, unregisterPlayer, type GpTrackInfo, type ScoreLayout, type TrackMode } from '~/utils/gpScore'
 
 type AtApi = import('@coderline/alphatab').AlphaTabApi
 type AtSettingsJson = import('@coderline/alphatab').SettingsJson
@@ -39,6 +39,14 @@ let api: AtApi | null = null
 let soundfontRequested = false
 // renderTracks 后 scoreLoaded 会再触发，提取音轨列表必须幂等
 let tracksExtracted = false
+// 本实例在页面互斥 bus 里的 id：播之前先停掉其他卡片
+const playerId = createPlayerId()
+
+// 停掉本卡片的一切声音：合成 + RSE 音频，供 bus 回调
+function stopAllSound() {
+  if (api && state.value === 'playing') api.stop()
+  if (audioEl.value && !audioEl.value.paused) audioEl.value.pause()
+}
 
 // 全屏浮层：实例不重建，谱面 DOM 在卡片和浮层容器之间搬运
 const fullscreen = ref(false)
@@ -181,6 +189,8 @@ async function togglePlay() {
       api.loadSoundFont(SOUNDFONT_URL, false)
       await waitForSoundfont()
     }
+    // 先停掉页面上其他 gp 卡片的声音，再播自己（bus 回调只停别人）
+    requestPlay(playerId)
     // 合成播放与 RSE 音频互斥：播一边先停另一边
     if (audioEl.value && !audioEl.value.paused) audioEl.value.pause()
     api.play()
@@ -192,8 +202,9 @@ async function togglePlay() {
   }
 }
 
-// RSE 音频开始播时，若合成在播就停掉它
+// RSE 音频开始播时，先停掉其他卡片，再停自己的合成（若在播）
 function onAudioPlay() {
+  requestPlay(playerId)
   if (api && state.value === 'playing') api.stop()
 }
 
@@ -383,6 +394,7 @@ function onFsKeydown(e: KeyboardEvent) {
 }
 
 onMounted(async () => {
+  registerPlayer(playerId, stopAllSound)
   loadFn = async () => {
     const tex = texSrc.value?.textContent?.trim() ?? ''
     if (!props.src && !tex) return
@@ -452,6 +464,7 @@ watch(colorMode, () => {
 })
 
 onBeforeUnmount(() => {
+  unregisterPlayer(playerId)
   document.removeEventListener('keydown', onFsKeydown)
   api?.destroy()
   api = null
@@ -505,13 +518,12 @@ onBeforeUnmount(() => {
         >
           <!-- 括号+谱线：单轨一横，多轨三横（mdi 无现成图标，内联画） -->
           <svg viewBox="0 0 24 24" class="w-3.5 h-3.5" aria-hidden="true">
-            <path d="M8 4 C5.5 4 5.5 4 5.5 7 L5.5 10 C5.5 12 5.5 12 3.5 12 C5.5 12 5.5 12 5.5 14 L5.5 17 C5.5 20 5.5 20 8 20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" />
-            <g v-if="trackMode === 'all'" fill="currentColor">
-              <rect x="10" y="6.5" width="10" height="2.2" />
-              <rect x="10" y="10.9" width="10" height="2.2" />
-              <rect x="10" y="15.3" width="10" height="2.2" />
+            <path d="M9 4 C7 4 6.2 5 6.2 7.2 L6.2 9.4 C6.2 11.2 5.4 11.7 3.6 12 C5.4 12.3 6.2 12.8 6.2 14.6 L6.2 16.8 C6.2 19 7 20 9 20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+            <g fill="currentColor">
+              <rect x="10.5" y="10.9" width="9" height="2.2" rx="1.1" />
+              <rect v-if="trackMode === 'all'" x="10.5" y="6.3" width="9" height="2.2" rx="1.1" />
+              <rect v-if="trackMode === 'all'" x="10.5" y="15.5" width="9" height="2.2" rx="1.1" />
             </g>
-            <rect v-else x="10" y="10.9" width="10" height="2.2" fill="currentColor" />
           </svg>
           <span>{{ trackMode === 'all' ? '单轨' : '多轨' }}</span>
         </button>

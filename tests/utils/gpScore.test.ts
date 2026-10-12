@@ -12,6 +12,10 @@ import {
   formatTime,
   SCROLL_OFFSET_X,
   FULLSCREEN_SCALE,
+  createPlayerId,
+  registerPlayer,
+  unregisterPlayer,
+  requestPlay,
 } from '~/utils/gpScore'
 
 describe('normalizeLayout', () => {
@@ -95,5 +99,48 @@ describe('formatTime', () => {
     expect(formatTime(0)).toBe('0:00')
     expect(formatTime(61000)).toBe('1:01')
     expect(formatTime(3599000)).toBe('59:59')
+  })
+})
+
+describe('播放互斥 bus', () => {
+  it('createPlayerId 每次返回不同 id', () => {
+    expect(createPlayerId()).not.toBe(createPlayerId())
+  })
+
+  it('requestPlay 只停别人不停自己', () => {
+    const stopped: string[] = []
+    const a = createPlayerId()
+    const b = createPlayerId()
+    registerPlayer(a, () => { stopped.push('a') })
+    registerPlayer(b, () => { stopped.push('b') })
+    requestPlay(a)
+    expect(stopped).toEqual(['b'])
+    unregisterPlayer(a)
+    unregisterPlayer(b)
+  })
+
+  it('注销后不再被打扰', () => {
+    const stopped: string[] = []
+    const a = createPlayerId()
+    const b = createPlayerId()
+    registerPlayer(a, () => { stopped.push('a') })
+    registerPlayer(b, () => { stopped.push('b') })
+    unregisterPlayer(b)
+    requestPlay(a)
+    expect(stopped).toEqual([])
+    unregisterPlayer(a)
+  })
+
+  it('重复注册覆盖旧回调', () => {
+    const stopped: string[] = []
+    const a = createPlayerId()
+    const b = createPlayerId()
+    registerPlayer(a, () => { stopped.push('old') })
+    registerPlayer(a, () => { stopped.push('new') })
+    registerPlayer(b, () => {})
+    requestPlay(b)
+    expect(stopped).toEqual(['new'])
+    unregisterPlayer(a)
+    unregisterPlayer(b)
   })
 })
