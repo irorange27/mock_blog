@@ -6,7 +6,7 @@
 - **Styling**: Tailwind CSS + @tailwindcss/typography
 - **Theme**: @nuxtjs/color-mode (dark/light)
 - **Testing**: Vitest + @nuxt/test-utils
-- **Deploy**: Cloudflare Workers — static assets (`nuxt generate`) + Worker API + Durable Object comment store. 手动 `pnpm publish`，无 Git 自动构建（见 `wrangler.jsonc` 与 `docs/comments.md`）
+- **Deploy**: Cloudflare Workers — static assets (`nuxt generate`) + Worker API + Durable Object comment store. 手动 `pnpm cf:deploy`，无 Git 自动构建（见 `wrangler.jsonc` 与 `docs/comments.md`）
 
 ## Directory Structure
 
@@ -106,5 +106,5 @@ pnpm generate      # Static site generation
 pnpm test          # Run vitest
 pnpm new-post <name>  # Create new post
 pnpm cf:dev        # Preview Worker + static assets locally (run pnpm generate first)
-pnpm publish      # nuxt generate && wrangler deploy (Cloudflare Workers)
+pnpm cf:deploy    # nuxt generate && wrangler deploy (Cloudflare Workers)
 ```

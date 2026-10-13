@@ -19,8 +19,8 @@
     "preview": "nuxt preview",
     "cf:dev": "wrangler dev",
     "cf:dry-run": "wrangler deploy --dry-run --outdir .wrangler/dry-run",
-    "publish": "nuxt generate && wrangler deploy",
-    "deploy": "部署这个仓库请用 pnpm publish（deploy 是 pnpm 内置命令名，会被它截走）",
+    "cf:deploy": "nuxt generate && wrangler deploy",
+    "deploy": "deploy / publish 都是 pnpm 内置命令名，会被 pnpm 自己截走。请用 pnpm cf:deploy",
     "postinstall": "nuxt prepare && (git config core.hooksPath .githooks || true)"
   },
   "dependencies": {
