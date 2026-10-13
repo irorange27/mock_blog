@@ -1,12 +1,17 @@
 name: CI
 
 # CI 只做「提交能不能过」的检查：类型、测试、静态产物、Worker 打包。
-# 部署不在这里 —— 线上是 Cloudflare Workers（wrangler.jsonc + `pnpm deploy`），
-# 由 Cloudflare 侧的 Workers Builds 从同一个仓库构建发布。
-# 这里的 dry-run 步骤与那条构建共享同一份配置，所以能当预检用。
 #
-# 历史上这里还并行部署 GitHub Pages，但那份产物没有 /api（阅读量、评论都静默降级），
+# 部署是手动的一步：本地跑 `pnpm deploy`（= nuxt generate && wrangler deploy）。
+# Worker 没有绑定 Git 仓库，push 不会自动上线——所以这个 CI 绿灯只代表
+# 「这份代码能构建」，不代表「线上已经是它」。
+#
+# 这里的 cf:dry-run 与真正的 deploy 读同一份 wrangler.jsonc，
+# 所以绑定名、DO 类、迁移配置有问题会在这里提前暴露。
+#
+# 历史上这里还并行部署 GitHub Pages，但那份产物没有 /api（评论会静默降级），
 # 于 2026-10 随评论功能一起退场（见 docs/comments.md）。
+# Cloudflare Pages 项目 blog 仍在，但已断开 Git 连接，不再参与发布。
 
 env:
   CI: true
@@ -82,6 +87,9 @@ jobs:
         run: pnpm cf:dry-run
 
       - name: upload build artifact
+        # 没有自动消费者（Pages 已断开、Worker 靠本地 pnpm deploy）。
+        # 留着是为了两件事：验证产物真的生成过；以及需要时能直接下载
+        # 一份静态产物来做对照，不必在本地重跑 generate。
         if: github.event_name == 'push'
         uses: actions/upload-artifact@v6
         with:

@@ -90,17 +90,25 @@ git commit -m "add: 新文章标题"
 git push origin main
 ```
 
-推送至 `main` 分支后，GitHub Actions 跑一遍检查（类型 / 测试 / 静态产物 / Worker 打包），
-再由 Cloudflare 侧的 Workers Builds 发布：
+推送至 `main` 分支后，GitHub Actions 跑一遍检查（类型 / 测试 / 静态产物 / Worker 打包）：
 
 ```plaintext
 typecheck → test → nuxt generate → 产物校验 → wrangler 预检
-                                              ↓
-                              Cloudflare Workers Builds 发布
 ```
 
-CI 不再往 GitHub Pages 发一份（那份产物没有 `/api`，评论会静默降级）。
-细节见 [comments.md](comments.md#开发与部署)。
+**但这一遍只是检查，不会发布。** 让线上更新还需要手动跑一次：
+
+```bash
+pnpm deploy     # = nuxt generate && wrangler deploy
+```
+
+Worker 没有绑定 Git 仓库，push 不会自动上线——**CI 绿灯只说明「能构建」，不说明「线上是它」**。
+发完文章记得补这一步，否则本地和线上会不一致。
+
+想先看效果的话，`pnpm cf:dev` 起本地 Worker（有真实的评论接口），
+比 `pnpm dev` 更接近线上。
+
+细节见 [comments.md](comments.md#ci-与部署的关系)。
 
 RSS (`/rss.xml`) 和 sitemap (`/sitemap.xml`) 随构建自动更新。
 
@@ -115,7 +123,9 @@ pnpm new-post     →    撰写 .md     →    pnpm dev (预览)
                           ↓
                      git push origin main
                           ↓
-              GitHub Actions 自动构建部署
+              GitHub Actions 跑检查（不发布）
+                          ↓
+                   pnpm deploy （手动，这一步才上线）
                           ↓
                    https://blog.niina.fun
 ```
