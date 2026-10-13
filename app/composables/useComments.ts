@@ -9,7 +9,7 @@ interface CommentNode extends CommentData {
 /**
  * 文章评论：读取、发表、博主删除。
  *
- * 与 usePageViews 一致：API 不可用时静默降级（本地 pnpm dev 没有 Worker，
+ * API 不可用时静默降级（本地 pnpm dev 没有 Worker，
  * 评论区显示为「暂时读不到评论」而不是报错），提交失败则把错误文案回给表单。
  *
  * 身份沿用访客自填的昵称/邮箱/网址，没有服务端会话——防冒充不在本版范围内，

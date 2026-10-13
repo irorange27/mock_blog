@@ -1,5 +1,5 @@
-// Cloudflare Workers 一体化部署：静态资产（nuxt generate 产物）+ Worker API + Durable Object 计数。
-// 本地预览：先 pnpm generate，再 pnpm cf:dev；部署：pnpm deploy。详见 docs/pageviews.md。
+// Cloudflare Workers 一体化部署：静态资产（nuxt generate 产物）+ Worker API + 评论 Durable Object。
+// 本地预览：先 pnpm generate，再 pnpm cf:dev；部署：pnpm deploy。详见 docs/comments.md。
 {
   "$schema": "node_modules/wrangler/config-schema.json",
   "name": "niina-blog",
@@ -16,10 +16,6 @@
   "durable_objects": {
     "bindings": [
       {
-        "name": "VIEWS",
-        "class_name": "ViewCounter"
-      },
-      {
         "name": "COMMENTS",
         "class_name": "CommentStore"
       }
@@ -28,10 +24,6 @@
   "migrations": [
     {
       "tag": "v1",
-      "new_sqlite_classes": ["ViewCounter"]
-    },
-    {
-      "tag": "v2",
       "new_sqlite_classes": ["CommentStore"]
     }
   ],

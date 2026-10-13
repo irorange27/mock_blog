@@ -99,8 +99,8 @@ typecheck → test → nuxt generate → 产物校验 → wrangler 预检
                               Cloudflare Workers Builds 发布
 ```
 
-CI 不再往 GitHub Pages 发一份（那份产物没有 `/api`，阅读量与评论都会静默降级）。
-细节见 [comments.md](comments.md#开发与部署) 与 [pageviews.md](pageviews.md)。
+CI 不再往 GitHub Pages 发一份（那份产物没有 `/api`，评论会静默降级）。
+细节见 [comments.md](comments.md#开发与部署)。
 
 RSS (`/rss.xml`) 和 sitemap (`/sitemap.xml`) 随构建自动更新。
 

@@ -34,7 +34,6 @@ export interface DurableObjectState {
 // wrangler.jsonc 中声明的绑定
 export interface Env {
   ASSETS: AssetFetcher
-  VIEWS: DurableObjectNamespace
   COMMENTS: DurableObjectNamespace
   /** 博主删除评论的令牌；未配置时删除接口整体关闭（501） */
   COMMENT_ADMIN_TOKEN?: string

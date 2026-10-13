@@ -1,6 +1,5 @@
 import type { Env } from './types'
 
-export { ViewCounter } from './views'
 export { CommentStore } from './comments'
 
 export default {
@@ -11,55 +10,11 @@ export default {
       return handleComments(request, env, pathname)
     }
     if (pathname.startsWith('/api/')) {
-      return handleApi(request, env, pathname)
+      return Response.json({ error: 'not found' }, { status: 404, headers: { 'Cache-Control': 'no-store' } })
     }
     // 其余请求交给静态资产；未命中时按 not_found_handling 返回 404 页
     return env.ASSETS.fetch(request)
   },
-}
-
-async function handleApi(request: Request, env: Env, pathname: string): Promise<Response> {
-  const prefix = '/api/views/'
-  if (!pathname.startsWith(prefix)) {
-    return apiJson({ error: 'not found' }, 404)
-  }
-
-  const encodedSlug = pathname.slice(prefix.length)
-  if (!encodedSlug) {
-    return apiJson({ error: 'not found' }, 404)
-  }
-
-  let slug: string
-  try {
-    slug = decodeURIComponent(encodedSlug)
-  } catch {
-    return apiJson({ error: 'invalid slug' }, 400)
-  }
-  if (!isValidSlug(slug)) {
-    return apiJson({ error: 'invalid slug' }, 400)
-  }
-
-  if (request.method !== 'GET' && request.method !== 'POST') {
-    return apiJson(
-      { error: 'method not allowed' },
-      405,
-      { Allow: 'GET, POST' },
-    )
-  }
-
-  // 用静态产物确认文章存在，避免任意 slug 建立 Durable Object 或污染计数数据。
-  const postPath = slug.split('/').map(encodeURIComponent).join('/')
-  const post = await env.ASSETS.fetch(
-    new Request(`https://assets.local/posts/${postPath}/`, { method: 'HEAD' }),
-  )
-  if (!post.ok) {
-    return apiJson({ error: 'post not found' }, 404)
-  }
-
-  // 文章是自然分区：每篇文章有独立 DO，不把全站请求串行到一个全局实例。
-  const action = request.method === 'POST' ? 'increment' : 'count'
-  const stub = env.VIEWS.get(env.VIEWS.idFromName(`post:${slug}`))
-  return stub.fetch(new Request(`https://view-counter/${action}`, { method: request.method }))
 }
 
 function apiJson(body: unknown, status = 200, headers?: HeadersInit): Response {
@@ -69,7 +24,7 @@ function apiJson(body: unknown, status = 200, headers?: HeadersInit): Response {
 }
 
 // 评论 API：GET /api/comments/<slug>、POST /api/comments/<slug>、DELETE /api/comments/<id>。
-// 与阅读量不同，删除需要博主令牌，见 handleComments。
+// 删除需要博主令牌，见 handleComments。
 async function handleComments(request: Request, env: Env, pathname: string): Promise<Response> {
   const rest = pathname.slice('/api/comments'.length).replace(/^\/+/, '')
   if (!rest) return apiJson({ error: 'not found' }, 404)
@@ -106,7 +61,7 @@ async function handleComments(request: Request, env: Env, pathname: string): Pro
     return apiJson({ error: 'invalid slug' }, 400)
   }
 
-  // 用静态产物确认文章存在，与阅读量同一套做法：拒绝为不存在的 slug 建立数据。
+  // 用静态产物确认文章存在：拒绝为不存在的 slug 建立数据。
   const postPath = decoded.split('/').map(encodeURIComponent).join('/')
   const post = await env.ASSETS.fetch(
     new Request(`https://assets.local/posts/${postPath}/`, { method: 'HEAD' }),

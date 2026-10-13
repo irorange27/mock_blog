@@ -6,7 +6,7 @@
 - **Styling**: Tailwind CSS + @tailwindcss/typography
 - **Theme**: @nuxtjs/color-mode (dark/light)
 - **Testing**: Vitest + @nuxt/test-utils
-- **Deploy**: Cloudflare Workers — static assets (`nuxt generate`) + Worker API + Durable Object page-view counter (see `wrangler.jsonc` and `docs/pageviews.md`)
+- **Deploy**: Cloudflare Workers — static assets (`nuxt generate`) + Worker API + Durable Object comment store (see `wrangler.jsonc` and `docs/comments.md`)
 
 ## Directory Structure
 
@@ -24,7 +24,6 @@ app/                 # Application source (srcDir)
 │   └── ImageLightbox.vue
 ├── composables/     # Auto-imported composables
 │   ├── useBlogData.ts   # Single source of truth for all post data
-│   └── usePageViews.ts  # Post view counter (calls the Worker API client-side)
 ├── layouts/
 │   ├── default.vue   # Main layout with sidebar
 │   └── 404.vue       # Minimal layout for 404
@@ -57,7 +56,6 @@ server/              # Nitro server
 
 worker/              # Cloudflare Worker backend (deployed together with static assets)
 ├── index.ts         # Router: /api/* → API, everything else → env.ASSETS.fetch()
-├── views.ts         # ViewCounter Durable Object (SQLite atomic counter)
 └── types.ts         # Minimal structural types for CF bindings
 
 wrangler.jsonc       # Workers config: assets dir, /api routing, DO binding + migration

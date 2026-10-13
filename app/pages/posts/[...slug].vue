@@ -11,7 +11,6 @@ const slug = computed(() => {
   // normalizeSlug 负责去掉 catch-all 参数的收尾斜杠（见 utils/blog.ts）
   return normalizeSlug(route.params.slug)
 })
-const { views } = usePageViews(() => slug.value)
 
 const { posts } = useBlogData()
 const adjacent = computed(() => {
@@ -40,13 +39,6 @@ useSeoMeta({
       <h1 class="text-2xl text-[var(--txt-90)] font-bold mb-4">{{ data?.title }}</h1>
       <div class="flex items-center text-[var(--txt-50)] text-sm">
         <span>{{ formatDate(data?.date) }}</span>
-        <template v-if="views !== null">
-          <span class="mx-2" aria-hidden="true">·</span>
-          <span class="inline-flex items-center gap-1">
-            <Icon name="mdi:eye-outline" class="w-4 h-4" aria-hidden="true" />
-            {{ views }} 次浏览
-          </span>
-        </template>
         <span class="mx-2" aria-hidden="true">·</span>
         <NuxtLink
           :to="`/categories/${data?.categories || '默认'}`"

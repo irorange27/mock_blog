@@ -4,7 +4,7 @@ import type { Post } from '~/types/post'
  * 把路由的 catch-all 参数归一成文章 slug。
  *
  * /posts/foo 与 /posts/foo/ 分别解析成 'foo' 与 'foo/'，而 Worker 的 isValidSlug
- * 只认前者——带收尾斜杠会被判非法（400）。阅读量上报与评论读写都吃这个值，
+ * 只认前者——带收尾斜杠会被判非法（400）。评论读写都吃这个值，
  * 所以统一在这里去掉收尾斜杠，页面里不再各写一份。
  */
 export const normalizeSlug = (param: string | string[] | undefined | null): string => {

@@ -73,7 +73,7 @@ describe('博客工具函数', () => {
 
 describe('normalizeSlug', () => {
   // 这条规则修的是一个真实 bug：route.params.slug 带收尾斜杠时，
-  // 阅读量与评论都会打到 /api/.../foo%2F 上被 Worker 判 400。
+  // 评论会打到 /api/.../foo%2F 上被 Worker 判 400。
   it('去掉收尾斜杠', () => {
     expect(normalizeSlug('2024summary/')).toBe('2024summary')
     expect(normalizeSlug('2024summary//')).toBe('2024summary')

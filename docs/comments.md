@@ -1,8 +1,8 @@
 # 评论（Comments）实现
 
-评论是一层自建的 Workers API + Durable Object，和阅读量（`docs/pageviews.md`）共用同一个 Worker：静态站点不变，评论存在 DO 的 SQLite 里。
+评论是一层自建的 Workers API + Durable Object，挂在同一个 Worker 上：静态站点不变，评论存在 DO 的 SQLite 里。
 
-选型经过见对话记录：giscus（外观归 GitHub Discussions 所有）、Artalk / Waline / Twikoo on Workers（要么接口不原生、要么适配器未发 npm）、Twikoo on Netlify（要新增 Netlify + MongoDB Atlas 两个平台）。最后选自建，理由是本站已经有一个能跑的 Worker + DO，评论就是把 `ViewCounter` 的模式再加一遍，且**外观归自己**。
+选型经过见对话记录：giscus（外观归 GitHub Discussions 所有）、Artalk / Waline / Twikoo on Workers（要么接口不原生、要么适配器未发 npm）、Twikoo on Netlify（要新增 Netlify + MongoDB Atlas 两个平台）。最后选自建，理由是本站已经有一个能跑的 Worker + DO，评论沿用同一套模式即可，且**外观归自己**。
 
 ## 架构
 
@@ -100,8 +100,8 @@ pnpm deploy    # = nuxt generate && wrangler deploy
 ```
 
 - 首次带上 `v2` 迁移部署时，wrangler 会创建 `CommentStore` 的 DO 命名空间；表由 DO 构造函数里的 `CREATE TABLE IF NOT EXISTS` 建，不需要手工建库建表。
-- 评论数据跨部署保留，与阅读量计数一样住在 DO 的 SQLite 里。
-- 免费额度：DO 每天 10 万次请求、5GB SQLite 存储。评论比阅读量写得少得多，个人博客用不到零头。
+- 评论数据跨部署保留，住在 DO 的 SQLite 里。
+- 免费额度：DO 每天 10 万次请求、5GB SQLite 存储。评论的写入量极小，个人博客用不到零头。
 
 ### CI 与部署的关系
 
@@ -114,7 +114,7 @@ typecheck:worker → typecheck:ci → test:run → generate → 产物校验 →
 - **`typecheck:ci`** 不是「零错误」检查。这个仓库在 main 上就带着 7 处既有类型错误，常红的检查等于没有检查，所以它比对的是一份错误基线（`scripts/typecheck-baseline.json`，粒度是「文件 + 行 + 错误码」）：基线之外的**新增**错误一律拦下，既有问题原样放行。修好既有错误后跑 `pnpm typecheck:update` 收敛基线；想知道当前还剩多少，跑 `pnpm typecheck:report`。
 - **产物校验**：`generate` 之后检查 `index.html` / `rss.xml` / `sitemap.xml` 非空、`_nuxt` 存在，并断言 `.output/public/api` **不存在**（`/api` 归 Worker，不该被预渲染）。
 - **`cf:dry-run`** 用 `wrangler deploy --dry-run` 提前验证绑定名、DO 类与迁移，这些平时要到 `wrangler deploy` 才会报错。
-- **GitHub Pages 已经退场**：那份产物没有 `/api`，阅读量与评论都会静默降级，推送两份产出还多一个不一致源。
+- **GitHub Pages 已经退场**：那份产物没有 `/api`，评论会静默降级，推送两份产出还多一个不一致源。
 
 ## 已知缺口
 

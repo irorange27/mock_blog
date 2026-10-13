@@ -49,7 +49,6 @@ function createEnv(options: { postExists?: boolean; token?: string } = {}) {
 
   const env: Env = {
     ASSETS: assets,
-    VIEWS: namespace,
     COMMENTS: namespace,
     COMMENT_ADMIN_TOKEN: options.token,
   }
@@ -167,11 +166,13 @@ describe('Worker 路由 — 删除', () => {
   })
 })
 
-describe('Worker 路由 — 与阅读量并存', () => {
-  it('/api/views/* 仍走原来的 DO', async () => {
+describe('Worker 路由 — 已下线的接口', () => {
+  // 阅读量功能整体移除（上报一直 400、线上从未生效），接口直接 404，
+  // 不要再打到任何 Durable Object 上。
+  it('/api/views/* 返回 404 且不触发 DO', async () => {
     const res = await run(ctx.env, '/api/views/hello-world')
-    expect(res.status).toBe(200)
-    expect(ctx.calls[0]!.url).toContain('view-counter')
+    expect(res.status).toBe(404)
+    expect(ctx.calls).toHaveLength(0)
   })
 
   it('静态资产路径不被评论路由截胡', async () => {
