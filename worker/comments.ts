@@ -1,4 +1,4 @@
-import type { DurableObjectState } from './types'
+import type { DurableObjectState, DurableObjectContext, Env } from './types'
 
 // 全站评论共用一个 Durable Object：评论要跨文章查询（比如后台按时间倒序列出），
 // 分片到每篇文章反而要再做一层聚合。单实例串行写入对本站量级完全够用。
@@ -55,9 +55,16 @@ export interface CommentError {
 
 export class CommentStore {
   private readonly sql: DurableObjectState['storage']['sql']
+  // Cloudflare 把 env / ctx 作为 DO 构造器的第二、三个参数传入：
+  // 发信靠 env.MAIL，让通知在响应之后落地靠 ctx.waitUntil。
+  private readonly env: Env
+  private readonly ctx: DurableObjectContext
 
-  constructor(state: DurableObjectState) {
+  constructor(state: DurableObjectState, env: Env) {
     this.sql = state.storage.sql
+    this.env = env
+    // waitUntil 挂在 DO 的 DurableObjectState 上（ctx === state）
+    this.ctx = state as unknown as DurableObjectContext
     this.sql.exec(`
       CREATE TABLE IF NOT EXISTS comments (
         id TEXT PRIMARY KEY,
@@ -159,6 +166,13 @@ export class CommentStore {
       comment.created,
     )
 
+    // 通知放最后且不 await：发信要几百毫秒，没理由让评论发布等它。
+    // 失败只写日志，不影响评论本身。waitUntil 缺失（如测试里的 mock state）
+    // 时退化成直接发，但要吞掉异常。
+    const notify = this.notify(comment)
+    if (this.ctx.waitUntil) this.ctx.waitUntil(notify)
+    else notify.catch(() => {})
+
     return json({ comment: toPublic(comment) }, 201)
   }
 
@@ -201,6 +215,41 @@ export class CommentStore {
     this.sql.exec('UPDATE comment_rate SET hits = hits + 1 WHERE ip = ?', ip)
     return false
   }
+
+/**
+ * 有新评论时给博主发一封邮件。
+ *
+ * 走 Cloudflare Email Routing：send_email binding 只允许发到 wrangler.jsonc 里
+ * 登记过的 destination_address（comment@niina.fun），规则再转发到 QQ 邮箱。
+ * 绑定没配（本地 dev 默认没有）或发送失败都只静默降级——评论照常发表。
+ */
+private async notify(comment: CommentRow): Promise<void> {
+  const from = this.env.MAIL
+  if (!from) return
+
+  const subject = `新评论 · ${comment.slug} · ${comment.nick}`
+  const body = [
+    `文章：https://blog.niina.fun/posts/${comment.slug}/`,
+    `昵称：${comment.nick}`,
+    comment.link ? `网址：${comment.link}` : '',
+    comment.parent ? '这是一条回复' : '这是主楼',
+    '',
+    comment.body,
+  ].filter(Boolean).join('\n')
+
+  try {
+    await from.send({
+      from: 'comment@niina.fun',
+      to: 'comment@niina.fun',
+      subject,
+      text: body,
+    })
+  } catch (err) {
+    // 通知是附加能力：失败只留日志，绝不影响评论发表。
+    console.error('comment notify failed', err)
+  }
+}
+
 }
 
 /** 校验并裁剪入参；返回字符串表示校验失败的原因 */

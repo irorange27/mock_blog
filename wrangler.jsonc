@@ -27,5 +27,11 @@
       "new_sqlite_classes": ["CommentStore"]
     }
   ],
+  "send_email": [
+    {
+      "name": "MAIL",
+      "destination_address": "comment@niina.fun"
+    }
+  ],
   "observability": { "enabled": true }
 }

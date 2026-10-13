@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest'
 import { CommentStore } from '../../worker/comments'
-import type { DurableObjectState, SqlStorage, SqlStorageCursor } from '../../worker/types'
+import type { DurableObjectState, Env, SqlStorage, SqlStorageCursor } from '../../worker/types'
 
 /**
  * Durable Object 的 SQLite 替身。
@@ -89,10 +89,13 @@ function createDatabase(): FakeDatabase {
   }
 }
 
-const state = (): DurableObjectState => {
-  const sql = new FakeSql(createDatabase())
-  return { storage: { sql } }
-}
+/** 收集 waitUntil 挂上的后台任务，便于断言「通知被触发过」 */
+const deferred: Promise<unknown>[] = []
+
+const state = (): DurableObjectState => ({
+  storage: { sql: new FakeSql(createDatabase()) },
+  waitUntil: (p) => deferred.push(p),
+})
 
 const post = (
   store: CommentStore,
@@ -136,7 +139,9 @@ const valid = {
 let store: CommentStore
 
 beforeEach(() => {
-  store = new CommentStore(state())
+  deferred.length = 0
+  // 默认不给 MAIL：等价于本地 dev 没配发信绑定，应当静默不通知。
+  store = new CommentStore(state(), {} as Env)
 })
 
 describe('CommentStore — 发表', () => {
@@ -214,6 +219,78 @@ describe('CommentStore — 发表', () => {
     await post(store, valid)
     const listed = await (await list(store, '')).json() as { comments: unknown[] }
     expect(listed.comments).toEqual([])
+  })
+})
+
+describe('CommentStore — 新评论通知', () => {
+  /** 收齐 waitUntil 挂上的后台任务；notify 自己吞异常，这里不担心未处理拒绝 */
+  const flush = async () => {
+    await Promise.all(deferred.splice(0))
+  }
+
+  const mailEnv = () => {
+    const sent: Array<{ subject: string, text?: string }> = []
+    return {
+      env: {
+        MAIL: {
+          async send(message: { subject: string, text?: string }) {
+            sent.push(message)
+            return 'message-id'
+          },
+        },
+      } as unknown as Env,
+      sent,
+    }
+  }
+
+  it('评论成功后通过 waitUntil 触发一封通知', async () => {
+    const { env, sent } = mailEnv()
+    store = new CommentStore(state(), env)
+
+    const res = await post(store, valid)
+    expect(res.status).toBe(201)
+
+    // waitUntil 只保证「不阻塞响应」，任务其实已经开跑；
+    // 这里等它落地后断言结果。
+    await flush()
+    expect(sent).toHaveLength(1)
+    expect(sent[0]!.subject).toContain('hello-world')
+    expect(sent[0]!.subject).toContain('Niina')
+    // 正文要带正文内容与文章链接，方便直接点进去
+    expect(sent[0]!.text).toContain('写得好')
+    expect(sent[0]!.text).toContain('/posts/hello-world/')
+  })
+
+  it('回复的通知里标出来源', async () => {
+    const { env, sent } = mailEnv()
+    store = new CommentStore(state(), env)
+    const rootId = await postWithCreated(store, valid, 1000)
+
+    await post(store, { ...valid, body: '这是一条回复', parent: rootId })
+    await flush()
+
+    expect(sent).toHaveLength(2)
+    expect(sent[1]!.text).toContain('这是一条回复')
+    expect(sent[1]!.text).toContain('这是一条回复')
+  })
+
+  it('没配 MAIL 时不通知也不报错', async () => {
+    const res = await post(store, valid)
+    expect(res.status).toBe(201)
+    await flush()   // 不应抛出
+    expect(deferred).toHaveLength(0)
+  })
+
+  it('发送失败不影响评论发表', async () => {
+    store = new CommentStore(state(), {
+      MAIL: {
+        async send() { throw new Error('email routing down') },
+      },
+    } as unknown as Env)
+
+    const res = await post(store, valid)
+    expect(res.status).toBe(201)
+    await flush()   // notify 内部 catch，不会变成未处理的拒绝
   })
 })
 
