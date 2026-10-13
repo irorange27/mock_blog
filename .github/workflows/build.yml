@@ -9,9 +9,9 @@ name: CI
 # 这里的 cf:dry-run 与真正的 deploy 读同一份 wrangler.jsonc，
 # 所以绑定名、DO 类、迁移配置有问题会在这里提前暴露。
 #
-# 历史上这里还并行部署 GitHub Pages，但那份产物没有 /api（评论会静默降级），
-# 于 2026-10 随评论功能一起退场（见 docs/comments.md）。
-# Cloudflare Pages 项目 blog 仍在，但已断开 Git 连接，不再参与发布。
+# 这个 workflow 不发任何部署：GitHub Pages 已于 2026-10 关闭（那份产物没有 /api，
+# 评论会静默降级），Cloudflare Pages 项目 blog 也已断开 Git 连接。
+# 详见 docs/comments.md。
 
 env:
   CI: true

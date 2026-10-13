@@ -117,7 +117,7 @@ typecheck:worker → typecheck:ci → test:run → generate → 产物校验 →
 - **产物校验**：`generate` 之后检查 `index.html` / `rss.xml` / `sitemap.xml` 非空、`_nuxt` 存在，并断言 `.output/public/api` **不存在**（`/api` 归 Worker，不该被预渲染）。
 - **`cf:dry-run`** 用 `wrangler deploy --dry-run` 提前验证绑定名、DO 类与迁移，这些平时要到 `wrangler deploy` 才会报错。
 - **CI 绿灯 ≠ 线上是这份代码**：CI 只证明「能构建」。要让线上更新，还得自己跑一次 `pnpm deploy`。这是刻意的取舍——接上自动构建后，「构建失败但线上是旧的」比「忘了部署」更难发现。
-- **GitHub Pages 已经退场**：那份产物没有 `/api`，评论会静默降级，推送两份产出还多一个不一致源。
+- **GitHub Pages 已关闭**（2026-10）：那份产物没有 `/api`，评论会静默降级，推送两份产出还多一个不一致源。仓库的 Pages 站点已删除；`niina.fun` 根域是另一个项目（`irorange27.github.io`），与本仓库无关。
 - **Cloudflare Pages 项目 `blog` 仍在**（`blog-ey3.pages.dev`），但已断开 Git 连接，不再参与发布。留着它是当 Worker 出问题时的回滚备份。
 
 ## 已知缺口
