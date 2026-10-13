@@ -96,7 +96,7 @@ curl -X DELETE localhost:8787/api/comments/<id> -H 'x-comment-token: <token>'
 ## 部署
 
 ```bash
-pnpm deploy    # = nuxt generate && wrangler deploy
+pnpm publish   # = nuxt generate && wrangler deploy
 ```
 
 - 首次带上 `v2` 迁移部署时，wrangler 会创建 `CommentStore` 的 DO 命名空间；表由 DO 构造函数里的 `CREATE TABLE IF NOT EXISTS` 建，不需要手工建库建表。
@@ -105,7 +105,7 @@ pnpm deploy    # = nuxt generate && wrangler deploy
 
 ### CI 与部署的关系
 
-发布只有**手动一条路**：本地跑 `pnpm deploy`（= `nuxt generate && wrangler deploy`），配置以 `wrangler.jsonc` 为准。Worker 没有绑定 Git 仓库，**push 不会自动上线**。
+发布只有**手动一条路**：本地跑 `pnpm publish`（= `nuxt generate && wrangler deploy`），配置以 `wrangler.jsonc` 为准。Worker 没有绑定 Git 仓库，**push 不会自动上线**。
 
 仓库里的 `.github/workflows/build.yml` 只做检查、不发部署：
 
@@ -116,7 +116,7 @@ typecheck:worker → typecheck:ci → test:run → generate → 产物校验 →
 - **`typecheck:ci`** 不是「零错误」检查。这个仓库在 main 上就带着 7 处既有类型错误，常红的检查等于没有检查，所以它比对的是一份错误基线（`scripts/typecheck-baseline.json`，粒度是「文件 + 行 + 错误码」）：基线之外的**新增**错误一律拦下，既有问题原样放行。修好既有错误后跑 `pnpm typecheck:update` 收敛基线；想知道当前还剩多少，跑 `pnpm typecheck:report`。
 - **产物校验**：`generate` 之后检查 `index.html` / `rss.xml` / `sitemap.xml` 非空、`_nuxt` 存在，并断言 `.output/public/api` **不存在**（`/api` 归 Worker，不该被预渲染）。
 - **`cf:dry-run`** 用 `wrangler deploy --dry-run` 提前验证绑定名、DO 类与迁移，这些平时要到 `wrangler deploy` 才会报错。
-- **CI 绿灯 ≠ 线上是这份代码**：CI 只证明「能构建」。要让线上更新，还得自己跑一次 `pnpm deploy`。这是刻意的取舍——接上自动构建后，「构建失败但线上是旧的」比「忘了部署」更难发现。
+- **CI 绿灯 ≠ 线上是这份代码**：CI 只证明「能构建」。要让线上更新，还得自己跑一次 `pnpm publish`。这是刻意的取舍——接上自动构建后，「构建失败但线上是旧的」比「忘了部署」更难发现。
 - **GitHub Pages 已关闭**（2026-10）：那份产物没有 `/api`，评论会静默降级，推送两份产出还多一个不一致源。仓库的 Pages 站点已删除；`niina.fun` 根域是另一个项目（`irorange27.github.io`），与本仓库无关。
 - **Cloudflare Pages 项目 `blog` 仍在**（`blog-ey3.pages.dev`），但已断开 Git 连接，不再参与发布。留着它是当 Worker 出问题时的回滚备份。
 

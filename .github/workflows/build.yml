@@ -2,7 +2,7 @@ name: CI
 
 # CI 只做「提交能不能过」的检查：类型、测试、静态产物、Worker 打包。
 #
-# 部署是手动的一步：本地跑 `pnpm deploy`（= nuxt generate && wrangler deploy）。
+# 部署是手动的一步：本地跑 `pnpm publish`（= nuxt generate && wrangler deploy）。
 # Worker 没有绑定 Git 仓库，push 不会自动上线——所以这个 CI 绿灯只代表
 # 「这份代码能构建」，不代表「线上已经是它」。
 #
@@ -87,7 +87,7 @@ jobs:
         run: pnpm cf:dry-run
 
       - name: upload build artifact
-        # 没有自动消费者（Pages 已断开、Worker 靠本地 pnpm deploy）。
+        # 没有自动消费者（Pages 已断开、Worker 靠本地 pnpm publish）。
         # 留着是为了两件事：验证产物真的生成过；以及需要时能直接下载
         # 一份静态产物来做对照，不必在本地重跑 generate。
         if: github.event_name == 'push'

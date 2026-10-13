@@ -99,8 +99,11 @@ typecheck → test → nuxt generate → 产物校验 → wrangler 预检
 **但这一遍只是检查，不会发布。** 让线上更新还需要手动跑一次：
 
 ```bash
-pnpm deploy     # = nuxt generate && wrangler deploy
+pnpm publish    # = nuxt generate && wrangler deploy
 ```
+
+注意是 `publish` 不是 `deploy`：`deploy` 是 pnpm 的内置命令名，会被它自己截走
+（报 `ERR_PNPM_CANNOT_DEPLOY`）。`package.json` 里留了个同名脚本当告示牌。
 
 Worker 没有绑定 Git 仓库，push 不会自动上线——**CI 绿灯只说明「能构建」，不说明「线上是它」**。
 发完文章记得补这一步，否则本地和线上会不一致。
@@ -125,7 +128,7 @@ pnpm new-post     →    撰写 .md     →    pnpm dev (预览)
                           ↓
               GitHub Actions 跑检查（不发布）
                           ↓
-                   pnpm deploy （手动，这一步才上线）
+                   pnpm publish （手动，这一步才上线）
                           ↓
                    https://blog.niina.fun
 ```
