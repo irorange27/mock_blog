@@ -51,32 +51,32 @@ describe('useComments — 读取', () => {
   it('拉取当前文章的评论并计数', async () => {
     fetchMock.mockResolvedValue(jsonResponse({ comments: [comment(), comment({ id: 'c2' })] }))
 
-    const { comments, count, loadFailed } = useComments(() => SLUG)
+    const { comments, count } = useComments(() => SLUG)
     await flush()
 
     expect(fetchMock).toHaveBeenCalledWith(`/api/comments/${SLUG}`)
     expect(count.value).toBe(2)
-    expect(loadFailed.value).toBe(false)
     expect(comments.value[0]!.nick).toBe('Niina')
   })
 
-  it('接口不可用时标记 loadFailed 而不是抛错', async () => {
+  // 读取失败不抛错、也不给读者看任何提示：列表就是空的，等下次刷新再试。
+  // 界面上没有「读不到评论」这种状态，所以这里只断言「不炸」。
+  it('接口不可用时不抛错，列表保持为空', async () => {
     fetchMock.mockRejectedValue(new Error('offline'))
 
-    const { comments, loadFailed } = useComments(() => SLUG)
+    const { comments } = useComments(() => SLUG)
     await flush()
 
-    expect(loadFailed.value).toBe(true)
     expect(comments.value).toEqual([])
   })
 
-  it('404（文章不存在）同样走降级路径', async () => {
+  it('404（文章不存在）同样安静降级', async () => {
     fetchMock.mockResolvedValue(jsonResponse({ error: 'post not found' }, 404))
 
-    const { loadFailed } = useComments(() => SLUG)
+    const { comments } = useComments(() => SLUG)
     await flush()
 
-    expect(loadFailed.value).toBe(true)
+    expect(comments.value).toEqual([])
   })
 
   it('过滤掉形状不对的条目', async () => {

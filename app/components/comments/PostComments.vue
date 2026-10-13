@@ -10,7 +10,7 @@ import type { CommentData } from '~/types/comment'
 const props = defineProps<{ slug: string }>()
 
 const {
-  tree, count, loading, submitting, loadFailed, identity, submit, remove,
+  tree, count, loading, submitting, identity, submit, remove,
 } = useComments(() => props.slug)
 
 const body = ref('')
@@ -196,10 +196,7 @@ async function onDelete(comment: CommentData) {
       </div>
     </form>
 
-    <p v-if="loadFailed" class="comments-empty">
-      暂时读不到评论。本地开发（pnpm dev）没有 Worker 后端，属预期行为。
-    </p>
-    <p v-else-if="loading && !count" class="comments-empty">正在加载评论…</p>
+    <p v-if="loading && !count" class="comments-empty">正在加载评论…</p>
     <p v-else-if="!count" class="comments-empty">还没有评论，来说两句吧。</p>
 
     <ul v-else class="comments-list">

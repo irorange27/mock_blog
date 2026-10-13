@@ -19,9 +19,6 @@ export function useComments(slug: () => string) {
   const comments = ref<CommentData[]>([])
   const loading = ref(false)
   const submitting = ref(false)
-  /** 读取失败（区别于「还没有评论」）：只在列表区域展示，不影响正文 */
-  const loadFailed = ref(false)
-
   // 访客身份记在本地，下次来访不用重填。读写在 localStorage 不可用时静默跳过。
   const identity = reactive({ nick: '', email: '', link: '' })
 
@@ -60,21 +57,17 @@ export function useComments(slug: () => string) {
     try {
       const res = await fetch(`/api/comments/${encodeURIComponent(target)}`)
       if (!res.ok) {
-        loadFailed.value = true
         return
       }
       const data = (await res.json()) as { comments?: unknown }
       if (!Array.isArray(data.comments)) {
-        loadFailed.value = true
         return
       }
       // 期间切换了文章：结果作废，避免串台
       if (target !== slug()) return
       comments.value = data.comments.filter(isCommentData)
-      loadFailed.value = false
     } catch {
-      loadFailed.value = true
-    } finally {
+      } finally {
       loading.value = false
     }
   }
@@ -144,12 +137,11 @@ export function useComments(slug: () => string) {
     loadIdentity()
     watch(slug, () => {
       comments.value = []
-      loadFailed.value = false
       void refresh()
     }, { immediate: true })
   }
 
-  return { comments, tree, count, loading, submitting, loadFailed, identity, refresh, submit, remove }
+  return { comments, tree, count, loading, submitting, identity, refresh, submit, remove }
 }
 
 /**
