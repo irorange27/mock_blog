@@ -870,17 +870,63 @@ html.dark-mode.lightbox-dark-ink .vel-modal .vel-img {
     color: var(--primary);
 }
 
+/* 博主工具条：一行、无底色、只有一条细分隔线。
+   它是个临时工具，不需要卡片那种存在感。 */
 .comments-admin {
     display: flex;
-    flex-direction: column;
-    gap: 0.5rem;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 0.5rem 0.75rem;
     margin-bottom: 1.25rem;
-    padding: 0.75rem 1rem;
-    border-radius: 0.75rem;
-    background: var(--panel-bg);
+    padding-bottom: 0.75rem;
+    border-bottom: 1px dashed var(--line-color);
 }
 
-.comments-hint,
+.comments-admin-token {
+    display: flex;
+    align-items: center;
+    flex: 0 1 22rem;
+    min-width: 0;
+    font-size: 0.75rem;
+    color: var(--txt-30);
+    background: var(--card-bg);
+    border: 1px solid var(--line-color);
+    border-radius: 0.5rem;
+    transition: border-color 0.15s ease;
+}
+
+.comments-admin-token:focus-within {
+    border-color: var(--primary);
+}
+
+.comments-admin-token > span {
+    display: flex;
+    align-items: center;
+    flex: none;
+    padding: 0 0.5rem;
+    white-space: nowrap;
+    border-right: 1px solid var(--line-color);
+}
+
+.comments-admin-token input {
+    flex: 1;
+    min-width: 0;
+    padding: 0.35rem 0.5rem;
+    font-size: 0.8125rem;
+    color: var(--txt-90);
+    background: transparent;
+    border: 0;
+}
+
+.comments-admin-token input:focus-visible {
+    outline: none;
+}
+
+.comments-admin-hint {
+    font-size: 0.75rem;
+    color: var(--txt-30);
+}
+
 .comments-counter {
     font-size: 0.75rem;
     color: var(--txt-30);

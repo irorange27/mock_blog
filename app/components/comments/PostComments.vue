@@ -137,18 +137,21 @@ async function onDelete(comment: CommentData) {
       </h2>
     </header>
 
-    <p v-if="showAdmin" class="comments-admin">
-      <label class="comments-field">
-        <span>删除令牌</span>
+    <!-- 博主工具条：只在 ?admin=1 时出现，读者看不到。刻意做得轻，
+         不跟读者要看的评论内容抢注意力。 -->
+    <div v-if="showAdmin" class="comments-admin">
+      <label class="comments-admin-token">
+        <span>令牌</span>
         <input
           v-model="token"
           type="password"
           autocomplete="off"
+          aria-label="删除令牌"
           placeholder="COMMENT_ADMIN_TOKEN"
         >
       </label>
-      <span class="comments-hint">令牌填对后，点评论右侧的「删除」即可移除（主楼连同回复）。</span>
-    </p>
+      <span class="comments-admin-hint">填对后点评论右侧的「删除」</span>
+    </div>
 
     <form class="comments-form" @submit.prevent="onSubmit">
       <p v-if="replyTo" class="comments-replying">
