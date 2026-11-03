@@ -7,8 +7,9 @@ const hasSidebar = computed(() => route.path === '/')
 </script>
 
 <template>
-  <!-- 不要在这里加 overflow-hidden：它会让容器成为 sticky 后代的滚动容器，破坏全站 position:sticky（横向溢出已由 html 的 overflow-x:hidden 处理） -->
-  <div class="min-h-screen bg-[var(--page-bg)]">
+  <!-- 不要在这里加 overflow-hidden：它会让容器成为 sticky 后代的滚动容器，破坏全站 position:sticky（横向溢出已由 html 的 overflow-x:hidden 处理）。
+       页面底色不挂这里：div 上的 100% 只覆盖文档本身，iOS 橡皮筋滚动会露白底，见 main.css 的 html 背景 -->
+  <div class="app-shell min-h-dvh">
     <!-- 跳过导航直达主内容（WCAG 2.4.1）：默认不可见，键盘聚焦时显示 -->
     <a
       href="#main-content"

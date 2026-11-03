@@ -146,11 +146,28 @@ html.dark-mode {
    成为 sticky 后代的滚动容器，导致 position:sticky 全站失效 */
 html {
     font-family: 'EBGaramond', 'LXGWWenKai', sans-serif;
+    /* 用 clip 而非 hidden：两者都能裁横向溢出，但 hidden 会把根元素变成
+       滚动容器，WebKit 在这种状态下不把根背景传播给画布，iOS 橡皮筋区
+       就露出 Safari 自己的底色（系统深色时是纯黑）。clip 不建滚动容器，
+       不破坏 sticky，也不打断背景传播。老浏览器退回 hidden */
     overflow-x: hidden;
+    overflow-x: clip;
+    /* 页面底色 html/body 都挂同色：html 供画布传播，body 供 WebKit
+       回退采样；明暗切换靠 .dark-mode 改写 --page-bg，两者自动跟随 */
+    background-color: var(--page-bg);
+    /* 跟站点主题一致（不是跟系统）：暗色下滚动条、输入框等原生控件
+       才不会按 light 渲染闪白 */
+    color-scheme: light;
 }
 
 body {
     font-family: 'EBGaramond', 'LXGWWenKai', sans-serif;
+    /* 见上：iOS 橡皮筋区的兜底画布，与 html 同色 */
+    background-color: var(--page-bg);
+}
+
+html.dark-mode {
+    color-scheme: dark;
 }
 
 /* 锚点跳转：平滑滚动，且标题不被 sticky 导航遮住 */
@@ -185,6 +202,27 @@ html {
 
 .prose :is(h1, h2, h3, h4, h5, h6) {
     scroll-margin-top: 5rem;
+}
+
+/* ── iPhone 安全区（配合 nuxt.config 的 viewport-fit=cover）──
+   页面画进刘海和 Home 指示条之后，贴边元素要让出被遮挡的高度。
+   只影响带刘海/指示条的设备，其余环境 env() 返回 0，无副作用。 */
+.site-nav {
+    padding-top: env(safe-area-inset-top);
+    padding-left: env(safe-area-inset-left);
+    padding-right: env(safe-area-inset-right);
+}
+
+/* 页面底部的安全区留白：last:pb-* 之类的 utility 覆盖不到，
+   统一在根容器上加，内容不会压到 Home 指示条上 */
+.app-shell {
+    padding-bottom: env(safe-area-inset-bottom);
+}
+
+/* 不带导航的独立页面（如 404）：上下都要让出安全区 */
+.safe-page {
+    padding-top: env(safe-area-inset-top);
+    padding-bottom: env(safe-area-inset-bottom);
 }
 
 /* ── TOC 侧栏：≥2xl 时固定在内容列右侧的留白里 ── */

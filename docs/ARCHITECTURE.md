@@ -7,6 +7,8 @@
 - **Theme**: @nuxtjs/color-mode (dark/light)
 - **Testing**: Vitest + @nuxt/test-utils
 - **Deploy**: Cloudflare Workers — static assets (`nuxt generate`) + Worker API + Durable Object comment store. 手动 `pnpm cf:deploy`，无 Git 自动构建（见 `wrangler.jsonc` 与 `docs/comments.md`）
+  - 线上地址：**https://blog.niina.fun** （自定义域，RSS/sitemap 的 `BASE_URL` 与它一致）
+  - Worker 原生地址：https://niina-blog.c27shu.workers.dev （未绑自定义域时的兜底入口）
 
 ## Directory Structure
 

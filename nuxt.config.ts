@@ -65,6 +65,11 @@ export default defineNuxtConfig({
   },
   app: {
     head: {
+      // viewport-fit=cover：让页面能画进 iPhone 的刘海与 Home 指示条区域。
+      // 不加的话 iOS 把这两条留白交给 Safari 自己填色（按系统深浅色走，
+      // 系统深色时就是纯黑），站点配色再对也接不上。
+      // 画进去之后的遮挡由 main.css 的 env(safe-area-inset-*) 处理。
+      viewport: 'width=device-width, initial-scale=1, viewport-fit=cover',
       link: [
         { rel: 'icon', type: 'image/x-icon', href: '/favicon.ico' },
         // 正文字体提前加载，减少 font-display: swap 的回退闪烁窗口

@@ -9,7 +9,7 @@ definePageMeta({
 </script>
 
 <template>
-  <main class="min-h-screen flex items-center justify-center">
+  <main class="safe-page min-h-dvh flex items-center justify-center">
     <div class="card-base p-8 text-center">
       <p class="text-6xl font-bold text-[var(--danger)] mb-4" aria-hidden="true">404</p>
       <h1 class="text-xl text-[var(--txt-75)] mb-6">页面未找到</h1>
