@@ -12,35 +12,15 @@ description: 介绍SSH客户端的用法。
 
 TL;DR
 
-Secure Shell is a protocol used to securely log onto remote systems.
-It can be used for logging or executing commands on a remote server.
-More information: <https://man.openbsd.org/ssh>.
+SSH, 全称 Secure Shell，是用于安全登录远程系统的一种协议。可被用于在远程服务器上登录或执行命令。
 
-- **Connect to a remote server**:
-    `ssh username@remote_host`
+除此之外，还可以：
 
-- **Connect to a remote server with a specific identity (private key)**:
-    `ssh -i path/to/key_file username@remote_host`
+- 转发端口，暴露本地或远程的端口，或彼此之间通信
+- 充当跳板等等
 
-- **Connect to a remote server with IP `10.0.0.1` and using a specific \[p]ort**(Note: `10.0.0.1` can be shortened to `10.1`):
-    `ssh username@10.0.0.1 -p 2222`
 
-- Run a command on a remote server with a \[t]ty allocation allowing interaction with the remote command:
-    `ssh username@remote_host -t command command_arguments`
-
-- SSH tunneling: **\[D]ynamic port forwarding** (SOCKS proxy on `localhost:1080`):
-    `ssh -D 1080 username@remote_host`
-
-- SSH tunneling: **Forward a specific port** (`localhost:9999` to `example.org:80`) along with disabling pseudo-\[T]ty allocation and executio\[N] of remote commands:
-    `ssh -L 9999:example.org:80 -N -T username@remote_host`
-
-- SSH \[J]umping: Connect through a jumphost to a remote server (Multiple jump hops may be specified separated by comma characters):
-    `ssh -J username@jump_host username@remote_host`
-
-- Close a hanged session:
-    \<Enter><~><.>
-
-## 公钥认证
+## 保证安全的原理：公钥认证
 
 默认情况下，SSH 会寻找 `~/.ssh/id_*` 作为私钥，其中 `*` 部分可以是 `rsa`、`ecdsa`、`ed25519` 等，也可以通过 `-i` 参数指定私钥文件。私钥的文件名加上 `.pub` 后缀就是公钥文件，暂时没有方法指定公钥文件的路径。如果要在配置文件中指定一个或多个私钥，可以使用 `IdentityFile` 选项，例如：
 

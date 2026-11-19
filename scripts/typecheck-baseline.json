@@ -15,6 +15,26 @@
     "code": "TS2532"
   },
   {
+    "file": "app/plugins/theme-color.ts",
+    "line": 11,
+    "code": "TS2345"
+  },
+  {
+    "file": "app/plugins/theme-color.ts",
+    "line": 20,
+    "code": "TS2532"
+  },
+  {
+    "file": "app/plugins/theme-color.ts",
+    "line": 21,
+    "code": "TS2532"
+  },
+  {
+    "file": "app/plugins/theme-color.ts",
+    "line": 22,
+    "code": "TS2532"
+  },
+  {
     "file": "app/utils/blog.ts",
     "line": 110,
     "code": "TS2769"

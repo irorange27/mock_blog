@@ -5,7 +5,7 @@ path: /posts/gp-tab-测试
 categories: ''
 tags:
 description: ''
-draft: false
+draft: true
 ---
 ::gp-score{src="/scores/非对称集.gp"}
 ::
