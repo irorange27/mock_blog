@@ -3,6 +3,8 @@
 ## Stack
 
 - **Framework**: Nuxt 4 + Nuxt Content v3
+- **Runtime**: Node.js 24（`.node-version` 与 `engines` 都钉在 24）
+- **Package manager**: pnpm 12（`packageManager` 钉版本，构建脚本白名单在 `pnpm-workspace.yaml` 的 `allowBuilds`）
 - **Styling**: Tailwind CSS + @tailwindcss/typography
 - **Theme**: @nuxtjs/color-mode (dark/light)
 - **Testing**: Vitest + @nuxt/test-utils
@@ -100,6 +102,10 @@ description: string    # used in post list
 ```
 
 ## Development
+
+Node 24 + pnpm 12。`pnpm install` 首次会跑 `postinstall`（`nuxt prepare` + 挂 `.githooks`）。
+
+构建脚本白名单在 `pnpm-workspace.yaml` 的 `allowBuilds`（pnpm 11 起不再读 `package.json` 的 `pnpm.onlyBuiltDependencies`）。少一个包就会在 install 末尾报 `ERR_PNPM_IGNORED_BUILDS`；补白名单用 `pnpm approve-builds`。
 
 ```bash
 pnpm dev           # Start dev server

@@ -46,7 +46,7 @@ jobs:
       - name: setup node.js
         uses: actions/setup-node@v7
         with:
-          # 与 engines（>=22）和本地上游一致；.node-version 也钉了同一个值
+          # 与 engines（>=24）和本地上游一致；.node-version 也钉了同一个值
           node-version-file: .node-version
           cache: pnpm
 

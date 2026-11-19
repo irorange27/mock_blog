@@ -1,0 +1,8 @@
+# pnpm 11+ 把构建脚本白名单从 package.json 的 "pnpm" 字段搬到了这里。
+# 这里的 allowBuilds 等价于旧的 pnpm.onlyBuiltDependencies：
+# 只有列出来的包才允许在 install 时执行 postinstall / install 脚本。
+allowBuilds:
+  '@parcel/watcher': true
+  esbuild: true
+  vue-demi: true
+  workerd: true
