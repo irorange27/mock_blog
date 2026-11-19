@@ -7,7 +7,7 @@ tags:
   - 搬运
   - 心理学
 description: '为什么大家的幸福都长一个样？一种认知被广泛传播后似乎变得不断扁平，这种感觉很奇怪。'
-draft: false
+draft: true
 ---
 
 ::note

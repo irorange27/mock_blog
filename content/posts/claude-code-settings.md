@@ -29,7 +29,7 @@ Claude Code 用户级的配置文件在 `~/.claude/settings.json`，环境变量
 - `permissions.deny` 把 `~/.ssh/`、`./secrets/` 封掉，就算 autoDream 哪天默认开启去扫归档，这些路径它也读不进来。
 - `attribution.commit/pr` 留空，不在 git history 里留 AI 痕迹。顺带一提，源码里有个 `undercover.ts`，在仓库被识别成"明确拒绝 AI 贡献的开源项目"时会主动让 Claude 隐藏作者身份 —— 这个态度本身就挺微妙的。
 
-文章里还提到两个设置，但还是记一下：
+两个设置：
 
 - **`CLAUDE_CODE_DISABLE_AUTO_MEMORY=1`**：关闭所有 memory / telemetry 写入。
 - **`CLAUDE_CODE_SIMPLE`**（`--bare` 模式）：直接关闭 memory 和 autoDream。

@@ -5,6 +5,7 @@ categories: 技术
 tags:
   - VPS
 description: 如何快速搭建个人VPS。
+draft: true
 ---
 参见 [Reference](#reference) 部分，根据以下教程，并结合 `VPS`、`optimize`、`订阅聚合`等关键词，可以检索出 VPS 搭建的相应教程。
 
