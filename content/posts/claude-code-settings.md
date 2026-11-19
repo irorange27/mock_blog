@@ -8,7 +8,7 @@ tags:
   - Agent
   - Claude Code
 description: ''
-draft: false
+draft: true
 ---
 
 Claude Code 用户级的配置文件在 `~/.claude/settings.json`，环境变量通过 `env` 键值对来设置。除此之外常用的键还有 `permissions`、`hooks`、`enabledPlugins` 等。
