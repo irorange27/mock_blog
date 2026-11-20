@@ -1,6 +1,7 @@
 ---
 title: 为什么模型上线后，体感像是“降智”了？
 date: 2026-09-29 21:44:08
+path: /posts/content/posts/为什么LLM在上线不久后使用体感上变差了.md
 categories: '技术杂谈'
 tags:
   - LLMs

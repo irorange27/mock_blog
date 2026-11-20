@@ -21,6 +21,20 @@ export default defineNuxtConfig({
   icon: {
     collections: ['mdi'],
   },
+  // Nuxt 4.6 的 vite-builder 改用原生 import() 解析 postcss 插件，tailwindcss v3
+  // 没有 exports map，'tailwindcss/nesting' 会被当成目录导入而报 NUXT_B7027。
+  // 本站 CSS 不用 & 嵌套语法，直接关掉这个插件（false 会被 @nuxtjs/tailwindcss
+  // 的 ?? {} 保留，从而在 resolveCSSOptions 里被跳过）。
+  postcss: {
+    plugins: {
+      'tailwindcss/nesting': false,
+    },
+  },
+  // color-mode v4 去掉了默认的 '-mode' 后缀（类名从 dark-mode 变成 dark），
+  // 而 main.css 全部按 html.dark-mode 写，必须显式钉住旧后缀
+  colorMode: {
+    classSuffix: '-mode',
+  },
   // comments/ 只是组织方式，不是命名空间：默认 Nuxt 会把目录名拼进组件名
   // （components/comments/PostComments.vue → <CommentsPostComments>），
   // 模板里写 <PostComments> 就只会渲染成一个空的自定义元素。

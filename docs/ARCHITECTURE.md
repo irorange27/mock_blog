@@ -5,8 +5,8 @@
 - **Framework**: Nuxt 4 + Nuxt Content v3
 - **Runtime**: Node.js 24（`.node-version` 与 `engines` 都钉在 24）
 - **Package manager**: pnpm 12（`packageManager` 钉版本，构建脚本白名单在 `pnpm-workspace.yaml` 的 `allowBuilds`）
-- **Styling**: Tailwind CSS + @tailwindcss/typography
-- **Theme**: @nuxtjs/color-mode (dark/light)
+- **Styling**: Tailwind CSS 3 + @tailwindcss/typography
+- **Theme**: @nuxtjs/color-mode v4（`nuxt.config.ts` 里显式 `classSuffix: '-mode'`，`main.css` 按 `html.dark-mode` 写）
 - **Testing**: Vitest + @nuxt/test-utils
 - **Deploy**: Cloudflare Workers — static assets (`nuxt generate`) + Worker API + Durable Object comment store. 手动 `pnpm cf:deploy`，无 Git 自动构建（见 `wrangler.jsonc` 与 `docs/comments.md`）
   - 线上地址：**https://blog.niina.fun** （自定义域，RSS/sitemap 的 `BASE_URL` 与它一致）
@@ -106,6 +106,8 @@ description: string    # used in post list
 Node 24 + pnpm 12。`pnpm install` 首次会跑 `postinstall`（`nuxt prepare` + 挂 `.githooks`）。
 
 构建脚本白名单在 `pnpm-workspace.yaml` 的 `allowBuilds`（pnpm 11 起不再读 `package.json` 的 `pnpm.onlyBuiltDependencies`）。少一个包就会在 install 末尾报 `ERR_PNPM_IGNORED_BUILDS`；补白名单用 `pnpm approve-builds`。
+
+依赖升级时的两个已知坑：`tailwindcss` 必须留在 v3（v4 换掉了 PostCSS 插件入口）；`postcss.plugins` 里显式把 `tailwindcss/nesting` 设为 `false`，否则 Nuxt 4.6 用原生 `import()` 解析插件时会报 `NUXT_B7027`。
 
 ```bash
 pnpm dev           # Start dev server
