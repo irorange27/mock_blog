@@ -440,10 +440,15 @@ html:not(.dark-mode) .code-btn:hover {
 }
 
 /* ── Tables ── */
+/* 表格居中：display:block 让 table 退化成块级、宽度塌成内容宽度并贴左。
+   width: fit-content + margin-inline:auto 把它按内容宽度居中；
+   内容超宽时 max-width 仍受 100% 约束，overflow-x 接管横向滚动。 */
 .prose table {
   display: block;
-  overflow-x: auto;
+  width: fit-content;
   max-width: 100%;
+  margin-inline: auto;
+  overflow-x: auto;
   white-space: normal;
 }
 
