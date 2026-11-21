@@ -1,7 +1,5 @@
 import type { CommentData } from '~/types/comment'
 
-export type { CommentData }
-
 interface CommentNode extends CommentData {
   children: CommentNode[]
 }
