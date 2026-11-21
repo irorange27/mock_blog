@@ -3,12 +3,15 @@ import { normalizePost } from '~/utils/blog'
 
 export function useBlogData() {
   // 只取列表/侧栏需要的元信息字段：带上 body 会让全站每页 payload 膨胀数百 KB
-  const { data, status, error, refresh } = useAsyncData('blog-posts', () =>
-    queryCollection('posts')
+  // 生产构建直接在查询层滤掉草稿：useAsyncData 会把整份结果序列化进 payload，
+  // 只在前端过滤的话，草稿的标题与 description 仍会出现在公开的 /posts/_payload.json 里
+  const { data, status, error, refresh } = useAsyncData('blog-posts', () => {
+    const query = queryCollection('posts')
       .select('path', 'title', 'description', 'date', 'categories', 'tags', 'draft')
+    return (import.meta.env.DEV ? query : query.where('draft', '=', false))
       .order('date', 'DESC')
       .all()
-  )
+  })
 
   const allPosts = computed(() =>
     (data.value || []).map(normalizePost)
@@ -16,6 +19,13 @@ export function useBlogData() {
 
   const posts = computed(() =>
     allPosts.value.filter(post => !post.draft)
+  )
+
+  // 草稿不进任何公开列表，但本地预览需要一处能点到它们的入口（见 pages/drafts.vue）。
+  // 用 import.meta.env.DEV 而不是 import.meta.dev：后者在客户端是 undefined（Vite 只注入
+  // import.meta.env），SSR 时为 true，导致首屏有草稿列表、水合后又被清空。
+  const drafts = computed(() =>
+    import.meta.env.DEV ? allPosts.value.filter(post => post.draft) : []
   )
 
   const categories = computed<CategoryCount[]>(() => {
@@ -50,6 +60,7 @@ export function useBlogData() {
 
   return {
     posts,
+    drafts,
     status,
     error,
     refresh,

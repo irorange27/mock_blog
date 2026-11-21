@@ -8,7 +8,11 @@ const navItems = [
   { name: '分类', path: '/categories' },
   { name: '归档', path: '/archives' },
   { name: '友链', path: '/links' },
-  { name: '关于', path: '/about' }
+  { name: '关于', path: '/about' },
+  // 只在 dev 出现。用 import.meta.env.DEV 而不是 import.meta.dev：后者在客户端是
+  // undefined（Vite 只注入 import.meta.env），SSR 时为 true，于是首屏 HTML 带着这一项、
+  // 水合后又被丢掉，看起来就是“闪一下就消失”。
+  ...(import.meta.env.DEV ? [{ name: '草稿', path: '/drafts' }] : []),
 ]
 
 const isMobileMenuOpen = ref(false)

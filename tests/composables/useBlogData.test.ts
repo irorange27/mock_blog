@@ -40,13 +40,22 @@ const rawPosts = [
 ]
 
 const mockQueryCollection = () =>
-  queryCollectionMock.mockImplementation(() => ({
-    select: () => ({
-      order: () => ({
-        all: async () => rawPosts,
+  queryCollectionMock.mockImplementation(() => {
+    // 生产构建的查询链会多一层 where('draft', '=', false)，这里按真实语义过滤
+    const rows = [...rawPosts]
+    const builder = {
+      where: (field: string, _op: string, value: unknown) => ({
+        order: () => ({
+          all: async () => rows.filter(row => (row as Record<string, unknown>)[field] === value),
+        }),
       }),
-    }),
-  }))
+      select: () => builder,
+      order: () => ({
+        all: async () => rows,
+      }),
+    }
+    return builder
+  })
 
 describe('normalizePost', () => {
   it('should fill defaults for missing fields', () => {
@@ -73,12 +82,16 @@ describe('useBlogData', () => {
   it('should filter drafts and derive categories/tags', async () => {
     mockQueryCollection()
 
-    const { posts, categories, tags, getPostsByCategory, getPostsByTag } = useBlogData()
+    const { posts, drafts, categories, tags, getPostsByCategory, getPostsByTag } = useBlogData()
     // useAsyncData 的 handler 异步执行，等它 resolve
     await new Promise(resolve => setTimeout(resolve, 0))
 
     expect(queryCollectionMock).toHaveBeenCalledWith('posts')
     expect(posts.value.map(p => p.path)).toEqual(['/posts/vue-guide', '/posts/daily'])
+    // vitest 跑在 dev 模式，import.meta.env.DEV 为 true，所以 drafts 能列出草稿。
+    // 生产构建走另一分支（查询层 where('draft','=',false)），草稿不进 payload，
+    // 由 scripts/typecheck-ci.mjs 与 nuxt generate 的产物检查覆盖。
+    expect(drafts.value.map(p => p.path)).toEqual(['/posts/wip'])
 
     expect(categories.value).toEqual([
       { name: '技术', count: 1 },

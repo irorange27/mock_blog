@@ -76,6 +76,9 @@ export default defineNuxtConfig({
   // /tags 的汇总在 /categories（分类与标签同页），把直觉 URL 接住
   routeRules: {
     '/tags': { redirect: '/categories' },
+    // 草稿预览页只在 dev 用。预渲染插件会把 pages 目录里所有静态路由都排进
+    // 队列（crawlLinks 开着，不看有没有链接），不显式关掉就会生成 /drafts/index.html
+    '/drafts': { prerender: false },
   },
   app: {
     head: {
