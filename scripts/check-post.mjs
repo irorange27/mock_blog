@@ -93,6 +93,12 @@ if (fixMode) {
 for (const key of ['title', 'date', 'categories', 'description']) {
   if (!fm[key]) problems.push(`front matter 缺 ${key}`)
 }
+if (fm.path) {
+  const cleanPath = fm.path.replace(/^['"]|['"]$/g, '')
+  if (!cleanPath.startsWith('/posts/') || cleanPath === '/posts/' || cleanPath.includes('/content/posts/') || /\.(md|mdx)$/i.test(cleanPath)) {
+    problems.push(`front matter path 格式异常: ${fm.path}（应为 /posts/<slug>，不带 content/posts/ 或 .md）`)
+  }
+}
 if (fm.draft !== undefined) notes.push(`draft: ${fm.draft}`)
 
 // ---------- 破折号 ----------

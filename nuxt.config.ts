@@ -42,6 +42,21 @@ export default defineNuxtConfig({
     { path: '~/components', pathPrefix: true },
     { path: '~/components/comments', pathPrefix: false },
   ],
+  hooks: {
+    // @nuxt/content v3 的 path-meta 用 slugify 生成 path，会剥离中文等非 ASCII 字符；
+    // 纯中文文件名若未在 frontmatter 显式写 path，会退化成 "/posts"（撞上文章列表页）。
+    // 这里兜底：对 posts 集合中含非 ASCII 字符且 frontmatter 未显式声明 path 的文件，
+    // 按解码后的 stem 保留原文路径（空白归一成连字符），同时不影响已有英文文章的小写 slug。
+    'content:file:afterParse'(ctx) {
+      if (ctx.collection.name !== 'posts') return
+      const stem = typeof ctx.content.stem === 'string' ? ctx.content.stem : ''
+      if (!/[^\x00-\x7F]/.test(stem)) return
+      const raw = typeof ctx.file.body === 'string' ? ctx.file.body : ''
+      const fmMatch = raw.match(/^---\r?\n([\s\S]*?)\r?\n---/)
+      if (fmMatch && /^path\s*:/m.test(fmMatch[1])) return
+      ctx.content.path = '/' + stem.replace(/\s+/g, '-')
+    },
+  },
   content: {
     build: {
       markdown: {

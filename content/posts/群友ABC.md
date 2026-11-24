@@ -1,5 +1,5 @@
 ---
-title: 闲谈：群友 ABC
+title: '闲谈：群友 ABC'
 date: 2026-11-24 16:08:08
 path: /posts/群友ABC
 categories: '生活杂谈'
