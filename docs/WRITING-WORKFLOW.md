@@ -117,7 +117,7 @@ Worker 没有绑定 Git 仓库，push 不会自动上线——**CI 绿灯只说�
 
 RSS (`/rss.xml`) 和 sitemap (`/sitemap.xml`) 随构建自动更新。
 
-线上地址：[https://blog.niina.fun](https://blog.niina.fun)
+线上地址：[https://blog.niina.pro](https://blog.niina.pro)
 
 ## 一图总结
 
@@ -132,5 +132,5 @@ pnpm new-post     →    撰写 .md     →    pnpm dev (预览)
                           ↓
                    pnpm cf:deploy （手动，这一步才上线）
                           ↓
-                   https://blog.niina.fun
+                   https://blog.niina.pro
 ```

@@ -1,7 +1,7 @@
 import { queryCollection } from '@nuxt/content/server'
 import RSS from 'rss'
 
-const BASE_URL = 'https://blog.niina.fun'
+const BASE_URL = 'https://blog.niina.pro'
 
 const VOID_ELEMENTS = new Set([
   'area', 'base', 'br', 'col', 'embed', 'hr', 'img',

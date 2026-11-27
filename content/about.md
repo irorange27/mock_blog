@@ -12,4 +12,4 @@ layout: default
 
 - GitHub: [@irorange27](https://github.com/irorange27)
 - Email: orange27\[at\]shu.edu.cn
-- Blog: [https://blog.niina.fun](https://blog.niina.fun)
+- Blog: [https://blog.niina.pro](https://blog.niina.pro)

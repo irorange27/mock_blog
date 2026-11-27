@@ -43,6 +43,6 @@ links:
 mailto: `python -c 'import base64; print(base64.b64decode("QzI3c2h1QGdtYWlsLmNvbQ=="))'`
 
 - name: 'Niina''s Blog'
-- url: 'https://blog.niina.fun'
-- avatar: 'https://blog.niina.fun/avatar.png'
+- url: 'https://blog.niina.pro'
+- avatar: 'https://blog.niina.pro/avatar.png'
 - description: 'There''s nothing I won''t try.'

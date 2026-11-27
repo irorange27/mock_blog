@@ -1,6 +1,6 @@
 import { queryCollection } from '@nuxt/content/server'
 
-const BASE_URL = 'https://blog.niina.fun'
+const BASE_URL = 'https://blog.niina.pro'
 
 export default defineEventHandler(async (event) => {
   const allDocs = await queryCollection(event, 'posts')

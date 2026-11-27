@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://blog.niina.fun/sitemap.xml
+Sitemap: https://blog.niina.pro/sitemap.xml

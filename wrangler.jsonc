@@ -30,7 +30,7 @@
   "send_email": [
     {
       "name": "MAIL",
-      "destination_address": "comment@niina.fun"
+      "destination_address": "comment@niina.pro"
     }
   ],
   "observability": { "enabled": true }

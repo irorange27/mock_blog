@@ -220,7 +220,7 @@ export class CommentStore {
  * 有新评论时给博主发一封邮件。
  *
  * 走 Cloudflare Email Routing：send_email binding 只允许发到 wrangler.jsonc 里
- * 登记过的 destination_address（comment@niina.fun），规则再转发到 QQ 邮箱。
+ * 登记过的 destination_address（comment@niina.pro），规则再转发到 QQ 邮箱。
  * 绑定没配（本地 dev 默认没有）或发送失败都只静默降级——评论照常发表。
  */
 private async notify(comment: CommentRow): Promise<void> {
@@ -229,7 +229,7 @@ private async notify(comment: CommentRow): Promise<void> {
 
   const subject = `新评论 · ${comment.slug} · ${comment.nick}`
   const body = [
-    `文章：https://blog.niina.fun/posts/${comment.slug}/`,
+    `文章：https://blog.niina.pro/posts/${comment.slug}/`,
     `昵称：${comment.nick}`,
     comment.link ? `网址：${comment.link}` : '',
     comment.parent ? '这是一条回复' : '这是主楼',
@@ -239,8 +239,8 @@ private async notify(comment: CommentRow): Promise<void> {
 
   try {
     await from.send({
-      from: 'comment@niina.fun',
-      to: 'comment@niina.fun',
+      from: 'comment@niina.pro',
+      to: 'comment@niina.pro',
       subject,
       text: body,
     })
